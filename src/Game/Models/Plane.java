@@ -1,38 +1,36 @@
 package Game.Models;
 
-import Sprite.Sprite;
-import User.User;
-import Scene.SceneObject;
 import Scene.Scene;
-import Sprite.StaticSprite;
-import Sprite.AnimatedSprite;
-import Game.Game;
+import Scene.SceneObject;
+import Scene.Sprite.AnimatedSprite;
+import Scene.Sprite.Sprite;
+import Scene.Sprite.StaticSprite;
+import User.User;
 import Utils.Vector;
 import config.GameConfig;
 
 /**
  * Created by egor on 02.07.15.
  */
-public abstract class Plane {
+public abstract class Plane extends SceneObject {
     private User player;
     protected double health;
-    private SceneObject body;
     private SceneObject propeller;
     private boolean dead = false;
 
     public Plane(Scene scene, User player, double x, double y) {
-
+        super(x, y);
         this.player = player;
-        body = new SceneObject(x, y);
+
         Sprite bodySprite = new StaticSprite(/*блабла.png*/);
-        body.setSprite(bodySprite);
+        setSprite(bodySprite);
         propeller = new SceneObject(10, 0); // как связать размер картинки в пикселях с координатной системой мира??
         propeller.setSprite(new AnimatedSprite());
-        propeller.setParent(body);
+        propeller.setParent(this);
     }
 
     public void fire(Scene scene){
-        Vector planeSpeed = body.getSpeed();
+        Vector planeSpeed = getSpeed();
         Vector bulletSpeed = new Vector(planeSpeed.getOrt());
         bulletSpeed.multiply(GameConfig.bulletSpeed);
         bulletSpeed.add(planeSpeed);
@@ -62,10 +60,6 @@ public abstract class Plane {
 
     public double getHealth() {
         return health;
-    }
-
-    public SceneObject getSceneObject() {
-        return body;
     }
 
     public void setDead(boolean dead) {

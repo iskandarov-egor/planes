@@ -1,26 +1,25 @@
 package Game.Models.Bonus;
 
+import Scene.Scene;
 import Scene.SceneObject;
-import Sprite.StaticSprite;
-import Sprite.Sprite;
+import Scene.Sprite.StaticSprite;
 /**
  * Created by egor on 02.07.15.
  */
 public class Bonus extends SceneObject{
-    Sprite box, parachute;
-    public Bonus(double x, double y) {
+    SceneObject parachute;
+    public Bonus(Scene scene, double x, double y) {
         super(x, y);
-        box = new StaticSprite(x, y, 10);
-        parachute = new StaticSprite(x, y - 10 - 20, 40);
-        addSprite(box);
-        addSprite(parachute);
+
+        parachute = new SceneObject(0, -10);
+        parachute.setParent(this);
+        scene.addObject(parachute);
+        parachute.setSprite( new StaticSprite());
+        setSprite(new StaticSprite());
+
     }
 
-    public Sprite getBox() {
-        return box;
-    }
-
-    public Sprite getParachute() {
+    public SceneObject getParachute() {
         return parachute;
     }
 }

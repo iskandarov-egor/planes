@@ -1,15 +1,17 @@
 package Game;
-import Game.Models.*;
 
+import Game.Models.*;
+import Scene.CollisionListener;
+import Scene.ObjectGroup;
 import Scene.Scene;
+import User.User;
 import Utils.AndroidCanvas;
 import Utils.Helper;
 import config.GameConfig;
-import User.User;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import Scene.SceneObject;
 /**
  * Created by egor on 02.07.15.
  */
@@ -20,41 +22,68 @@ public class Game {
     private Base base;
     private Ground ground;
     private int roundNumber = 0;
-    private User localPlayer; // владелец телефона, от него идут события нажатий
+    private User localPlayer;
     private AndroidCanvas canvas;
     public Game(int playersCount, AndroidCanvas canvas) {
         scene = new Scene(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT);
+
         base = new Base(this);
         ground = new Ground(scene);
-        gameLoop = new GameLoop(this);
+
         this.playersCount = playersCount;
+
+        scene.setOnGraphicsFrame(() -> {
+            processMessages();
+        });
+    }
+
+    ObjectGroup planesGroup = new ObjectGroup();
+    ObjectGroup bulletsGroup = new ObjectGroup();
+    private void setCollisionRules() {
+
+
+        CollisionListener planesAndPlanes = new CollisionListener(planesGroup, planesGroup);
+        planesAndPlanes.setOnCollisionStart((object, other) -> {
+            killPlane((Plane) object);
+            killPlane((Plane) other);
+        });
+        scene.addCollisionListener(planesAndPlanes);
+
+        CollisionListener planesAndBullets = new CollisionListener(planesGroup, bulletsGroup);
+        planesAndBullets.setOnCollisionStart((object, other) -> {
+            Plane plane = (Plane) object;
+
+            plane.hit();
+            if (plane.getHealth() <= 0) killPlane(plane);
+            scene.removeObject(other);
+            bullets.remove(other);
+        });
     }
 
     public Scene getScene() {
         return scene;
     }
 
-    public void onFrame() {
-        scene.onFrame();
-        doCollisions();
+    private void syncWithServer() {
 
     }
 
-    public void render() {
-        scene.draw(canvas);
+    public void sendUpdatesToClient() {
+
     }
 
-    public void startGame() {
+    public void startNewGame() {
         roundNumber = 0;
+        scene.pauseAndClear();
         startNewRound();
     }
 
-    GameLoop gameLoop;
+
     private void startNewRound() {
 
         Plane testPlane = new SmallPlane(scene, localPlayer, GameConfig.WORLD_WIDTH / 2, GameConfig.WORLD_HEIGHT / 2);
-
-        gameLoop.run();
+        scene.addObject(testPlane, planesGroup);
+        setCollisionRules();
     }
 
     private int planesDead = 0;
@@ -71,41 +100,6 @@ public class Game {
         startNewRound();
     }
 
-    private void doCollisions(){
-        for(int i = 0; i < planes.size() - 1; i++) {
-            Plane plane = planes.get(i);
-            SceneObject planeObject = plane.getSceneObject();
-            for(int j = i + 1; j < planes.size(); j++) {
-                Plane otherPlane = planes.get(j);
-                if(planeObject.intersects(otherPlane.getSceneObject())) {
-                    killPlane(plane);
-                    killPlane(otherPlane);
-                }
-            }
-
-            if(planeObject.intersects(base)) {
-                killPlane(plane);
-            }
-
-
-        }
-
-
-        for(int i = 0; i < bullets.size(); i++) {
-            for(Plane plane : planes) {
-
-                if (plane.getSceneObject().intersects(bullets.get(i))) {
-                    plane.hit();
-                    if (plane.getHealth() <= 0) killPlane(plane);
-                    scene.removeObject(bullets.get(i));
-                    bullets.remove(i);
-                    i--;
-                }
-            }
-        }
-    }
-
-
 
     public void onFireDown(Plane plane){
 
@@ -117,6 +111,5 @@ public class Game {
 
     public void processMessages() {
         // тут реагировать на события нажатий, сообщения сервера и т.п.
-        // вызывается GameConfig.FPS раз в секунду
     }
 }

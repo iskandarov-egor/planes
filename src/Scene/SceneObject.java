@@ -1,11 +1,9 @@
 package Scene;
 
-import Sprite.Sprite;
+import Scene.Sprite.Sprite;
 import Utils.AndroidCanvas;
 import Utils.MathHelper;
 import Utils.Vector;
-
-import java.util.List;
 
 /**
  * Created by egor on 01.07.15.
@@ -19,7 +17,7 @@ public class SceneObject {
     private Sprite sprite = null;
     private Body body = null;
     private SceneObject parent = null;
-
+    
 
     public SceneObject(double x, double y) {
         position.set(x, y);
@@ -28,10 +26,10 @@ public class SceneObject {
     
     public void moveBy(double dx, double dy) {
         position.add(dx, dy);
-    };
+    }
     public void moveTo(int x, int y) {
         position.set(x, y);
-    };
+    }
     public void onFrame() {
         position.add(speed);
         angle += angleSpeed;
@@ -39,7 +37,7 @@ public class SceneObject {
     public void rotate(double angle) {};
 
     public void setSprite(Sprite sprite){
-        sprite = sprite;
+        this.sprite = sprite;
     }
 
     public void removeSprite() {

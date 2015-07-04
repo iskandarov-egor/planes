@@ -1,11 +1,8 @@
 package Game.Models;
 
-import Scene.SceneObject;
-import Scene.Scene;
 import Scene.Body;
-import Sprite.StaticSprite;
-import Utils.Vector;
-import config.GameConfig;
+import Scene.SceneObject;
+import Scene.Sprite.StaticSprite;
 
 /**
  * Created by egor on 02.07.15.
