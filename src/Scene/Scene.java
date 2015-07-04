@@ -2,10 +2,7 @@ package Scene;
 
 import Utils.AndroidCanvas;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by egor on 01.07.15.
@@ -61,9 +58,11 @@ public class Scene {
 
     private void onPhysicsFrame(){
 
+
+
     }
 
-    private void onGraphicsFrame(){
+    private void onGraphicsFrame() {
 
     }
 
@@ -75,11 +74,12 @@ public class Scene {
         return x * screenWidth / width;
     }
 
-    public void removeObject(SceneObject object) {
+
+    private void removeObjectNow(SceneObject object) {
         objects.remove(object);
         while(groupMap.values().remove(object));
-
     }
+
 
     public void addObject(SceneObject object) {
         objects.add(object);
@@ -90,7 +90,9 @@ public class Scene {
         addToGroup(group, object);
     }
 
+    boolean canRemove = true;
     public void onFrame() {
+        setCanRemove(false);
         for(SceneObject object : objects) {
             object.onFrame();
         }
@@ -114,7 +116,33 @@ public class Scene {
                 }
             }
         }
+        setCanRemove(true);
     }
+
+    private Queue<SceneObject> removeQueue = new ArrayDeque<>();
+    public void removeObject(SceneObject object) {
+        if(canRemove) {
+            objects.remove(object);
+        } else {
+            removeQueue.add(object);
+            object.setRemoved(true);
+        }
+    }
+    public boolean canRemove() {
+        return canRemove;
+    }
+
+    public void setCanRemove(boolean canRemove) {
+        this.canRemove = canRemove;
+        if(canRemove) {
+            SceneObject object = removeQueue.remove();
+            while(object != null) {
+                objects.remove(object);
+            }
+        }
+    }
+
+
 
     public void setOnPhysicsFrame(Runnable onPhysicsFrame) {
         this.onPhysicsFrame = onPhysicsFrame;

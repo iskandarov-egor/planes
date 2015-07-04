@@ -17,7 +17,8 @@ public class SceneObject {
     private Sprite sprite = null;
     private Body body = null;
     private SceneObject parent = null;
-    
+    private boolean removed = false;
+
 
     public SceneObject(double x, double y) {
         position.set(x, y);
@@ -68,7 +69,8 @@ public class SceneObject {
     }
 
     public boolean intersects(SceneObject object) {
-        if(!hasBody() || !object.hasBody()) return false;
+        if(!hasBody() || !object.hasBody()
+                || removed || object.removed) return false; // removed тут только для быстродействия
         return body.intersects(object.body);
     }
     
@@ -104,5 +106,9 @@ public class SceneObject {
 
     public void draw(AndroidCanvas canvas, double x, double y) {
         if(sprite != null) sprite.draw(canvas, x, y);
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 }
