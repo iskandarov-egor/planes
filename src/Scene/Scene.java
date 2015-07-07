@@ -98,19 +98,18 @@ public class Scene {
         }
 
         for(CollisionListener listener : colListeners) {
-
             List<ObjectGroup> groups = listener.groups;
             for(int i = 0; i < groups.size(); i++){
-                for(SceneObject object : groupMap.get(groups.get(i))) {
+                for(SceneObject object : groupMap.get(groups.get(i))) { // for each object in the group
                     for (int j = i + 1; i < groups.size(); j++) {
-                        for (SceneObject other : groupMap.get(groups.get(j))) {
-
-                            if(object.intersects(other)) {
-                                listener.processCollision(object, other);
-                            } else {
-                                listener.processNoCollision(object, other);
+                        for (SceneObject other : groupMap.get(groups.get(j))) { // for each object in another group
+                            if(object != other) {
+                                if(object.intersects(other)) {
+                                    listener.processCollision(object, other);
+                                } else {
+                                    listener.processNoCollision(object, other);
+                                }
                             }
-
                         }
                     }
                 }
