@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
+import com.example.planes.Engine.Sprite.Square;
 import com.example.planes.Engine.Sprite.Triangle;
 import com.example.planes.Utils.MathHelper;
 
@@ -19,7 +20,7 @@ public class MyApplication extends Application {
         // TODO Put your application initialization code here.
         try {
             //1. create scene
-            scene = new Scene();
+            scene = new SceneImpl();
             scene.setGraphicsFPS(GameConfig.FPS);
             scene.setPhysicsFPS(GameConfig.PHYSICS_FPS);
             scene.setHorizontalPeriod(1f);
@@ -27,7 +28,7 @@ public class MyApplication extends Application {
 
             //2. create objects
             SceneObject plane = scene.createObject(0, 0, planesGroup);
-            plane.setSprite(new Triangle());
+            plane.setSprite(new Square());
             plane.setAngleSpeed(0*MathHelper.PI2);
             plane.setSpeed(0, 0);
             SceneObject plane2 = scene.createObject(0.7f, 0*0.3f, planesGroup);
@@ -37,6 +38,7 @@ public class MyApplication extends Application {
             plane2.setSpeed(-0.1f, 0);
             plane.addBody(0.1f);
             plane2.addBody(0.1f);
+            plane.setColor(1, 1, 1);
 
             //3. create collision listeners
             CollisionListener planesAndPlanes = new CollisionListener(planesGroup, planesGroup);

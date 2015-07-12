@@ -3,6 +3,7 @@ package com.example.planes.Engine;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import com.example.planes.Engine.Sprite.OpenGLShape;
 import com.example.planes.Engine.Sprite.Triangle;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -16,9 +17,9 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
-    private final Scene scene;
+    private final SceneImpl scene;
 
-    public MyGLRenderer(Scene scene) {
+    public MyGLRenderer(SceneImpl scene) {
         //debug
         Log.d("hey", "MyGLRenderer called");
         if(scene == null) throw new NullPointerException("scene");
@@ -31,7 +32,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         Log.d("hey", "onSurfaceCreated called");
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        Triangle.onSurfaceCreated();
+        OpenGLShape.onSurfaceCreated();
     }
 
     long now, dt = 0;

@@ -3,14 +3,14 @@ package com.example.planes.Engine;
 
 import com.example.planes.Engine.Body.Body;
 import com.example.planes.Engine.Body.Circle;
+import com.example.planes.Engine.Sprite.OpenGLShape;
 import com.example.planes.Engine.Sprite.Sprite;
-import com.example.planes.Utils.AndroidCanvas;
 
 /**
  * Created by egor on 01.07.15.
  */
 final class ObjectImpl implements SceneObject {
-    private Scene scene = null;
+    private SceneImpl scene = null;
     private float vx = 0;
     private float vy = 0;
     private float x = 0;
@@ -22,7 +22,7 @@ final class ObjectImpl implements SceneObject {
     private Body body = null;
     private ObjectImpl parent = null;
     private boolean removed = false;
-    public ObjectImpl(float x, float y, Scene scene) {
+    public ObjectImpl(float x, float y, SceneImpl scene) {
         //debug
         if(scene == null) throw new NullPointerException("scene");
 
@@ -52,7 +52,7 @@ final class ObjectImpl implements SceneObject {
 
     public void setSprite(Sprite sprite){
         this.sprite = sprite;
-        Scene scene = null;
+        SceneImpl scene = null;
     }
 
     public void removeSprite() {
@@ -114,6 +114,13 @@ final class ObjectImpl implements SceneObject {
         if(radius <= 0) throw new IllegalArgumentException("radius");
 
         body = new Circle(this, radius);
+    }
+
+    @Override
+    public void setColor(float r, float g, float b) {
+        Utils.assertColor(r, g, b);
+        if(sprite == null || !(sprite instanceof OpenGLShape) ) throw new RuntimeException("dun goofed");
+        ((OpenGLShape)sprite).setColor(r, g, b);
     }
 
     public float getRadius() {

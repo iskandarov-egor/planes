@@ -8,12 +8,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import com.example.planes.Engine.Scene;
-import com.example.planes.Engine.SceneObject;
-import com.example.planes.Engine.Sprite.Triangle;
-import com.example.planes.Utils.MathHelper;
-import com.example.planes.R;
-
-import java.math.MathContext;
+import com.example.planes.Engine.SceneImpl;
 
 public class MyActivity extends Activity {
     /**

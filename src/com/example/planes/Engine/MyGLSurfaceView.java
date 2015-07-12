@@ -10,7 +10,7 @@ import android.util.Log;
 final class MyGLSurfaceView extends GLSurfaceView {
 
 
-    public MyGLSurfaceView(Context context, Scene scene, MyGLRenderer mRenderer){
+    public MyGLSurfaceView(Context context, SceneImpl scene, MyGLRenderer mRenderer){
         super(context);
         Log.d("hey", "MyGLSurfaceView called");
         // Create an OpenGL ES 2.0 context
