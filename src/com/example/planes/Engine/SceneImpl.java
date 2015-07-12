@@ -55,6 +55,11 @@ final class SceneImpl implements Scene{
         gLRenderer.run();
     }
 
+    @Override
+    public void pause() {
+        gLRenderer.pause();
+    }
+
 
     private float[] cameraM = new float[16];
     private float[] screenM = new float[16];
@@ -103,7 +108,7 @@ final class SceneImpl implements Scene{
     public View getView(Context context) {
         if(view != null) throw new RuntimeException("view was already assigned");
 
-        view = new MyGLSurfaceView(context, this, gLRenderer);
+        view = new MyGLSurfaceView(context, gLRenderer);
         return view;
     }
 

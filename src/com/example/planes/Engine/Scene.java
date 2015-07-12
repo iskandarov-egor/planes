@@ -31,4 +31,10 @@ public interface Scene {
     View getView(Context context);
 
     void run();
+
+    void pause();
+
+    //void onPause();
+
+    //void onResume();
 }

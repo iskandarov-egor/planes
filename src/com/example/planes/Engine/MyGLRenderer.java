@@ -48,7 +48,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         last = System.nanoTime();
         isRunning = true;
     }
-
+    private int c = 0;
     private boolean drawCalled = false; //debug
     public void onDrawFrame(GL10 gl) {
         //debug
@@ -56,10 +56,21 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
             Log.d("hey", "onDrawFrame first called");
             drawCalled = true;
         }
+        c++;
+        if(c > 111111) {
+
+            Log.d("hey", "hello from onDrawFrame");
+            c = 0;
+        }
 
         if (isRunning) {
             now = System.nanoTime();
             dt += Math.min(NANO_IN_SECOND, (now - last));
+//            try {
+//                Thread.sleep((long) ((float)graphStepTime/NANO_IN_SECOND*1000));
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             if (dt > graphStepTime) {
                 while (dt > physStepTime) {
                     dt -= physStepTime;

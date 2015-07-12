@@ -109,7 +109,6 @@ final class ObjectImpl implements SceneObject {
         return parent;
     }
 
-
     @Override
     public void addBody(float radius) {
         //debug
@@ -117,8 +116,6 @@ final class ObjectImpl implements SceneObject {
 
         body = new Circle(this, radius);
     }
-
-
 
     public float getRadius() {
         if(sprite == null) return 0;
