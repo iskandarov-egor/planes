@@ -60,6 +60,16 @@ final class SceneImpl implements Scene{
         gLRenderer.pause();
     }
 
+    @Override
+    public void onPause() {
+        view.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        view.onResume();
+    }
+
 
     private float[] cameraM = new float[16];
     private float[] screenM = new float[16];

@@ -57,9 +57,9 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
             drawCalled = true;
         }
         c++;
-        if(c > 111111) {
+        if(c > 211111) {
 
-            Log.d("hey", "hello from onDrawFrame");
+            Log.d("hey", "onDrawFrame running");
             c = 0;
         }
 

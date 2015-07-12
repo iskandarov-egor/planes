@@ -43,6 +43,7 @@ public class MyActivity extends Activity {
         super.onResume();
         Log.d("hey", "activity onresume");
         scene.run();
+        scene.onResume();
     }
 
     @Override
@@ -50,6 +51,7 @@ public class MyActivity extends Activity {
         super.onPause();
         Log.d("hey", "activity onpause");
         scene.pause();
+        scene.onPause();
     }
 
     @Override

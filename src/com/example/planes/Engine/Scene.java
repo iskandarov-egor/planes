@@ -34,7 +34,7 @@ public interface Scene {
 
     void pause();
 
-    //void onPause();
+    void onPause();
 
-    //void onResume();
+    void onResume();
 }
