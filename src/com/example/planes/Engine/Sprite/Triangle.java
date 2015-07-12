@@ -25,9 +25,8 @@ public final class Triangle extends OpenGLShape {
         GLES20.glDisableVertexAttribArray(mPositionHandle);
     }
 
-    public void rotate(float angle) {
-        this.angle = angle;
-
+    @Override
+    protected void rebuild(){
         coords[0] = r*(float)Math.cos(angle);
         coords[1] = r*(float)Math.sin(angle);
         coords[2] = r*(float)Math.cos(angle + 5*Math.PI/6);
@@ -38,16 +37,16 @@ public final class Triangle extends OpenGLShape {
         vertexBuffer.position(0);
     }
 
+    public void rotate(float angle) {
+        this.angle = angle;
 
-
-
-
+        rebuild();
+    }
 
     public Triangle() {
         super(6);
         Log.d("hey", "Triangle called");
 
-        rotate(0);
     }
 
     private final int vertexCount = coords.length / COORDS_PER_VERTEX;

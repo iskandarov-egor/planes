@@ -34,9 +34,8 @@ public class Square extends OpenGLShape{
 
     }
 
-    public void rotate(float angle) {
-        this.angle = angle;
-
+    @Override
+    protected void rebuild(){
         coords[0] = r*(float)Math.cos(angle + Utils.PI / 4);
         coords[1] = r*(float)Math.sin(angle + Utils.PI / 4);
         coords[2] = r*(float)Math.cos(angle + 3*Utils.PI / 4);
@@ -47,6 +46,12 @@ public class Square extends OpenGLShape{
         coords[7] = r*(float)Math.sin(angle - Utils.PI / 4);
         vertexBuffer.put(coords);
         vertexBuffer.position(0);
+    }
+
+    public void rotate(float angle) {
+        this.angle = angle;
+
+        rebuild();
     }
 
     @Override

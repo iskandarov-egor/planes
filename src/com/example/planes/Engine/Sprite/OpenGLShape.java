@@ -16,7 +16,7 @@ abstract public class OpenGLShape extends StaticSprite {
     protected float angle = 0;
     protected float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
     protected static int mProgram;
-    protected final float r = 0.1f;
+    protected float r = 0.1f;
     protected static final int COORDS_PER_VERTEX = 2;
     protected final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
     protected FloatBuffer vertexBuffer;
@@ -50,6 +50,8 @@ abstract public class OpenGLShape extends StaticSprite {
         color[2] = b;
     }
 
+    abstract protected void rebuild();
+
     public OpenGLShape(int numberOfVertexes) {
         coords = new float[numberOfVertexes];
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
@@ -57,7 +59,7 @@ abstract public class OpenGLShape extends StaticSprite {
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(coords);
         vertexBuffer.position(0);
-        rotate(0);
+        rebuild();
     }
     public abstract void rotate(float angle);
     public static int loadShader(int type, String shaderCode){
@@ -87,6 +89,11 @@ abstract public class OpenGLShape extends StaticSprite {
     @Override
     public float getRadius() {
         return r;
+    }
+
+    public void setRadius(float r) {
+        this.r = r;
+        rebuild();
     }
 
     public static void checkGlError(String glOperation) {

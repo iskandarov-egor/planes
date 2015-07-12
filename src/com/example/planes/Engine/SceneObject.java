@@ -16,5 +16,4 @@ public interface SceneObject {
     ObjectImpl getImpl();
     void addBody(float radius);
 
-    void setColor(float r, float g, float b);
 }

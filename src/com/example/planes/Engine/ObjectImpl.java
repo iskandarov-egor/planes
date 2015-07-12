@@ -22,6 +22,7 @@ final class ObjectImpl implements SceneObject {
     private Body body = null;
     private ObjectImpl parent = null;
     private boolean removed = false;
+
     public ObjectImpl(float x, float y, SceneImpl scene) {
         //debug
         if(scene == null) throw new NullPointerException("scene");
@@ -63,6 +64,7 @@ final class ObjectImpl implements SceneObject {
         this.vx = vx / scene.getPhysicsFPS();
         this.vy = vy / scene.getPhysicsFPS();
     }
+
 
     public float getAbsoluteX() {
         if(parent != null) return parent.getAbsoluteX() + x;
@@ -116,12 +118,7 @@ final class ObjectImpl implements SceneObject {
         body = new Circle(this, radius);
     }
 
-    @Override
-    public void setColor(float r, float g, float b) {
-        Utils.assertColor(r, g, b);
-        if(sprite == null || !(sprite instanceof OpenGLShape) ) throw new RuntimeException("dun goofed");
-        ((OpenGLShape)sprite).setColor(r, g, b);
-    }
+
 
     public float getRadius() {
         if(sprite == null) return 0;
@@ -157,5 +154,7 @@ final class ObjectImpl implements SceneObject {
     public ObjectImpl getImpl(){
         return this;
     }
+
+
 
 }

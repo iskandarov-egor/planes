@@ -18,6 +18,7 @@ public interface Scene {
     void zoom(float zoom);
 
     SceneObject createObject(float x, float y, ObjectGroup group);
+    Sticker createSticker(float x, float y);
 
     void setBackgroundColor(float r, float g, float b);
 

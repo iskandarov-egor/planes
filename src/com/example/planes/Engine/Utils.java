@@ -1,5 +1,7 @@
 package com.example.planes.Engine;
 
+import android.opengl.Matrix;
+
 /**
  * Created by egor on 11.07.15.
  */
@@ -14,5 +16,10 @@ public final class Utils {
         if(R < 0 || G > 1) throw new IllegalArgumentException("0<rgb<1!");
         if(G < 0 || B > 1) throw new IllegalArgumentException("0<rgb<1!");
         if(B < 0 || R > 1) throw new IllegalArgumentException("0<rgb<1!");
+    }
+
+    public static float[] idMatrix = new float[16];
+    static {
+        Matrix.setIdentityM(idMatrix, 0);
     }
 }

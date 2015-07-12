@@ -13,9 +13,10 @@ import java.util.*;
 /**
  * Created by egor on 09.07.15.
  */
-public final class SceneImpl implements Scene{
+final class SceneImpl implements Scene{
     private MyGLSurfaceView view;
-    private List<ObjectImpl> objects;
+    private List<ObjectImpl> objects = new ArrayList<>();
+    private List<Sticker> stickers = new ArrayList<>();
     private int graphicsFPS = 60;
     private int physicsFPS = 60;
     private boolean playing = false;
@@ -26,7 +27,6 @@ public final class SceneImpl implements Scene{
         Log.d("hey", "Scene called");
         gLRenderer = new MyGLRenderer(this);
 
-        objects = new ArrayList<>();
         //init camera
         setCameraPosition(0, 0);
         Matrix.setLookAtM(cameraM, 0, 0, 0, 1, 0, 0, 0f, 0f, 1.0f, 0.0f);
@@ -94,6 +94,10 @@ public final class SceneImpl implements Scene{
                 object.draw(object.getAbsoluteX() - cameraX, object.getAbsoluteY() - cameraY, transformM);
             }
         }
+
+        for(Sticker sticker : stickers) {
+            sticker.draw(transformM);
+        }
     }
 
     public View getView(Context context) {
@@ -102,6 +106,7 @@ public final class SceneImpl implements Scene{
         view = new MyGLSurfaceView(context, this, gLRenderer);
         return view;
     }
+
 
     private float halfWidth = 1;
     private float halfHeight = 1;
@@ -150,6 +155,12 @@ public final class SceneImpl implements Scene{
         ObjectImpl object = new ObjectImpl(x, y, this);
         objects.add(object);
         return object;
+    }
+
+    public Sticker createSticker(float x, float y) {
+        Sticker sticker = new Sticker(x, y);
+        stickers.add(sticker);
+        return sticker;
     }
 
     public int getPhysicsFPS() {
