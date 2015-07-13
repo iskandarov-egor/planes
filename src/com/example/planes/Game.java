@@ -17,31 +17,32 @@ import com.example.planes.Utils.MathHelper;
 public class Game {
     Scene scene;
     ObjectGroup planesGroup = new ObjectGroup();
+    Camera camera = new Camera();
 
-    public Game(){
+    public Game() {
         Log.d("hey", "Game()");
         //1. create scene
         scene = Engine.getScene();
-        scene.setGraphicsFPS(GameConfig.FPS);
-        scene.setPhysicsFPS(GameConfig.PHYSICS_FPS);
+        Engine.setGraphicsFPS(GameConfig.FPS);
+        Engine.setPhysicsFPS(GameConfig.PHYSICS_FPS);
         scene.setHorizontalPeriod(1f);
-        scene.zoom(1);
 
         //2. create objects
-        SceneObject plane = scene.createObject(0, 0, planesGroup);
+        SceneObject squareObject = scene.createObject(0, 0, planesGroup);
         Square square = new Square();
         square.setColor(1, 1, 1);
-        plane.setSprite(square);
-        plane.setAngleSpeed(0* MathHelper.PI2);
-        plane.setSpeed(0, 0);
-        SceneObject plane2 = scene.createObject(0.7f, 0 * 0.3f, planesGroup);
-        plane2.setSprite(new Triangle());
-        plane2.setAngle(MathHelper.PI);
-        plane2.setAngleSpeed(MathHelper.PI2); // 2*PI per second
-        plane2.setSpeed(-0.1f, 0);
-        plane.addBody(0.1f);
-        plane2.addBody(0.1f);
+        squareObject.setSprite(square);
+        squareObject.setAngleSpeed(0 * MathHelper.PI2);
+        squareObject.setSpeed(0, 0);
+        squareObject.addBody(0.1f);
 
+        SceneObject triangleObject = scene.createObject(0.7f, 0 * 0.3f, planesGroup);
+        triangleObject.setSprite(new Triangle());
+        triangleObject.setAngle(MathHelper.PI);
+        triangleObject.setAngleSpeed(MathHelper.PI2); // 2*PI per second
+        triangleObject.setSpeed(-0.1f, 0);
+        triangleObject.addBody(0.1f);
+        Engine.getViewport().setZoom(1f);
 
         //3. create buttons
         Sticker button = scene.createSticker(-getScreenRatio() + 0.2f, 1 - 0.2f);
@@ -60,11 +61,15 @@ public class Game {
                 scene.setBackgroundColor(0, 0, 1);
             }
         });
-        scene.addCollisionListener(planesAndPlanes);
-    }
+        Engine.getCollisionManager().addCollisionListener(planesAndPlanes);
 
-    public void start() {
-
+        //5. listen to onFrame
+        Engine.setOnGraphicsFrameCallback(new Runnable() {
+            @Override
+            public void run() {
+                camera.onFrame(); // update camera
+            }
+        });
     }
 
     private float getScreenRatio() {

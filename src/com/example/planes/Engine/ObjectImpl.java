@@ -61,8 +61,8 @@ final class ObjectImpl implements SceneObject {
     }
 
     public void setSpeed(float vx, float vy) {
-        this.vx = vx / scene.getPhysicsFPS();
-        this.vy = vy / scene.getPhysicsFPS();
+        this.vx = vx / Engine.getPhysicsFPS();
+        this.vy = vy / Engine.getPhysicsFPS();
     }
 
 
@@ -138,9 +138,9 @@ final class ObjectImpl implements SceneObject {
 
     public void setAngleSpeed(float angleSpeed) {
 
-        int fps = scene.getPhysicsFPS();
+        float fps = Engine.getPhysicsFPS();
         if(fps <= 0) throw new RuntimeException("fps");
-        this.angleSpeed = angleSpeed / scene.getPhysicsFPS();
+        this.angleSpeed = angleSpeed / Engine.getPhysicsFPS();
     }
 
     public void setAngle(float angle){

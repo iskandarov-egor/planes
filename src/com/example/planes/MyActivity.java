@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import com.example.planes.Engine.Engine;
 import com.example.planes.Engine.Scene;
 
 public class MyActivity extends Activity {
@@ -26,7 +27,7 @@ public class MyActivity extends Activity {
         game = new Game();
 
         scene = game.getScene();
-        setContentView(scene.getView(this));
+        setContentView(Engine.getView(this));
 
 
     }
@@ -42,16 +43,16 @@ public class MyActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Log.d("hey", "activity onresume");
-        scene.run();
-        scene.onResume();
+        Engine.run();
+        Engine.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d("hey", "activity onpause");
-        scene.pause();
-        scene.onPause();
+        Engine.pause();
+        Engine.onPause();
     }
 
     @Override

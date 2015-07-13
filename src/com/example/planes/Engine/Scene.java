@@ -9,14 +9,8 @@ import com.example.planes.MyActivity;
  */
 public interface Scene {
 
-    void setGraphicsFPS(int fps);
-
-    void setPhysicsFPS(int fps);
-
     // Период повторения мира по горизонтали (в экранах). Если равен нулю, то мир не повторяется.
     void setHorizontalPeriod(float period);
-
-    void zoom(float zoom);
 
     SceneObject createObject(float x, float y, ObjectGroup group);
 
@@ -25,16 +19,5 @@ public interface Scene {
 
     void setBackgroundColor(float r, float g, float b);
 
-    void addCollisionListener(CollisionListener listener);
-
-    // для SetContentView в Activity
-    View getView(Context context);
-
-    void run();
-
-    void pause();
-
-    void onPause();
-
-    void onResume();
+    SceneButton createButton(float x, float y);
 }

@@ -14,10 +14,12 @@ import javax.microedition.khronos.opengles.GL10;
  * Created by name on 08.07.15.
  */
 final class MyGLRenderer implements GLSurfaceView.Renderer {
-
+    // todo background color
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
     private final SceneImpl scene;
+    private Runnable onGraphicsFrameCallback = null;
+    private Runnable onPhysicsFrameCallback = null;
 
     public MyGLRenderer(SceneImpl scene) {
         //debug
@@ -25,8 +27,16 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         if(scene == null) throw new NullPointerException("scene");
 
         this.scene = scene;
-        physStepTime = NANO_IN_SECOND / scene.getPhysicsFPS();
-        graphStepTime = NANO_IN_SECOND / scene.getGraphicsFPS();
+        physStepTime = 60;
+        graphStepTime = 60;
+    }
+
+    public void setGraphicsFPS(float fps) {
+        graphStepTime = (long)(NANO_IN_SECOND / fps);
+    }
+
+    public void setPhysicsFPS(float fps) {
+        physStepTime = (long)(NANO_IN_SECOND / fps);
     }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -77,11 +87,10 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
                     scene.onPhysicsFrame();
                 }
                 scene.onGraphicsFrame();
+                if(onGraphicsFrameCallback != null) onGraphicsFrameCallback.run();
             }
             last = now;
         }
-
-
     }
 
     public void pause(){
@@ -91,9 +100,15 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         isRunning = false;
     }
 
+    public void setOnGraphicsFrameCallback(Runnable onGraphicsFrameCallback) {
+        //debug
+        if(onGraphicsFrameCallback == null) throw new NullPointerException("bug!");
 
+        this.onGraphicsFrameCallback = onGraphicsFrameCallback;
+    }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
+        scene.getViewport().onScreenChanged(width, height);
         scene.onScreenChanged(width, height);
     }
 
