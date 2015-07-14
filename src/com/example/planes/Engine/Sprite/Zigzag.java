@@ -9,17 +9,14 @@ public class Zigzag {
     private float angle;
 
     public Zigzag() {
-        rect.setColor(0.2f, 0.2f, 0);
-        tiltedRect.setColor(0.2f, 0.2f, 0);
+        rect.setColor(0.5f, 0.5f, 1);
+        tiltedRect.setColor(0.5f, 0.5f, 1);
     }
 
     public void setWH(float w, float h) {
-//        this.w = w;
-//        this.h = h;
-
-        rect.setWH(w / h * 2, 0.1f);
-        tiltedRect.setWH(2*(float) Math.hypot(1, w / h), 0.1f);
-        angle = (float) Math.atan2(1, w / h);
+        rect.setWH(w, 0.05f);
+        tiltedRect.setWH((float) Math.hypot(h, w), 0.05f);
+        angle = (float) Math.atan2(h, w);
     }
 
     public void draw(float x, float y, float[] matrix) {

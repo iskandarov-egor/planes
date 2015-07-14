@@ -14,7 +14,7 @@ public abstract class Sprite {
     }
 
     public abstract void draw(float x, float y, float angle, float[] transform);
-    public abstract void onFrame();
+    public abstract void onFrame(float graphicsFPS);
 
     public float getRadius() {
         return radius;

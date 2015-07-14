@@ -1,11 +1,8 @@
 package com.example.planes.Engine;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
-import android.view.View;
-import com.example.planes.Engine.Sprite.StaticSprite;
 import com.example.planes.Engine.Sprite.Zigzag;
 
 import java.util.*;
@@ -13,31 +10,33 @@ import java.util.*;
 /**
  * Created by egor on 09.07.15.
  */
-final class SceneImpl implements Scene{
+
+final class SceneImpl implements Scene {
 
     private List<ObjectImpl> objects = new ArrayList<>();
     private List<Sticker> stickers = new ArrayList<>();
     CollisionManager collisionManager = new CollisionManager(this);
-
-    private boolean playing = false;
-
-    Viewport viewport = new Viewport();
+    // Буква Z на фоне для наглядности, показывает границы мира
+    Zigzag zigzag = new Zigzag();
+    Viewport viewport = new Viewport(this);
+    // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
+    private float[] backgroundColor = {0, 0, 0};
 
-    Zigzag background = new Zigzag();
+    // задачи, которые нужно выполнить во время рисования грядущего кадра
+    private Queue<Runnable> glTasks = new ArrayDeque<>();
+
     public SceneImpl() {
-        Log.d("hey", "Scene called");
-
-        //init camera
-        setCameraPosition(0, 0);
-
-        //Matrix.multiplyMM(transformM, 0, screenM, 0, cameraM, 0);
-
+        Log.d("hey", "Scene() called");
     }
 
     public void setBackgroundColor(float R, float G, float B) {
         Utils.assertColor(R, G, B);
-        GLES20.glClearColor(R, G, B, 1.0f);
+
+        backgroundColor[0] = R;
+        backgroundColor[1] = G;
+        backgroundColor[2] = B;
+
     }
 
     public CollisionManager getCollisionManager() {
@@ -49,27 +48,25 @@ final class SceneImpl implements Scene{
     }
 
     public void setHorizontalPeriod(float numberOfScreens) {
+        if(numberOfScreens < 0) throw new IllegalArgumentException("NO");
         this.numberOfScreens = numberOfScreens;
+        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 
-    @Override
-    public SceneButton createButton(float x, float y) {
-        return null;//view.createButton(x, y);
-    }
+    public void onGraphicsFrame(float graphicsFPS){
+        // разбор очереди задач
+        while(!glTasks.isEmpty()) { glTasks.poll().run(); }
 
-    public void setOnClickListener(ButtonClickListener onClickListener) {
-       // view.setOnClickListener(onClickListener);
-    }
-
-    public void onGraphicsFrame(){
+        // очистка экрана
+        GLES20.glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        background.draw(-viewport.cameraX, -viewport.cameraY, viewport.transformM);
+        zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
 
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
         for(ObjectImpl object : objects) {
-
+            object.onGraphicsFrame(graphicsFPS);
             float horizPeriod = getHorizPeriod();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
 
@@ -77,43 +74,31 @@ final class SceneImpl implements Scene{
             float y = (object.getAbsoluteY() - viewport.cameraY);
 
             if(horizPeriod != 0) {
-
                 float r = (object.getRadius());
-
                 if (y + r > -halfHeight && y - r < halfHeight) {
                     //тащим х влево экрана
                     while (x + r > horizPeriod - halfWidth) x -= horizPeriod;
                     while (x + r < -halfWidth) x += horizPeriod;
                     //цикл рисования объекта и его горизонтальных образов если они помещаются
                     while (x - r < halfWidth) {
-
-                            object.draw(x, y, viewport.transformM);
-
+                        object.draw(x, y, viewport.ratioAndZoomMatrix);
                         x += horizPeriod;
                     }
                 }
             } else {
-                object.draw(x, y, viewport.transformM);
+                object.draw(x, y, viewport.ratioAndZoomMatrix);
             }
         }
 
         for(Sticker sticker : stickers) {
-            sticker.draw(viewport.stickerTransformM);
+            sticker.draw(viewport.ratioMatrix);
         }
     }
 
-
-
-    public void setCameraPosition(float x, float y){
-        viewport.cameraX = x;
-        viewport.cameraY = y;
-    }
-
-    public void onPhysicsFrame() {
+    public void onPhysicsFrame(float physicsFPS) {
         setCanRemoveObjects(false);
         for(ObjectImpl object : objects) {
-            object.onPhysicsFrame(getHorizPeriod());
-
+            object.onPhysicsFrame(getHorizPeriod(), physicsFPS);
         }
         collisionManager.doCollisions();
         setCanRemoveObjects(true);
@@ -131,15 +116,13 @@ final class SceneImpl implements Scene{
         return sticker;
     }
 
-
-
     boolean canRemoveObjects = true;
 
     private Queue<ObjectImpl> removeQueue = new ArrayDeque<>();
     public void removeObject(ObjectImpl object) {
         //debug
         if(!objects.contains(object)) throw new RuntimeException("no such object");
-        if(removeQueue.contains(object)) throw new RuntimeException("no such object");
+        if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
 
         if(canRemoveObjects) {
             objects.remove(object);
@@ -148,6 +131,7 @@ final class SceneImpl implements Scene{
             object.setRemoved(true);
         }
     }
+
     public boolean canRemove() {
         return canRemoveObjects;
     }
@@ -173,6 +157,11 @@ final class SceneImpl implements Scene{
     }
 
     public void onScreenChanged(int width, int height) {
-        background.setWH(width, height);
+        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
+        viewport.onScreenChanged(width, height);
+    }
+
+    public void onRatioChanged() {
+        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 }

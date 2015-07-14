@@ -14,6 +14,6 @@ public interface SceneObject {
 
     void setAngle(float angle);
     ObjectImpl getImpl();
-    void addBody(float radius);
+    void setBody(float radius);
 
 }

@@ -1,6 +1,7 @@
 package com.example.planes.Engine;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.util.Log;
 import android.view.View;
 
@@ -17,15 +18,11 @@ public final class Engine {
     static {
         Log.d("hey", "Engine static init");
         scene = new SceneImpl();
-        gLRenderer = new MyGLRenderer(scene);
+        gLRenderer = new MyGLRenderer();
     }
 
     public static CollisionManager getCollisionManager() {
         return scene.getCollisionManager();
-    }
-
-    public static Viewport getViewport(){
-        return scene.getViewport();
     }
 
     public static View getView(Context context) {
@@ -79,6 +76,25 @@ public final class Engine {
 
     public static void setOnGraphicsFrameCallback(Runnable callback){
         gLRenderer.setOnGraphicsFrameCallback(callback);
+    }
+
+    static TouchEventListener touchEventListener;
+
+    public static void setTouchEventListener(TouchEventListener touchEventListener) {
+        Engine.touchEventListener = (touchEventListener);
+    }
+
+    public static void onGraphicsFrame() {
+        scene.onGraphicsFrame(graphicsFPS);
+    }
+
+    static void onPhysicsFrame() {
+        scene.onPhysicsFrame(physicsFPS);
+    }
+
+    static void onScreenChanged(int width, int height) {
+        // напоминание: если будет много сцен, то им тоже надо будет сообщить
+        scene.onScreenChanged(width, height);
     }
 }
 

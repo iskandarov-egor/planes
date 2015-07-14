@@ -10,7 +10,6 @@ import com.example.planes.Engine.Sprite.Sprite;
  * Created by egor on 01.07.15.
  */
 final class ObjectImpl implements SceneObject {
-    private SceneImpl scene = null;
     private float vx = 0;
     private float vy = 0;
     private float x = 0;
@@ -27,7 +26,6 @@ final class ObjectImpl implements SceneObject {
         //debug
         if(scene == null) throw new NullPointerException("scene");
 
-        this.scene = scene;
         this.x = x;
         this.y = y;
     }
@@ -35,21 +33,20 @@ final class ObjectImpl implements SceneObject {
     private ObjectImpl(){} //
 
 
-    public void onPhysicsFrame(float horizPeriod) {
+    public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
         //debug
         if(horizPeriod < 0) throw new IllegalArgumentException("period");
 
-        angle = Utils.mod(angle + angleSpeed, Utils.PI2);
+        angle = Utils.mod(angle + angleSpeed / physicsFPS, Utils.PI2);
 
-        x += vx;
-        y += vy;
+        x += vx / physicsFPS;
+        y += vy / physicsFPS;
 
         if(horizPeriod != 0) {
             while (x > horizPeriod / 2) x -= horizPeriod;
             while (x < -horizPeriod / 2) x += horizPeriod;
         }
     }
-
 
     public void setSprite(Sprite sprite){
         this.sprite = sprite;
@@ -61,8 +58,12 @@ final class ObjectImpl implements SceneObject {
     }
 
     public void setSpeed(float vx, float vy) {
-        this.vx = vx / Engine.getPhysicsFPS();
-        this.vy = vy / Engine.getPhysicsFPS();
+        //debug
+        if(Math.abs(vx) > 444444) throw new RuntimeException("что то не так");
+        if(Math.abs(vy) > 444444) throw new RuntimeException("что то не так");
+
+        this.vx = vx;
+        this.vy = vy;
     }
 
 
@@ -88,33 +89,27 @@ final class ObjectImpl implements SceneObject {
         if(object == null) throw new NullPointerException("lalala");
         if(period < 0) throw new IllegalArgumentException("period");
 
-        if(!hasBody() || !object.hasBody()
-                || removed || object.removed) return false; // removed тут только для быстродействия
-        return body.intersects(object.body, period);
+        if(!hasBody() || !object.hasBody()) throw new NullPointerException("no body");
+        if(removed || object.removed) return false;
+        return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX(),
+                object.getAbsoluteY() - getAbsoluteY(), period);
     }
 
     public boolean hasBody(){
         return body != null;
     }
 
-    public Body getBody() {
-        return body;
-    }
-
     public void setParent(SceneObject parent) {
         // todo написать
     }
 
-    public ObjectImpl getParent() {
-        return parent;
-    }
 
     @Override
-    public void addBody(float radius) {
+    public void setBody(float radius) {
         //debug
         if(radius <= 0) throw new IllegalArgumentException("radius");
 
-        body = new Circle(this, radius);
+        body = new Circle(radius);
     }
 
     public float getRadius() {
@@ -137,14 +132,15 @@ final class ObjectImpl implements SceneObject {
     }
 
     public void setAngleSpeed(float angleSpeed) {
+        //debug
+        if(Math.abs(angleSpeed) > 444) throw new RuntimeException("что то не так");
 
-        float fps = Engine.getPhysicsFPS();
-        if(fps <= 0) throw new RuntimeException("fps");
-        this.angleSpeed = angleSpeed / Engine.getPhysicsFPS();
+
+        this.angleSpeed = angleSpeed;
     }
 
     public void setAngle(float angle){
-        this.angle = angle;
+        this.angle = Utils.mod(angle, Utils.PI2);
     }
 
     @Override
@@ -153,5 +149,7 @@ final class ObjectImpl implements SceneObject {
     }
 
 
-
+    public void onGraphicsFrame(float graphicsFPS) {
+        if(sprite != null) sprite.onFrame(graphicsFPS);
+    }
 }

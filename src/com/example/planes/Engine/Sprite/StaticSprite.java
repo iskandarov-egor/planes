@@ -1,8 +1,6 @@
 package com.example.planes.Engine.Sprite;
 
 
-import com.example.planes.Utils.AndroidCanvas;
-
 /**
  * Created by egor on 01.07.15.
  */
@@ -18,7 +16,7 @@ public class StaticSprite extends Sprite {
     }
 
     @Override
-    public void onFrame() {
+    public void onFrame(float graphicsFPS) {
         // ничего не делать
     }
 

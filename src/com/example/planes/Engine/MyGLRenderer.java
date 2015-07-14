@@ -14,19 +14,14 @@ import javax.microedition.khronos.opengles.GL10;
  * Created by name on 08.07.15.
  */
 final class MyGLRenderer implements GLSurfaceView.Renderer {
-    // todo background color
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
-    private final SceneImpl scene;
     private Runnable onGraphicsFrameCallback = null;
     private Runnable onPhysicsFrameCallback = null;
 
-    public MyGLRenderer(SceneImpl scene) {
-        //debug
+    public MyGLRenderer() {
         Log.d("hey", "MyGLRenderer called");
-        if(scene == null) throw new NullPointerException("scene");
 
-        this.scene = scene;
         physStepTime = 60;
         graphStepTime = 60;
     }
@@ -84,9 +79,9 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
             if (dt > graphStepTime) {
                 while (dt > physStepTime) {
                     dt -= physStepTime;
-                    scene.onPhysicsFrame();
+                    Engine.onPhysicsFrame();
                 }
-                scene.onGraphicsFrame();
+                Engine.onGraphicsFrame();
                 if(onGraphicsFrameCallback != null) onGraphicsFrameCallback.run();
             }
             last = now;
@@ -108,8 +103,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
-        scene.getViewport().onScreenChanged(width, height);
-        scene.onScreenChanged(width, height);
+        Engine.onScreenChanged(width, height);
     }
 
     public static int shaderCounter = 0;

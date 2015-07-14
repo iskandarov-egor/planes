@@ -16,7 +16,8 @@ public class MathHelper {
     public static float PI2 = (float)Math.PI*2;
     public static float PI = (float)Math.PI;
 
-    public static void rotate(Vector point, float centerX, float centerY, float angle, float R) {
+    // повернуть точку вокруг другой точки на угол
+    public static void rotate(Vector point, float centerX, float centerY, float angle) {
         double x1 = point.x - centerX;
         double y1 = point.y - centerY;
 

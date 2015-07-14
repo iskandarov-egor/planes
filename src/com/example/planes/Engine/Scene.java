@@ -1,14 +1,11 @@
 package com.example.planes.Engine;
 
-import android.content.Context;
-import android.view.View;
-import com.example.planes.MyActivity;
+import android.graphics.Point;
 
 /**
  * Created by egor on 12.07.15.
  */
 public interface Scene {
-
     // Период повторения мира по горизонтали (в экранах). Если равен нулю, то мир не повторяется.
     void setHorizontalPeriod(float period);
 
@@ -19,5 +16,5 @@ public interface Scene {
 
     void setBackgroundColor(float r, float g, float b);
 
-    SceneButton createButton(float x, float y);
+    public Viewport getViewport();
 }
