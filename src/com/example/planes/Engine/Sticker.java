@@ -2,8 +2,6 @@ package com.example.planes.Engine;
 
 import com.example.planes.Engine.Body.Body;
 import com.example.planes.Engine.Body.Circle;
-import com.example.planes.Engine.Sprite.Sprite;
-import com.example.planes.Engine.Sprite.Square;
 
 /**
  * Created by egor on 12.07.15.
@@ -11,12 +9,17 @@ import com.example.planes.Engine.Sprite.Square;
 public class Sticker {
     private float x;
     private float y;
+    private float angle = 0;
     private Sticker(){}
     private Sprite sprite = null;
     private Body body = null;
     public Sticker(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void setAngle(float angle){
+        this.angle = Utils.mod(angle, Utils.PI2);
     }
 
     public float getX() {
@@ -51,6 +54,11 @@ public class Sticker {
         if(radius <= 0) throw new IllegalArgumentException("radius");
 
         body = new Circle(radius);
+    }
+
+    public float getRadius() {
+        if(sprite == null) return 0;
+        return sprite.getRadius();
     }
 
     public boolean isPointInside(float x, float y) {

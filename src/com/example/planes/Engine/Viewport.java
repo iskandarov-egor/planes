@@ -18,10 +18,8 @@ public final class Viewport {
 
     // матрица направления камеры
     final private float[] cameraM = new float[16];
-    private final SceneImpl scene;
 
-    Viewport(SceneImpl scene) {
-        this.scene = scene;
+    Viewport() {
         Matrix.setLookAtM(cameraM, 0, 0, 0, 1, 0, 0, 0f, 0f, 1.0f, 0.0f);
         updateScreenMatrix();
     }
@@ -29,7 +27,7 @@ public final class Viewport {
     float cameraX = 0;
     float cameraY = 0;
 
-    void updateScreenMatrix() {
+    private void updateScreenMatrix() {
         float[] screenM = new float[16];
         float halfWidth = getHalfWidth();
         float halfHeight = getHalfHeight();
@@ -39,7 +37,7 @@ public final class Viewport {
         Matrix.multiplyMM(ratioMatrix, 0, screenM, 0, cameraM, 0);
     }
 
-    private float currentZoom = 1;
+    float currentZoom = 1;
     float screenRatio = 1;
 
     // полуширина экрана с учетом зума
@@ -64,7 +62,6 @@ public final class Viewport {
         screenRatio = (float) width / height;
 
         updateScreenMatrix();
-        scene.onRatioChanged();
     }
 
 

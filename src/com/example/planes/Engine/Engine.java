@@ -10,7 +10,7 @@ import android.view.View;
  */
 
 public final class Engine {
-    static SceneImpl scene;
+    private static SceneImpl scene;
     private static MyGLSurfaceView view;
     private static MyGLRenderer gLRenderer;
     private static float physicsFPS = 60;
@@ -66,14 +66,6 @@ public final class Engine {
         gLRenderer.setPhysicsFPS(physicsFPS);
     }
 
-    public static float getPhysicsFPS() {
-        return physicsFPS;
-    }
-
-    public static float getGraphicsFPS() {
-        return graphicsFPS;
-    }
-
     public static void setOnGraphicsFrameCallback(Runnable callback){
         gLRenderer.setOnGraphicsFrameCallback(callback);
     }
@@ -84,7 +76,7 @@ public final class Engine {
         Engine.touchEventListener = (touchEventListener);
     }
 
-    public static void onGraphicsFrame() {
+    static void onGraphicsFrame() {
         scene.onGraphicsFrame(graphicsFPS);
     }
 

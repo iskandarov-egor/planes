@@ -8,8 +8,8 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
-import com.example.planes.Engine.Sprite.Square;
-import com.example.planes.Engine.Sprite.Triangle;
+import com.example.planes.Engine.Square;
+import com.example.planes.Engine.Triangle;
 import com.example.planes.Utils.MathHelper;
 import com.example.planes.Utils.Vector;
 

@@ -8,9 +8,9 @@ import java.util.List;
  * Created by egor on 04.07.15.
  */
 public final class CollisionListener {
-    public List<ObjectGroup> groups = new ArrayList<>();
-    public CollisionProcessor onCollisionStart;
-    public CollisionProcessor onCollision;
+    List<ObjectGroup> groups = new ArrayList<>();
+    private CollisionProcessor onCollisionStart;
+    private CollisionProcessor onCollision;
     private CollisionProcessor onCollisionEnd;
 
     public void addGroup(ObjectGroup group) {
@@ -22,12 +22,12 @@ public final class CollisionListener {
 
     public CollisionListener(ObjectGroup group1, ObjectGroup group2) {
         addGroup(group1);
-        addGroup(group1);
+        addGroup(group2);
     }
 
     private int counter = 0; //debug
 
-    public void processCollision(SceneObject object, SceneObject other) {
+    void processCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
@@ -39,12 +39,11 @@ public final class CollisionListener {
         if(onCollision != null) onCollision.process(object, other);
     }
 
-    public void processNoCollision(SceneObject object, SceneObject other) {
+    void processNoCollision(SceneObject object, SceneObject other) {
         if(areColliding(object, other)) {
             stopCollision(object, other);
             onCollisionEnd.process(object, other);
         }
-
     }
 
     public void setOnCollisionEnd(CollisionProcessor onCollisionEnd) {
@@ -95,7 +94,7 @@ public final class CollisionListener {
         this.onCollision = onCollision;
     }
 
-    public void startCollision(SceneObject object, SceneObject other) {
+    private void startCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
@@ -107,7 +106,7 @@ public final class CollisionListener {
 
     }
 
-    public void stopCollision(SceneObject object, SceneObject other) {
+    private void stopCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");

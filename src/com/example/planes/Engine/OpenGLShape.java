@@ -1,8 +1,7 @@
-package com.example.planes.Engine.Sprite;
+package com.example.planes.Engine;
 
 import android.opengl.GLES20;
 import android.util.Log;
-import com.example.planes.Engine.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,7 +21,7 @@ abstract public class OpenGLShape extends StaticSprite {
     protected FloatBuffer vertexBuffer;
     protected final float[] coords;
     @Override
-    public void draw(float x, float y, float angle, float[] transform) {
+    void draw(float x, float y, float angle, float[] transform) {
         //debug
         if(transform == null) throw new NullPointerException("matrix");
         if(mProgram <= 0) throw new RuntimeException("debug");

@@ -3,8 +3,6 @@ package com.example.planes.Engine;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import com.example.planes.Engine.Sprite.OpenGLShape;
-import com.example.planes.Engine.Sprite.Triangle;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -21,9 +19,6 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public MyGLRenderer() {
         Log.d("hey", "MyGLRenderer called");
-
-        physStepTime = 60;
-        graphStepTime = 60;
     }
 
     public void setGraphicsFPS(float fps) {
@@ -40,10 +35,10 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         OpenGLShape.onSurfaceCreated();
     }
 
-    long now, dt = 0;
-    long last = 0;
-    long physStepTime;
-    long graphStepTime;
+    private long now, dt = 0;
+    private long last = 0;
+    private long physStepTime;
+    private long graphStepTime;
     public void run(){
         //debug
         if(isRunning) throw new RuntimeException("already running");
@@ -106,6 +101,5 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         Engine.onScreenChanged(width, height);
     }
 
-    public static int shaderCounter = 0;
 
 }

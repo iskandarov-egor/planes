@@ -2,14 +2,11 @@ package com.example.planes.Engine;
 
 
 import com.example.planes.Engine.Body.Body;
-import com.example.planes.Engine.Body.Circle;
-import com.example.planes.Engine.Sprite.OpenGLShape;
-import com.example.planes.Engine.Sprite.Sprite;
 
 /**
  * Created by egor on 01.07.15.
  */
-final class ObjectImpl implements SceneObject {
+public class ObjectImpl extends Sticker implements SceneObject {
     private float vx = 0;
     private float vy = 0;
     private float x = 0;
@@ -22,15 +19,13 @@ final class ObjectImpl implements SceneObject {
     private ObjectImpl parent = null;
     private boolean removed = false;
 
-    public ObjectImpl(float x, float y, SceneImpl scene) {
-        //debug
-        if(scene == null) throw new NullPointerException("scene");
+    public ObjectImpl(float x, float y) {
+        super(x, y);
+
 
         this.x = x;
         this.y = y;
     }
-
-    private ObjectImpl(){} //
 
 
     public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
@@ -46,11 +41,6 @@ final class ObjectImpl implements SceneObject {
             while (x > horizPeriod / 2) x -= horizPeriod;
             while (x < -horizPeriod / 2) x += horizPeriod;
         }
-    }
-
-    public void setSprite(Sprite sprite){
-        this.sprite = sprite;
-        SceneImpl scene = null;
     }
 
     public void removeSprite() {
@@ -99,23 +89,13 @@ final class ObjectImpl implements SceneObject {
         return body != null;
     }
 
-    public void setParent(SceneObject parent) {
+    public void setParent(SceneImpl parent) {
         // todo написать
     }
 
 
-    @Override
-    public void setBody(float radius) {
-        //debug
-        if(radius <= 0) throw new IllegalArgumentException("radius");
 
-        body = new Circle(radius);
-    }
 
-    public float getRadius() {
-        if(sprite == null) return 0;
-        return sprite.getRadius();
-    }
 
     public void draw(float x, float y, float[] transform) {
         //debug
@@ -139,9 +119,6 @@ final class ObjectImpl implements SceneObject {
         this.angleSpeed = angleSpeed;
     }
 
-    public void setAngle(float angle){
-        this.angle = Utils.mod(angle, Utils.PI2);
-    }
 
     @Override
     public ObjectImpl getImpl(){

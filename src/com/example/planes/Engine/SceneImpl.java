@@ -1,9 +1,7 @@
 package com.example.planes.Engine;
 
-import android.graphics.Color;
 import android.opengl.GLES20;
 import android.util.Log;
-import com.example.planes.Engine.Sprite.Zigzag;
 
 import java.util.*;
 
@@ -15,16 +13,13 @@ final class SceneImpl implements Scene {
 
     private List<ObjectImpl> objects = new ArrayList<>();
     private List<Sticker> stickers = new ArrayList<>();
-    CollisionManager collisionManager = new CollisionManager(this);
+    private CollisionManager collisionManager = new CollisionManager(this);
     // Буква Z на фоне для наглядности, показывает границы мира
-    Zigzag zigzag = new Zigzag();
-    Viewport viewport = new Viewport(this);
+    private Zigzag zigzag = new Zigzag();
+    private Viewport viewport = new Viewport();
     // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
     private float[] backgroundColor = {0, 0, 0};
-
-    // задачи, которые нужно выполнить во время рисования грядущего кадра
-    private Queue<Runnable> glTasks = new ArrayDeque<>();
 
     public SceneImpl() {
         Log.d("hey", "Scene() called");
@@ -43,7 +38,7 @@ final class SceneImpl implements Scene {
         return collisionManager;
     }
 
-    public float getHorizPeriod(){
+    float getHorizPeriod(){
         return numberOfScreens * viewport.screenRatio * 2;
     }
 
@@ -54,8 +49,6 @@ final class SceneImpl implements Scene {
     }
 
     public void onGraphicsFrame(float graphicsFPS){
-        // разбор очереди задач
-        while(!glTasks.isEmpty()) { glTasks.poll().run(); }
 
         // очистка экрана
         GLES20.glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
@@ -105,7 +98,7 @@ final class SceneImpl implements Scene {
     }
 
     public SceneObject createObject(float x, float y) {
-        ObjectImpl object = new ObjectImpl(x, y, this);
+        ObjectImpl object = new ObjectImpl(x, y);
         objects.add(object);
         return object;
     }
@@ -159,9 +152,5 @@ final class SceneImpl implements Scene {
     public void onScreenChanged(int width, int height) {
         if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
         viewport.onScreenChanged(width, height);
-    }
-
-    public void onRatioChanged() {
-        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 }

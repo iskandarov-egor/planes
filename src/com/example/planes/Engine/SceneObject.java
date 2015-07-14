@@ -1,11 +1,10 @@
 package com.example.planes.Engine;
 
-import com.example.planes.Engine.Sprite.Sprite;
-
 /**
  * Created by egor on 11.07.15.
  */
 public interface SceneObject {
+
     void setSpeed(float vx, float vy);
     void setAngleSpeed(float angleSpeed);
     void setSprite(Sprite sprite);
@@ -15,5 +14,4 @@ public interface SceneObject {
     void setAngle(float angle);
     ObjectImpl getImpl();
     void setBody(float radius);
-
 }

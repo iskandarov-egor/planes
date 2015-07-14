@@ -1,4 +1,4 @@
-package com.example.planes.Engine.Sprite;
+package com.example.planes.Engine;
 
 /**
  * Created by egor on 13.07.15.
