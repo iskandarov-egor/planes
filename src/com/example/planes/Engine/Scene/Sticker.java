@@ -1,21 +1,26 @@
-package com.example.planes.Engine;
+package com.example.planes.Engine.Scene;
 
 import com.example.planes.Engine.Body.Body;
 import com.example.planes.Engine.Body.Circle;
+import com.example.planes.Engine.Utils;
 
 /**
  * Created by egor on 12.07.15.
  */
 public class Sticker {
-    private float x;
-    private float y;
-    private float angle = 0;
+    protected float x;
+    protected float y;
+    protected float angle = 0;
     private Sticker(){}
     private Sprite sprite = null;
     private Body body = null;
     public Sticker(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void removeSprite() {
+        sprite = null;
     }
 
     public void setAngle(float angle){
@@ -38,7 +43,7 @@ public class Sticker {
         this.y = y;
     }
 
-    public void draw(float[] transformM) {
+    void draw(float[] transformM) {
         //debug
         if(sprite == null) throw new RuntimeException("no sprite");
 

@@ -5,19 +5,19 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
-import com.example.planes.Engine.Square;
-import com.example.planes.Engine.Triangle;
+import com.example.planes.Engine.Scene.*;
+import com.example.planes.Engine.Scene.Object;
 import com.example.planes.Utils.MathHelper;
-import com.example.planes.Utils.Vector;
 
 /**
  * Created by egor on 12.07.15.
  */
-public class Game {
-    Scene scene;
+public class Game implements EngineEventsListener {
+    Engine engine;
     ObjectGroup planesGroup = new ObjectGroup();
     StupidTestCamera camera;
     Sticker button;
@@ -25,81 +25,75 @@ public class Game {
     public Game() {
         Log.d("hey", "Game()");
         //1. create scene
-        scene = Engine.getScene();
-        Engine.setGraphicsFPS(GameConfig.FPS);
-        Engine.setPhysicsFPS(GameConfig.PHYSICS_FPS);
+        this.engine = new Engine();
+        engine.setGraphicsFPS(GameConfig.FPS);
+        engine.setPhysicsFPS(GameConfig.PHYSICS_FPS);
+        final Scene scene = engine.getScene();
         scene.setHorizontalPeriod(1.5f);
         scene.setBackgroundColor(0, 0, 1);
 
         //2. create objects
-        SceneObject squareObject = scene.createObject(0, 0, planesGroup);
+        Object squareObject = new Object(0, 0);
         Square square = new Square();
         square.setColor(1, 1, 1);
 
         squareObject.setSprite(square);
         squareObject.setBody(0.1f);
+        scene.addObject(squareObject);
 
-        SceneObject triangleObject = scene.createObject(0.7f, 0 * 0.3f, planesGroup);
+        Object triangleObject = new Object(0.7f, 0 * 0.3f);
         triangleObject.setSprite(new Triangle());
         triangleObject.setAngle(MathHelper.PI);
         triangleObject.setAngleSpeed(MathHelper.PI2); // 2*PI per second
         triangleObject.setSpeed(-0.1f, 0);
         triangleObject.setBody(0.1f);
+        scene.addObject(triangleObject);
 
         //3. create buttons
-        button = scene.createSticker(-getScreenRatio() + 0.2f, 1 - 0.2f);
+        button = new Sticker(-getScreenRatio() + 0.2f, 1 - 0.2f);
+        scene.addSticker(button);
         button.setSprite(new Square());
         button.setBody(0.1f);
 
         //4. create collision listeners
         CollisionListener listener = new CollisionListener(planesGroup, planesGroup);
+        scene.addToGroup(planesGroup, triangleObject);
+        scene.addToGroup(planesGroup, squareObject);
         listener.setOnCollisionStart(new CollisionProcessor() {
             @Override
-            public void process(SceneObject object, SceneObject other) {
+            public void process(StaticObject object, StaticObject other) {
                 scene.setBackgroundColor(1, 0, 0);
             }
         });
         listener.setOnCollisionEnd(new CollisionProcessor() {
             @Override
-            public void process(SceneObject object, SceneObject other) {
+            public void process(StaticObject object, StaticObject other) {
                 scene.setBackgroundColor(0, 0, 1);
             }
         });
-        Engine.getCollisionManager().addCollisionListener(listener);
+        scene.addCollisionListener(listener);
 
-        //5. listen to onFrame
+        engine.setEventsListener(this);
         camera = new StupidTestCamera(scene);
-        Engine.setOnGraphicsFrameCallback(new Runnable() {
-            @Override
-            public void run() {
-                camera.onFrame(); // update camera
-            }
-        });
-
-        //6. listen to touch events
-        Engine.setTouchEventListener(new TouchEventListener() {
-            @Override
-            public boolean onTouchEvent(MotionEvent e) {
-                return onTouch(e);
-            }
-        });
+        engine.run();
     }
 
 
-    private boolean onTouch(MotionEvent e) {
-        Vector pos = screenToEngine(e.getRawX(), e.getRawY());
+    public boolean onTouchEvent(MotionEvent e) {
+        Log.d("hey", "Game.onTouchEvent");
+        Utils.FloatPoint pos = engine.getScene().getViewport().screenToEngine(e.getRawX(), e.getRawY());
         float x = pos.x;
         float y = pos.y;
         switch(e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(button.isPointInside(x, y)) {
-                    scene.setBackgroundColor(0, 0, 0);
+                    engine.getScene().setBackgroundColor(0, 0, 0);
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if(button.isPointInside(x, y)) {
-                    scene.setBackgroundColor(0, 1, 1);
+                    engine.getScene().setBackgroundColor(0, 1, 1);
                     return true;
                 }
                 break;
@@ -116,10 +110,7 @@ public class Game {
         return (float)size.x / size.y;
     }
 
-    private Vector screenToEngine(float x, float y) {
-        return new Vector(2*(x / getScreenHeight() - 0.5f*getScreenRatio()),
-                            2*(0.5f - y / getScreenHeight()));
-    }
+
 
     private int getScreenHeight(){
         WindowManager wm = (WindowManager) MyApplication.context.getSystemService(Context.WINDOW_SERVICE);
@@ -130,7 +121,21 @@ public class Game {
         return size.y;
     }
 
-    public Scene getScene() {
-        return scene;
+    @Override
+    public void onGraphicsFrame(float graphicsFPS) {
+        camera.onFrame();
+    }
+
+    @Override
+    public void onPhysicsFrame(float physicsFPS) {
+        //lalala
+    }
+
+    public Engine getEngine() {
+        return engine;
+    }
+
+    public View createView(Context context) {
+        return engine.createView(context);
     }
 }

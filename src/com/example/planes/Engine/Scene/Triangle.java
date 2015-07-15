@@ -1,4 +1,4 @@
-package com.example.planes.Engine;
+package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
@@ -9,7 +9,7 @@ import android.util.Log;
 public final class Triangle extends OpenGLShape {
 
     @Override
-    void draw(float x, float y, float angle, float[] transform) {
+    public void draw(float x, float y, float angle, float[] transform) {
         super.draw(x, y, angle, transform);
         int mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
         GLES20.glEnableVertexAttribArray(mPositionHandle);

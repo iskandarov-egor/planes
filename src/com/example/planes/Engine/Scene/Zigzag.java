@@ -1,4 +1,4 @@
-package com.example.planes.Engine;
+package com.example.planes.Engine.Scene;
 
 /**
  * Created by egor on 13.07.15.

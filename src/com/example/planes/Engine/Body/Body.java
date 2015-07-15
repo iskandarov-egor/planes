@@ -1,7 +1,5 @@
 package com.example.planes.Engine.Body;
 
-import com.example.planes.Engine.SceneObject;
-
 /**
  * Created by egor on 02.07.15.
  */

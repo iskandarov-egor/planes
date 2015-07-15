@@ -7,27 +7,24 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import com.example.planes.Engine.Engine;
-import com.example.planes.Engine.Scene;
 
 public class MyActivity extends Activity {
     /**
      * Called when the activity is first created.
      */
-    Scene scene;
+
     Game game;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("hey", "activity oncreate");
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         game = new Game();
 
-        scene = game.getScene();
-        setContentView(Engine.getView(this));
+        setContentView(game.createView(this));
 
 
     }
@@ -36,23 +33,20 @@ public class MyActivity extends Activity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d("hey", "activity onconfigchanged");
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d("hey", "activity onresume");
-        Engine.run();
-        Engine.onResume();
+        game.getEngine().onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d("hey", "activity onpause");
-        Engine.pause();
-        Engine.onPause();
+        game.getEngine().onPause();
     }
 
     @Override
@@ -84,4 +78,5 @@ public class MyActivity extends Activity {
         super.onDestroy();
         Log.d("hey", "activity ondestroy");
     }
+
 }

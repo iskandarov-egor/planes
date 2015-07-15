@@ -1,7 +1,8 @@
-package com.example.planes.Engine;
+package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
+import com.example.planes.Engine.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -10,7 +11,7 @@ import java.nio.FloatBuffer;
 /**
  * Created by egor on 12.07.15.
  */
-abstract public class OpenGLShape extends StaticSprite {
+public abstract class OpenGLShape extends StaticSprite {
     protected final float[] disp = {0,0,0,0};
     protected float angle = 0;
     protected float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
@@ -20,6 +21,7 @@ abstract public class OpenGLShape extends StaticSprite {
     protected final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
     protected FloatBuffer vertexBuffer;
     protected final float[] coords;
+
     @Override
     void draw(float x, float y, float angle, float[] transform) {
         //debug
@@ -60,7 +62,7 @@ abstract public class OpenGLShape extends StaticSprite {
         vertexBuffer.position(0);
         rebuild();
     }
-    public abstract void rotate(float angle);
+    protected abstract void rotate(float angle);
     public static int loadShader(int type, String shaderCode){
         Log.d("hey", "loadShader called ");
         int shader = GLES20.glCreateShader(type);

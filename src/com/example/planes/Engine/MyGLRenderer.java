@@ -3,6 +3,8 @@ package com.example.planes.Engine;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import com.example.planes.Engine.Scene.OpenGLShape;
+import com.example.planes.Engine.Scene.Scene;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -16,9 +18,11 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     private final static int NANO_IN_SECOND = 1000000000;
     private Runnable onGraphicsFrameCallback = null;
     private Runnable onPhysicsFrameCallback = null;
+    private Engine engine;
 
-    public MyGLRenderer() {
+    public MyGLRenderer(Scene scene, Engine engine) {
         Log.d("hey", "MyGLRenderer called");
+        this.engine = engine;
     }
 
     public void setGraphicsFPS(float fps) {
@@ -74,10 +78,10 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
             if (dt > graphStepTime) {
                 while (dt > physStepTime) {
                     dt -= physStepTime;
-                    Engine.onPhysicsFrame();
+                    engine.onPhysicsFrame(60f);
                 }
-                Engine.onGraphicsFrame();
-                if(onGraphicsFrameCallback != null) onGraphicsFrameCallback.run();
+
+                engine.onGraphicsGrame(60f);
             }
             last = now;
         }
@@ -98,7 +102,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
-        Engine.onScreenChanged(width, height);
+        engine.getScene().onScreenChanged(width, height);
     }
 
 

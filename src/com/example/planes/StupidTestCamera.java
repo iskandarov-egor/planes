@@ -1,7 +1,6 @@
 package com.example.planes;
 
-import com.example.planes.Engine.Engine;
-import com.example.planes.Engine.Scene;
+import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Utils.MathHelper;
 import com.example.planes.Utils.Vector;
 

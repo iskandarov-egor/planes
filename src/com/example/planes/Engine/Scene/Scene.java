@@ -1,27 +1,32 @@
-package com.example.planes.Engine;
+package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
+import com.example.planes.Engine.ObjectGroup;
+import com.example.planes.Engine.Utils;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Created by egor on 09.07.15.
  */
 
-final class SceneImpl implements Scene {
+public final class Scene {
 
-    private List<ObjectImpl> objects = new ArrayList<>();
-    private List<Sticker> stickers = new ArrayList<>();
-    private CollisionManager collisionManager = new CollisionManager(this);
+    private final List<StaticObject> objects = new ArrayList<>();
+    private final List<Sticker> stickers = new ArrayList<>();
+    private final CollisionManager collisionManager = new CollisionManager(this);
     // Буква Z на фоне для наглядности, показывает границы мира
-    private Zigzag zigzag = new Zigzag();
-    private Viewport viewport = new Viewport();
+    private final Zigzag zigzag = new Zigzag();
+    private final Viewport viewport = new Viewport();
     // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
     private float[] backgroundColor = {0, 0, 0};
 
-    public SceneImpl() {
+    public Scene() {
         Log.d("hey", "Scene() called");
     }
 
@@ -58,7 +63,7 @@ final class SceneImpl implements Scene {
 
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
-        for(ObjectImpl object : objects) {
+        for(StaticObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
             float horizPeriod = getHorizPeriod();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
@@ -90,29 +95,29 @@ final class SceneImpl implements Scene {
 
     public void onPhysicsFrame(float physicsFPS) {
         setCanRemoveObjects(false);
-        for(ObjectImpl object : objects) {
+        for(StaticObject object : objects) {
             object.onPhysicsFrame(getHorizPeriod(), physicsFPS);
         }
         collisionManager.doCollisions();
         setCanRemoveObjects(true);
     }
 
-    public SceneObject createObject(float x, float y) {
-        ObjectImpl object = new ObjectImpl(x, y);
+    public void addObject(StaticObject object) {
+        if(objects.contains(object)) throw new RuntimeException("object already present");
+
         objects.add(object);
-        return object;
+
     }
 
-    public Sticker createSticker(float x, float y) {
-        Sticker sticker = new Sticker(x, y);
+    public void addSticker(Sticker sticker) {
+        if(stickers.contains(sticker)) throw new RuntimeException("sticker already present");
         stickers.add(sticker);
-        return sticker;
     }
 
-    boolean canRemoveObjects = true;
+    private boolean canRemoveObjects = true;
 
-    private Queue<ObjectImpl> removeQueue = new ArrayDeque<>();
-    public void removeObject(ObjectImpl object) {
+    private Queue<StaticObject> removeQueue = new ArrayDeque<>();
+    public void removeObject(StaticObject object) {
         //debug
         if(!objects.contains(object)) throw new RuntimeException("no such object");
         if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
@@ -121,29 +126,28 @@ final class SceneImpl implements Scene {
             objects.remove(object);
         } else {
             removeQueue.add(object);
-            object.setRemoved(true);
         }
     }
 
-    public boolean canRemove() {
+    private boolean canRemove() {
         return canRemoveObjects;
     }
 
-    public void setCanRemoveObjects(boolean canRemoveObjects) {
+    private void setCanRemoveObjects(boolean canRemoveObjects) {
         this.canRemoveObjects = canRemoveObjects;
         if(!removeQueue.isEmpty() && canRemoveObjects) {
-            ObjectImpl object = removeQueue.remove();
+            StaticObject object = removeQueue.remove();
             while(object != null) {
                 objects.remove(object);
             }
         }
     }
 
-    public SceneObject createObject(float x, float y, ObjectGroup group) {
-        SceneObject object = createObject(x, y);
-        collisionManager.addToGroup(group, object);
-        return object;
-    }
+//    public SceneObject createObject(float x, float y, ObjectGroup group) {
+//        SceneObject object = createObject(x, y);
+//        collisionManager.addToGroup(group, object);
+//        return object;
+//    }
 
     public Viewport getViewport() {
         return viewport;
@@ -152,5 +156,13 @@ final class SceneImpl implements Scene {
     public void onScreenChanged(int width, int height) {
         if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
         viewport.onScreenChanged(width, height);
+    }
+
+    public void addToGroup(ObjectGroup group, StaticObject object) {
+        collisionManager.addToGroup(group, object);
+    }
+
+    public void addCollisionListener(CollisionListener listener) {
+        collisionManager.addCollisionListener(listener);
     }
 }
