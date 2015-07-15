@@ -6,7 +6,7 @@ import com.example.planes.Engine.Body.Body;
 /**
  * Created by egor on 01.07.15.
  */
-public class ObjectImpl extends Sticker implements SceneObject {
+class ObjectImpl extends Sticker implements SceneObject {
     private float vx = 0;
     private float vy = 0;
     private float x = 0;
@@ -21,12 +21,9 @@ public class ObjectImpl extends Sticker implements SceneObject {
 
     public ObjectImpl(float x, float y) {
         super(x, y);
-
-
         this.x = x;
         this.y = y;
     }
-
 
     public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
         //debug
@@ -92,10 +89,6 @@ public class ObjectImpl extends Sticker implements SceneObject {
     public void setParent(SceneImpl parent) {
         // todo написать
     }
-
-
-
-
 
     public void draw(float x, float y, float[] transform) {
         //debug
