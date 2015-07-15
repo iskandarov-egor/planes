@@ -18,7 +18,8 @@ import com.example.planes.Utils.MathHelper;
  */
 public class Game implements EngineEventsListener {
     Engine engine;
-    ObjectGroup planesGroup = new ObjectGroup();
+    ObjectGroup squaresGroup = new ObjectGroup();
+    ObjectGroup trianglesGroup = new ObjectGroup();
     StupidTestCamera camera;
     Sticker button;
 
@@ -56,9 +57,9 @@ public class Game implements EngineEventsListener {
         button.setBody(0.1f);
 
         //4. create collision listeners
-        CollisionListener listener = new CollisionListener(planesGroup, planesGroup);
-        scene.addToGroup(planesGroup, triangleObject);
-        scene.addToGroup(planesGroup, squareObject);
+        CollisionListener listener = new CollisionListener(squaresGroup, trianglesGroup);
+        scene.addToGroup(trianglesGroup, triangleObject);
+        scene.addToGroup(squaresGroup, squareObject);
         listener.setOnCollisionStart(new CollisionProcessor() {
             @Override
             public void process(StaticObject object, StaticObject other) {
@@ -80,7 +81,6 @@ public class Game implements EngineEventsListener {
 
 
     public boolean onTouchEvent(MotionEvent e) {
-        Log.d("hey", "Game.onTouchEvent");
         Utils.FloatPoint pos = engine.getScene().getViewport().screenToEngine(e.getRawX(), e.getRawY());
         float x = pos.x;
         float y = pos.y;
