@@ -7,6 +7,7 @@ public class Zigzag {
     private static Rect rect = new Rect(1, 1);
     private static Rect tiltedRect = new Rect(1, 1);
     private float angle;
+    private float w, h;
 
     public Zigzag() {
         rect.setColor(0.5f, 0.5f, 1);
@@ -17,13 +18,15 @@ public class Zigzag {
         rect.setWH(w, 0.05f);
         tiltedRect.setWH((float) Math.hypot(h, w), 0.05f);
         angle = (float) Math.atan2(h, w);
+        this.w = w;
+        this.h = h;
     }
 
     public void draw(float x, float y, float[] matrix) {
 
 
-        rect.draw(x, y + 1, 0, matrix);
-        rect.draw(x, y - 1, 0, matrix);
+        rect.draw(x, y + h/2, 0, matrix);
+        rect.draw(x, y - h/2, 0, matrix);
 
         tiltedRect.draw(x, y, angle, matrix);
     }

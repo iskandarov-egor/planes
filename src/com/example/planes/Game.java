@@ -11,6 +11,7 @@ import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Engine.Scene.Object;
+import com.example.planes.Models.Plane;
 import com.example.planes.Utils.MathHelper;
 
 /**
@@ -22,6 +23,7 @@ public class Game implements EngineEventsListener {
     ObjectGroup trianglesGroup = new ObjectGroup();
     StupidTestCamera camera;
     Sticker button;
+    Plane plane;
 
     public Game() {
         Log.d("hey", "Game()");
@@ -50,6 +52,9 @@ public class Game implements EngineEventsListener {
         triangleObject.setBody(0.1f);
         scene.addObject(triangleObject);
 
+        plane = new Plane(-1, 0, 0.16f, 0);
+        scene.addObject(plane);
+
         //3. create buttons
         button = new Sticker(-getScreenRatio() + 0.2f, 1 - 0.2f);
         scene.addSticker(button);
@@ -58,8 +63,8 @@ public class Game implements EngineEventsListener {
 
         //4. create collision listeners
         CollisionListener listener = new CollisionListener(squaresGroup, trianglesGroup);
-        scene.addToGroup(trianglesGroup, triangleObject);
-        scene.addToGroup(squaresGroup, squareObject);
+        trianglesGroup.add(triangleObject);
+        squaresGroup.add(squareObject);
         listener.setOnCollisionStart(new CollisionProcessor() {
             @Override
             public void process(StaticObject object, StaticObject other) {
@@ -87,13 +92,15 @@ public class Game implements EngineEventsListener {
         switch(e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(button.isPointInside(x, y)) {
-                    engine.getScene().setBackgroundColor(0, 0, 0);
+                    //engine.getScene().setBackgroundColor(0, 0, 0);
+                    plane.turning = 2;
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if(button.isPointInside(x, y)) {
-                    engine.getScene().setBackgroundColor(0, 1, 1);
+                    //engine.getScene().setBackgroundColor(0, 1, 1);
+                    plane.turning = 0;
                     return true;
                 }
                 break;

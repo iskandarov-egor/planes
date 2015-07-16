@@ -1,7 +1,6 @@
 package com.example.planes.Engine.Scene;
 
 import com.example.planes.Engine.CollisionProcessor;
-import com.example.planes.Engine.ObjectGroup;
 
 import java.lang.Object;
 import java.util.ArrayList;

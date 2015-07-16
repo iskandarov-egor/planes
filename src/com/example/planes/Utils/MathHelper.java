@@ -24,4 +24,15 @@ public class MathHelper {
         point.x = (float)(x1 * Math.cos(angle) - y1 * Math.sin(angle)) + centerX;
         point.y = (float)(x1 * Math.sin(angle) + y1 * Math.cos(angle)) + centerY;
     }
+
+    public static float pullToX(float y, float by, float x) {
+        if(y > x){
+            y -= by;
+            if(y < x) y = x;
+        } else {
+            y += by;
+            if(y > x) y = x;
+        }
+        return y;
+    }
 }

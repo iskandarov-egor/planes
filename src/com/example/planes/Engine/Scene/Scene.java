@@ -2,7 +2,6 @@ package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
-import com.example.planes.Engine.ObjectGroup;
 import com.example.planes.Engine.Utils;
 
 import java.util.ArrayDeque;
@@ -114,23 +113,29 @@ public final class Scene {
         stickers.add(sticker);
     }
 
-    private boolean canRemoveObjects = true;
+    boolean canRemoveObjects = true;
 
     private Queue<StaticObject> removeQueue = new ArrayDeque<>();
+
+    private void removeObjectNow(StaticObject object) {
+        objects.remove(object);
+
+        //debug
+        if(objects.contains(object)) throw new RuntimeException("что то не так");
+
+        collisionManager.onObjectRemoved(object);
+    }
+
     public void removeObject(StaticObject object) {
         //debug
         if(!objects.contains(object)) throw new RuntimeException("no such object");
         if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
 
         if(canRemoveObjects) {
-            objects.remove(object);
+            removeObjectNow(object);
         } else {
             removeQueue.add(object);
         }
-    }
-
-    private boolean canRemove() {
-        return canRemoveObjects;
     }
 
     private void setCanRemoveObjects(boolean canRemoveObjects) {
@@ -138,7 +143,7 @@ public final class Scene {
         if(!removeQueue.isEmpty() && canRemoveObjects) {
             StaticObject object = removeQueue.remove();
             while(object != null) {
-                objects.remove(object);
+                removeObjectNow(object);
             }
         }
     }
@@ -154,13 +159,13 @@ public final class Scene {
     }
 
     public void onScreenChanged(int width, int height) {
-        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
         viewport.onScreenChanged(width, height);
+        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 
-    public void addToGroup(ObjectGroup group, StaticObject object) {
-        collisionManager.addToGroup(group, object);
-    }
+//    public void addToGroup(ObjectGroup group, StaticObject object) {
+//        collisionManager.addToGroup(group, object);
+//    }
 
     public void addCollisionListener(CollisionListener listener) {
         collisionManager.addCollisionListener(listener);
