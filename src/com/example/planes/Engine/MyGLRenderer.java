@@ -1,10 +1,12 @@
 package com.example.planes.Engine;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import com.example.planes.Engine.Scene.OpenGLShape;
 import com.example.planes.Engine.Scene.Scene;
+import com.example.planes.Engine.Scene.TextureSprite;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,8 +21,9 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     private Runnable onGraphicsFrameCallback = null;
     private Runnable onPhysicsFrameCallback = null;
     private Engine engine;
+    private Context context;
 
-    public MyGLRenderer(Scene scene, Engine engine) {
+    public MyGLRenderer(Engine engine) {
         Log.d("hey", "MyGLRenderer called");
         this.engine = engine;
     }
@@ -37,6 +40,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         Log.d("hey", "onSurfaceCreated called");
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
         OpenGLShape.onSurfaceCreated();
+        //TextureSprite.loadImage(context);
     }
 
     private long now, dt = 0;
@@ -106,4 +110,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

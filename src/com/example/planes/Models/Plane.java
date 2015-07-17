@@ -7,8 +7,8 @@ import com.example.planes.Utils.MathHelper;
 /**
  * Created by egor on 15.07.15.
  */
-public class Plane extends Object {
-
+public class Plane {
+    private SceneObject so;
     private float k = 0.002666f;
     private float acc = 0.025f* k *60*60;
     private float tanDrag = 0.008f*60;
@@ -17,31 +17,36 @@ public class Plane extends Object {
     private float lift = 0.015f*60;
     private float normDrag = 0.008f*60;
     private boolean gazing = true;
+    private float x, y;
+    private float vx, vy;
+    private float angle;
 
-    public Plane(float x, float y) {
-        super(x, y);
-        setSprite(new Triangle());
-        setBody(0.1f);
+
+    public Plane(Scene scene, float x, float y) {
+        so = scene.createObject(x, y);
+        so.setSprite(new Triangle());
+        so.setBody(0.1f);
+        this.x = x;
+        this.y = y;
     }
 
-    public Plane(float x, float y, float speed, float angle) {
-        this(x, y);
+    public Plane(Scene scene, float x, float y, float speed, float angle) {
+        this(scene, x, y);
         this.vx = (float) (speed*Math.cos(angle));
         this.vy = (float) (speed*Math.sin(angle));
     }
 
     public int turning = 0;
 
-    @Override
-    public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
-        super.onPhysicsFrame(horizPeriod, physicsFPS);
-        //float fps2 = physicsFPS*physicsFPS;
+    public void onPhysicsFrame(float physicsFPS) {
         float v = (float) (vx*Math.cos(angle)+vy*Math.sin(angle));
         if(turning == 1) {
             angle -= angleVelFunc(v);
+            so.setAngle(angle);
         }
         if(turning == 2) {
             angle += angleVelFunc(v);
+            so.setAngle(angle);
         }
 
         if(gazing) {
@@ -71,6 +76,11 @@ public class Plane extends Object {
         vnorm = MathHelper.pullToX(vnorm, Math.abs(normDrag  * vnorm/ physicsFPS), 0);
         vx = (float) (vtan*Math.cos(angle) - vnorm*Math.sin(angle));
         vy = (float) (vnorm*Math.cos(angle) + vtan*Math.sin(angle));
+
+        x += vx / physicsFPS;
+        y += vy / physicsFPS;
+
+        so.setXY(x, y);
 
     }
 

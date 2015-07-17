@@ -7,17 +7,15 @@ import com.example.planes.Engine.Utils;
 /**
  * Created by egor on 15.07.15.
  */
-public class StaticObject {
+public class SceneObject {
     protected float x;
     protected float y;
     protected float angle = 0;
     private Sprite sprite = null;
     private Body body = null;
-    protected StaticObject parent = null;
+    protected SceneObject parent = null;
 
-    private StaticObject(){}
-
-    public StaticObject(float x, float y) {
+    public SceneObject(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -33,10 +31,14 @@ public class StaticObject {
     }
 
     public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
-
+        if(horizPeriod != 0) {
+            while (x > horizPeriod / 2) x -= horizPeriod;
+            while (x < -horizPeriod / 2) x += horizPeriod;
+        }
+        angle = Utils.mod(angle, Utils.PI2);
     }
 
-    public boolean intersects(StaticObject object, float period) {
+    public boolean intersects(SceneObject object, float period) {
         //debug
         if(object == null) throw new NullPointerException("lalala");
         if(period < 0) throw new IllegalArgumentException("period");
@@ -50,7 +52,7 @@ public class StaticObject {
         return body != null;
     }
 
-    public void setParent(StaticObject parent) {
+    public void setParent(SceneObject parent) {
         // todo написать
     }
 
@@ -85,5 +87,23 @@ public class StaticObject {
 
     public void setAngle(float angle) {
         this.angle = angle;
+    }
+
+    public void moveToScene(Scene scene) {
+
+    }
+
+//    public void setScene(Scene scene) {
+//
+//        if(scene == this.scene) return;
+//
+//        if(this.scene != null) this.scene.removeObject(this);
+//        if(scene != null) scene.addObject(this);
+//        this.scene = scene;
+//    }
+
+    public void setXY(float x, float y) {
+        this.x = x;
+        this.y = y;
     }
 }

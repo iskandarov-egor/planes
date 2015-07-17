@@ -1,10 +1,10 @@
 package com.example.planes.Engine;
 
-import com.example.planes.Engine.Scene.StaticObject;
+import com.example.planes.Engine.Scene.SceneObject;
 
 /**
  * Created by egor on 04.07.15.
  */
 public interface CollisionProcessor {
-    public void process(StaticObject object, StaticObject other);
+    public void process(SceneObject object, SceneObject other);
 }

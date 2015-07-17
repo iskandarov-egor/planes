@@ -6,7 +6,7 @@ import com.example.planes.Engine.Utils;
 /**
  * Created by egor on 01.07.15.
  */
-public class Object extends StaticObject {
+public class Object extends SceneObject {
 
     protected float vx = 0;
     protected float vy = 0;

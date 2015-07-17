@@ -2,6 +2,8 @@ package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
+import android.view.MotionEvent;
+import com.example.planes.Engine.SceneButtonListener;
 import com.example.planes.Engine.Utils;
 
 import java.util.ArrayDeque;
@@ -15,9 +17,10 @@ import java.util.Queue;
 
 public final class Scene {
 
-    private final List<StaticObject> objects = new ArrayList<>();
+    private final List<SceneObject> objects = new ArrayList<>();
     private final List<Sticker> stickers = new ArrayList<>();
     private final CollisionManager collisionManager = new CollisionManager(this);
+    private final ButtonManager buttonManager = new ButtonManager(this);
     // Буква Z на фоне для наглядности, показывает границы мира
     private final Zigzag zigzag = new Zigzag();
     private final Viewport viewport = new Viewport();
@@ -52,6 +55,10 @@ public final class Scene {
         if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 
+    public void setButtonEventListner(SceneButtonListener listner) {
+        buttonManager.setListener(listner);
+    }
+
     public void onGraphicsFrame(float graphicsFPS){
 
         // очистка экрана
@@ -62,7 +69,7 @@ public final class Scene {
 
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
-        for(StaticObject object : objects) {
+        for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
             float horizPeriod = getHorizPeriod();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
@@ -94,19 +101,19 @@ public final class Scene {
 
     public void onPhysicsFrame(float physicsFPS) {
         setCanRemoveObjects(false);
-        for(StaticObject object : objects) {
+        for(SceneObject object : objects) {
             object.onPhysicsFrame(getHorizPeriod(), physicsFPS);
         }
         collisionManager.doCollisions();
         setCanRemoveObjects(true);
     }
 
-    public void addObject(StaticObject object) {
-        if(objects.contains(object)) throw new RuntimeException("object already present");
-
-        objects.add(object);
-
+    public void addButton(SceneButton button) {
+        buttonManager.addButton(button);
+        stickers.add(button);
     }
+
+
 
     public void addSticker(Sticker sticker) {
         if(stickers.contains(sticker)) throw new RuntimeException("sticker already present");
@@ -115,18 +122,19 @@ public final class Scene {
 
     boolean canRemoveObjects = true;
 
-    private Queue<StaticObject> removeQueue = new ArrayDeque<>();
+    private Queue<SceneObject> removeQueue = new ArrayDeque<>();
 
-    private void removeObjectNow(StaticObject object) {
+    private void removeObjectNow(SceneObject object) {
         objects.remove(object);
 
         //debug
         if(objects.contains(object)) throw new RuntimeException("что то не так");
 
         collisionManager.onObjectRemoved(object);
+        //object.setScene(null);
     }
 
-    public void removeObject(StaticObject object) {
+    public void removeObject(SceneObject object) {
         //debug
         if(!objects.contains(object)) throw new RuntimeException("no such object");
         if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
@@ -141,18 +149,19 @@ public final class Scene {
     private void setCanRemoveObjects(boolean canRemoveObjects) {
         this.canRemoveObjects = canRemoveObjects;
         if(!removeQueue.isEmpty() && canRemoveObjects) {
-            StaticObject object = removeQueue.remove();
+            SceneObject object = removeQueue.poll();
             while(object != null) {
                 removeObjectNow(object);
+                object = removeQueue.poll();
             }
         }
     }
 
-//    public SceneObject createObject(float x, float y, ObjectGroup group) {
-//        SceneObject object = createObject(x, y);
-//        collisionManager.addToGroup(group, object);
-//        return object;
-//    }
+    public SceneObject createObject(float x, float y) {
+        SceneObject object = new Object(x, y);
+        objects.add(object);
+        return object;
+    }
 
     public Viewport getViewport() {
         return viewport;
@@ -163,11 +172,23 @@ public final class Scene {
         if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 
-//    public void addToGroup(ObjectGroup group, StaticObject object) {
+//    public void addToGroup(ObjectGroup group, SceneObject object) {
 //        collisionManager.addToGroup(group, object);
 //    }
 
     public void addCollisionListener(CollisionListener listener) {
         collisionManager.addCollisionListener(listener);
+    }
+
+    public boolean onTouchEvent(MotionEvent e) {
+        return buttonManager.onTouch(e);
+    }
+
+    public boolean contains(SceneObject object) {
+        return objects.contains(object);
+    }
+
+    public void removeCollisionListener(CollisionListener collisionListener) {
+        collisionManager.removeCollisionListener(collisionListener);
     }
 }

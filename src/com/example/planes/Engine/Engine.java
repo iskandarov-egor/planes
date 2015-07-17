@@ -10,7 +10,7 @@ import com.example.planes.Engine.Scene.Scene;
  * Created by egor on 15.07.15.
  */
 public class Engine {
-    protected Scene scene;
+    private Scene scene;
     private MyGLSurfaceView view;
     private MyGLRenderer gLRenderer;
 
@@ -18,11 +18,12 @@ public class Engine {
         Log.d("hey", "activity oncreate");
 
         scene = new Scene();
-        gLRenderer = new MyGLRenderer(scene, this);
+        gLRenderer = new MyGLRenderer(this);
     }
 
     public View createView(Context context) {
         Log.d("hey", "Engine.createView called");
+        gLRenderer.setContext(context);
         view = new MyGLSurfaceView(context, gLRenderer, this);
         return view;
     }
@@ -88,9 +89,11 @@ public class Engine {
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-
+        if(scene.onTouchEvent(e)) return true;
         return listener.onTouchEvent(e);
     }
 
-
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
 }

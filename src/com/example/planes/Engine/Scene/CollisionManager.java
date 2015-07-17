@@ -12,22 +12,16 @@ final class CollisionManager {
         this.scene = scene;
     }
 
-    //private Map<ObjectGroup, List<StaticObject>> groupMap = new HashMap<>();
+    //private Map<ObjectGroup, List<SceneObject>> groupMap = new HashMap<>();
     private List<CollisionListener> colListeners = new ArrayList<>();
 
-    // когда из сцены удаляется объект, его надо удалить из всех групп
-    void onObjectRemoved(StaticObject object) {
+    void onObjectRemoved(SceneObject object) {
         //debug
         if(!scene.canRemoveObjects) throw new RuntimeException("что то не так");
         if(!canModify) throw new RuntimeException("что то совсем не так");
 
         for(CollisionListener listener : colListeners) {
-            for(ObjectGroup group : listener.getGroups()) {
-                group.getList().remove(object);
-
-                //debug
-                if (group.getList().contains(object)) throw new RuntimeException("что то не так");
-            }
+            listener.onObjectRemoved(object);
         }
     }
 
@@ -42,14 +36,16 @@ final class CollisionManager {
         for(CollisionListener listener : colListeners) {
             List<ObjectGroup> groups = listener.getGroups();
             for(int i = 0; i < groups.size(); i++){
-                for(StaticObject object : groups.get(i).getList()) { // for each object in the group
-                    for (int j = i + 1; j < groups.size(); j++) {
-                        for (StaticObject other : groups.get(j).getList()) { // for each object in another group
-                            if(object != other) {
-                                if(object.intersects(other, scene.getHorizPeriod())) {
-                                    listener.processCollision(object, other);
-                                } else {
-                                    listener.processNoCollision(object, other);
+                for(SceneObject object : groups.get(i).getList()) { // for each object in the group
+                    if(scene.contains(object)) {
+                        for (int j = i + 1; j < groups.size(); j++) {
+                            for (SceneObject other : groups.get(j).getList()) { // for each object in another group
+                                if (scene.contains(other) && object != other) {
+                                    if (object.intersects(other, scene.getHorizPeriod())) {
+                                        listener.processCollision(object, other);
+                                    } else {
+                                        listener.processNoCollision(object, other);
+                                    }
                                 }
                             }
                         }
@@ -64,13 +60,16 @@ final class CollisionManager {
         if(colListeners.contains(listener)) throw new RuntimeException("This listener is already present");
         if(!canModify) throw new RuntimeException("cannot add collision listener while processing collisions");
         colListeners.add(listener);
-
-
     }
 
-//    public void addToGroup(ObjectGroup group, StaticObject object) {
-//        StaticObject impl = object;
-//        List<StaticObject> contents = groupMap.get(group);
+    public void removeCollisionListener(CollisionListener collisionListener) {
+        if(!canModify) throw new RuntimeException("cannot remove collision listener while processing collisions");
+        colListeners.remove(collisionListener);
+    }
+
+//    public void addToGroup(ObjectGroup group, SceneObject object) {
+//        SceneObject impl = object;
+//        List<SceneObject> contents = groupMap.get(group);
 //        if(contents == null) contents = new LinkedList<>();
 //
 //        if(contents.contains(object)) throw new RuntimeException("already present");

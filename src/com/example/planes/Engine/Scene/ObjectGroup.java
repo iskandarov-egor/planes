@@ -1,8 +1,6 @@
 package com.example.planes.Engine.Scene;
 
 
-import com.example.planes.Engine.Scene.StaticObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,17 +9,20 @@ import java.util.List;
  */
 public class ObjectGroup {
 
-    private List<StaticObject> list;
-    public ObjectGroup() {
+    private List<SceneObject> list;
+    private Scene scene;
+    public ObjectGroup(Scene scene) {
         list = new ArrayList<>();
+        this.scene = scene;
     }
 
-    public void add(StaticObject object) {
+    public void add(SceneObject object) {
         if(list.contains(object)) throw new RuntimeException("already present");
+        if(!scene.contains(object)) throw new IllegalArgumentException("object is not in scene");
         list.add(object);
     }
 
-    List<StaticObject> getList() {
+    List<SceneObject> getList() {
         return list;
     }
 }

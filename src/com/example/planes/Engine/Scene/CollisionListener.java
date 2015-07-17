@@ -4,6 +4,7 @@ import com.example.planes.Engine.CollisionProcessor;
 
 import java.lang.Object;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 /**
@@ -14,6 +15,20 @@ public final class CollisionListener {
     private CollisionProcessor onCollisionStart;
     private CollisionProcessor onCollision;
     private CollisionProcessor onCollisionEnd;
+    //private Scene scene;
+
+//    public void setScene(Scene scene) {
+//        if(scene == null) throw new NullPointerException("scene");
+//        if(this.scene == scene) return;
+//
+//        this.scene.removeCollisionListener(this);
+//        this.scene = scene;
+//
+//        while(!colliding.isEmpty()) {
+//            Pair pair = colliding.remove(0);
+//            onCollisionEnd.process(pair.object, pair.other);
+//        }
+//    }
 
     List<ObjectGroup> getGroups() {
         return groups;
@@ -33,7 +48,7 @@ public final class CollisionListener {
 
     private int counter = 0; //debug
 
-    void processCollision(StaticObject object, StaticObject other) {
+    void processCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
@@ -45,7 +60,7 @@ public final class CollisionListener {
         if(onCollision != null) onCollision.process(object, other);
     }
 
-    void processNoCollision(StaticObject object, StaticObject other) {
+    void processNoCollision(SceneObject object, SceneObject other) {
         if(areColliding(object, other)) {
             stopCollision(object, other);
             onCollisionEnd.process(object, other);
@@ -59,11 +74,23 @@ public final class CollisionListener {
         this.onCollisionEnd = onCollisionEnd;
     }
 
-    private final static class Pair {
-        public StaticObject object;
-        public StaticObject other;
+    public void onObjectRemoved(SceneObject object) {
+        Iterator<Pair> i = colliding.iterator();
+        while (i.hasNext()) {
+            Pair pair = i.next();
+            if(pair.object == object || pair.other == object) {
+                onCollisionEnd.process(pair.object, pair.other);
+                i.remove();
+                counter--;
+            }
+        }
+    }
 
-        public Pair(StaticObject object, StaticObject other) {
+    private final static class Pair {
+        public SceneObject object;
+        public SceneObject other;
+
+        public Pair(SceneObject object, SceneObject other) {
             this.object = object;
             this.other = other;
         }
@@ -77,7 +104,7 @@ public final class CollisionListener {
 
     }
     private List<Pair> colliding = new LinkedList<>(); // array maybe?
-    public boolean areColliding(StaticObject object, StaticObject other) {
+    public boolean areColliding(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
@@ -100,7 +127,7 @@ public final class CollisionListener {
         this.onCollision = onCollision;
     }
 
-    private void startCollision(StaticObject object, StaticObject other) {
+    private void startCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
@@ -112,7 +139,7 @@ public final class CollisionListener {
 
     }
 
-    private void stopCollision(StaticObject object, StaticObject other) {
+    private void stopCollision(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");

@@ -9,9 +9,9 @@ import java.nio.ShortBuffer;
 
 public class Square extends OpenGLShape{
 
-    private final ShortBuffer drawListBuffer;
+    protected final ShortBuffer drawListBuffer;
 
-    private final short drawOrder[] = {0, 1, 2, 0, 2, 3}; // order to draw vertices
+    protected final short drawOrder[] = {0, 1, 2, 0, 2, 3}; // order to draw vertices
 
     public Square() {
         super(8);
