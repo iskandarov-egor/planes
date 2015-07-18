@@ -11,5 +11,5 @@ public interface EngineEventsListener {
 
     boolean onTouchEvent(MotionEvent e);
 
-    void onGlInit();
+    void onGLInit();
 }

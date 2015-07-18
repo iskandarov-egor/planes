@@ -4,9 +4,8 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import com.example.planes.Engine.Scene.OpenGLShape;
 import com.example.planes.Engine.Scene.Scene;
-import com.example.planes.Engine.Scene.TextureSprite;
+import com.example.planes.Engine.Scene.StaticSprite;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -18,10 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
 final class MyGLRenderer implements GLSurfaceView.Renderer {
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
-    private Runnable onGraphicsFrameCallback = null;
-    private Runnable onPhysicsFrameCallback = null;
     private Engine engine;
-    private Context context;
 
     public MyGLRenderer(Engine engine) {
         Log.d("hey", "MyGLRenderer called");
@@ -39,9 +35,8 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         Log.d("hey", "onSurfaceCreated called");
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        OpenGLShape.onSurfaceCreated();
-        TextureSprite.loadImage();
-        engine.listener.onGlInit();
+        StaticSprite.loadImage();
+        engine.listener.onGLInit();
     }
 
     private long now, dt = 0;
@@ -122,19 +117,11 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         isRunning = false;
     }
 
-    public void setOnGraphicsFrameCallback(Runnable onGraphicsFrameCallback) {
-        //debug
-        if(onGraphicsFrameCallback == null) throw new NullPointerException("bug!");
 
-        this.onGraphicsFrameCallback = onGraphicsFrameCallback;
-    }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         engine.getScene().onScreenChanged(width, height);
     }
 
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
 }

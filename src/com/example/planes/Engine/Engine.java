@@ -23,7 +23,6 @@ public class Engine {
 
     public View createView(Context context) {
         Log.d("hey", "Engine.createView called");
-        gLRenderer.setContext(context);
         view = new MyGLSurfaceView(context, gLRenderer, this);
         return view;
     }

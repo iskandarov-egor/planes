@@ -6,13 +6,17 @@ package com.example.planes.Engine.Scene;
  */
 public abstract class Sprite {
 
+    boolean loaded = false;
     //Картинка кароч
     public Sprite() {
 
     }
 
-    abstract void draw(float x, float y, float angle, float[] transform);
+    abstract void draw(float x, float y, float[] transform);
     abstract void onFrame(float graphicsFPS);
 
     public abstract float getRadius();
+    public abstract void rebuild(float dx, float dy, float angle);
+
+    public abstract void load();
 }

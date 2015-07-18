@@ -7,50 +7,26 @@ import com.example.planes.Engine.Utils;
 /**
  * Created by egor on 15.07.15.
  */
-public class SceneObject {
-    protected float x;
-    protected float y;
-    protected float angle = 0;
-    private Sprite sprite = null;
-    private Body body = null;
+public class SceneObject extends AbstractSceneObject{
     protected SceneObject parent = null;
 
     public SceneObject(float x, float y) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
     }
 
-    public float getAbsoluteX() {
-        if(parent != null) return parent.getAbsoluteX() + x;
-        return x;
-    }
 
-    public float getAbsoluteY() {
-        if(parent != null) return parent.getAbsoluteY() + y;
-        return y;
-    }
-
-    public void onPhysicsFrame(float horizPeriod, float physicsFPS) {
-        if(horizPeriod != 0) {
-            while (x > horizPeriod / 2) x -= horizPeriod;
-            while (x < -horizPeriod / 2) x += horizPeriod;
-        }
-        angle = Utils.mod(angle, Utils.PI2);
-    }
 
     public boolean intersects(SceneObject object, float period) {
         //debug
         if(object == null) throw new NullPointerException("lalala");
         if(period < 0) throw new IllegalArgumentException("period");
 
-        if(!hasBody() || !object.hasBody()) throw new NullPointerException("no body");
+        if(body == null || object.body == null ) throw new NullPointerException("no body");
         return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX(),
                 object.getAbsoluteY() - getAbsoluteY(), period);
     }
 
-    public boolean hasBody(){
-        return body != null;
-    }
+
 
     public void setParent(SceneObject parent) {
         // todo написать
@@ -60,50 +36,16 @@ public class SceneObject {
         //debug
         if(transform == null) throw new NullPointerException("transform");
 
-        if(sprite != null) sprite.draw(x, y, getModAngle(), transform);
-    }
-
-    private float getModAngle() {
-        // todo
-        return Utils.mod(angle, Utils.PI2);
-    }
-
-    public float getRadius() {
-        if(sprite == null) return 0;
-        return sprite.getRadius();
+        if(sprite != null) {
+            if(!sprite.loaded) {
+                sprite.load();
+                sprite.rebuild(dx, dy, angle);
+            }
+            sprite.draw(x, y, transform);
+        }
     }
 
     void onGraphicsFrame(float graphicsFPS) {
         if(sprite != null) sprite.onFrame(graphicsFPS);
-    }
-
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
-    }
-
-    public void setBody(float radius) {
-        this.body = new Circle(radius);
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
-
-    public void moveToScene(Scene scene) {
-
-    }
-
-//    public void setScene(Scene scene) {
-//
-//        if(scene == this.scene) return;
-//
-//        if(this.scene != null) this.scene.removeObject(this);
-//        if(scene != null) scene.addObject(this);
-//        this.scene = scene;
-//    }
-
-    public void setXY(float x, float y) {
-        this.x = x;
-        this.y = y;
     }
 }

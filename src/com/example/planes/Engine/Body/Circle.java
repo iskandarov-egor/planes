@@ -39,4 +39,9 @@ public class Circle extends Body {
     public boolean isPointInside(float dx, float dy) {
         return Math.hypot(dx, dy) < radius;
     }
+
+    @Override
+    public void rebuild(float dx, float dy, float angle) {
+        //
+    }
 }

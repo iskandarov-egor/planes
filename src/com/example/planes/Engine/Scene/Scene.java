@@ -22,7 +22,6 @@ public final class Scene {
     private final CollisionManager collisionManager = new CollisionManager(this);
     private final ButtonManager buttonManager = new ButtonManager(this);
     // Буква Z на фоне для наглядности, показывает границы мира
-    private final Zigzag zigzag = new Zigzag();
     private final Viewport viewport = new Viewport();
     // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
@@ -52,7 +51,9 @@ public final class Scene {
     public void setHorizontalPeriod(float numberOfScreens) {
         if(numberOfScreens < 0) throw new IllegalArgumentException("NO");
         this.numberOfScreens = numberOfScreens;
-        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
+        if(numberOfScreens != 0) {
+            // zigzag was updated here
+        }
     }
 
     public void setButtonEventListner(SceneButtonListener listner) {
@@ -65,7 +66,7 @@ public final class Scene {
         GLES20.glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
+        //zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
 
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
@@ -102,15 +103,19 @@ public final class Scene {
     public void onPhysicsFrame(float physicsFPS) {
         setCanRemoveObjects(false);
         for(SceneObject object : objects) {
-            object.onPhysicsFrame(getHorizPeriod(), physicsFPS);
+            if(!object.hasParent()) {
+                if (numberOfScreens != 0) {
+                    float horizPeriod = getHorizPeriod();
+                    float x = object.getX();
+                    while (x > horizPeriod / 2) x -= horizPeriod;
+                    while (x < -horizPeriod / 2) x += horizPeriod;
+                    object.setX(x);
+                }
+            }
         }
         collisionManager.doCollisions();
         setCanRemoveObjects(true);
     }
-
-
-
-
 
     public void addSticker(Sticker sticker) {
         if(stickers.contains(sticker)) throw new RuntimeException("sticker already present");
@@ -155,7 +160,7 @@ public final class Scene {
     }
 
     public SceneObject createObject(float x, float y) {
-        SceneObject object = new Object(x, y);
+        SceneObject object = new SceneObject(x, y);
         objects.add(object);
         return object;
     }
@@ -166,7 +171,7 @@ public final class Scene {
 
     public void onScreenChanged(int width, int height) {
         viewport.onScreenChanged(width, height);
-        if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
+      //  if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
     }
 
 //    public void addToGroup(ObjectGroup group, SceneObject object) {

@@ -18,4 +18,5 @@ public abstract class Body {
     public abstract boolean isPointInside(float dx, float dy);
 
 
+    public abstract void rebuild(float dx, float dy, float angle);
 }

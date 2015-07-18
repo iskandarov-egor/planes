@@ -10,7 +10,6 @@ import android.view.WindowManager;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
 import com.example.planes.Engine.Scene.*;
-import com.example.planes.Engine.Scene.Object;
 import com.example.planes.Models.Plane;
 import com.example.planes.Utils.MathHelper;
 
@@ -37,17 +36,16 @@ public class Game implements EngineEventsListener, SceneButtonListener {
         scene.setHorizontalPeriod(1.6f);
         scene.setBackgroundColor(0, 0, 1);
 
-
         //2. create objects
         SceneObject squareObject = scene.createObject(0, 0);
 
         //square.setColor(1, 1, 1);
 
-        squareObject.setSprite(new TextureSprite(R.drawable.ic_launcher, 0.1f));
+        squareObject.setSprite(new StaticSprite(R.drawable.ic_launcher, 0.1f));
         squareObject.setBody(0.1f);
 
         SceneObject triangleObject = scene.createObject(0.7f, 0 * 0.3f);
-        triangleObject.setSprite(new Triangle());
+        triangleObject.setSprite(new StaticSprite(R.drawable.but, 0.1f));
         triangleObject.setAngle(MathHelper.PI);
 
 
@@ -56,14 +54,15 @@ public class Game implements EngineEventsListener, SceneButtonListener {
 
         plane = new Plane(scene, -1, 0, 0.16f, 0);
 
-        plane.so.setSprite(new TextureSprite(R.drawable.plane_stub, 0.1f));
+        plane.so.setSprite(new StaticSprite(R.drawable.plane_stub, 0.1f));
+
 
         //3. create buttons
         buttonUp = scene.createButton(-getScreenRatio() + 0.2f, 0.2f);
-        buttonUp.setSprite(new TextureSprite(R.drawable.btn_up, 0.2f));
+        buttonUp.setSprite(new StaticSprite(R.drawable.btn_up, 0.2f));
         buttonUp.setBody(0.2f);
         buttonDown = scene.createButton(-getScreenRatio() + 0.2f, -0.2f);
-        buttonDown.setSprite(new TextureSprite(R.drawable.btn_up, 0.2f));
+        buttonDown.setSprite(new StaticSprite(R.drawable.btn_up, 0.2f));
         buttonDown.setAngle(MathHelper.PI);
         buttonDown.setBody(0.2f);
         scene.setButtonEventListner(this);
@@ -99,13 +98,13 @@ public class Game implements EngineEventsListener, SceneButtonListener {
         return false;
     }
 
-    private int droidId = 0;
     @Override
-    public void onGlInit() {
-       // droid.loadTexture();
-       // pin.loadTexture();
-       // but.loadTexture();
+    public void onGLInit() {
+
     }
+
+    private int droidId = 0;
+
 
     private float getScreenRatio() {
         WindowManager wm = (WindowManager) MyApplication.context.getSystemService(Context.WINDOW_SERVICE);
