@@ -4,8 +4,8 @@ package com.example.planes.Engine.Scene;
  * Created by egor on 13.07.15.
  */
 public class Zigzag {
-    private static Rect rect = new Rect(1, 1);
-    private static Rect tiltedRect = new Rect(1, 1);
+    private static Rect rect = new Rect();
+    private static Rect tiltedRect = new Rect();
     private float angle;
     private float w, h;
 

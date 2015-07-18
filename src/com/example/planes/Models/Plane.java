@@ -8,7 +8,7 @@ import com.example.planes.Utils.MathHelper;
  * Created by egor on 15.07.15.
  */
 public class Plane {
-    private SceneObject so;
+    public SceneObject so;
     private float k = 0.002666f;
     private float acc = 0.025f* k *60*60;
     private float tanDrag = 0.008f*60;
@@ -24,7 +24,7 @@ public class Plane {
 
     public Plane(Scene scene, float x, float y) {
         so = scene.createObject(x, y);
-        so.setSprite(new Triangle());
+
         so.setBody(0.1f);
         this.x = x;
         this.y = y;

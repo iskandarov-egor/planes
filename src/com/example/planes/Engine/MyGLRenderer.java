@@ -40,7 +40,8 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         Log.d("hey", "onSurfaceCreated called");
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
         OpenGLShape.onSurfaceCreated();
-        //TextureSprite.loadImage(context);
+        TextureSprite.loadImage();
+        engine.listener.onGlInit();
     }
 
     private long now, dt = 0;
@@ -55,21 +56,30 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
         dt = 0;
         last = System.nanoTime();
         isRunning = true;
+        fpsLastSpam = System.currentTimeMillis();
+        gfpsCount = 0;
+        pfpsCount = 0;
+        gfpsSum = 0;
+        pfpsSum = 0;
     }
     private int c = 0;
     private boolean drawCalled = false; //debug
+
+    private float gfpsSum = 0;
+    private float pfpsSum = 0;
+    private long fpsSpamRate = 2000;
+    private long fpsLastSpam = 0;
+    private int gfpsCount = 0;
+    private int pfpsCount = 0;
+
+
     public void onDrawFrame(GL10 gl) {
         //debug
         if(!drawCalled) {
             Log.d("hey", "onDrawFrame first called");
             drawCalled = true;
         }
-        c++;
-        if(c > 211111) {
 
-            Log.d("hey", "onDrawFrame running");
-            c = 0;
-        }
 
         if (isRunning) {
             now = System.nanoTime();
@@ -82,10 +92,24 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
             if (dt > graphStepTime) {
                 while (dt > physStepTime) {
                     dt -= physStepTime;
+                    long b = System.nanoTime();
                     engine.onPhysicsFrame(60f);
+                    pfpsSum += ((float)NANO_IN_SECOND / (System.nanoTime() - b));
+                    pfpsCount++;
                 }
-
+                long b = System.nanoTime();
                 engine.onGraphicsGrame(60f);
+                gfpsSum += ((float)NANO_IN_SECOND / (System.nanoTime() - b));
+                gfpsCount++;
+                if((System.currentTimeMillis() - fpsLastSpam > fpsSpamRate)) {
+                    Log.d("PERF", "Pfps : "+String.valueOf(pfpsSum / pfpsCount)+" Gfps : "+String.valueOf(gfpsSum /
+                            gfpsCount));
+                    pfpsSum = 0;
+                    gfpsSum = 0;
+                    gfpsCount = 0;
+                    pfpsCount = 0;
+                    fpsLastSpam = System.currentTimeMillis();
+                }
             }
             last = now;
         }

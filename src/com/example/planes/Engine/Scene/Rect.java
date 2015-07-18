@@ -10,13 +10,14 @@ import java.nio.ShortBuffer;
  * Created by egor on 13.07.15.
  */
 public class Rect extends OpenGLShape{
-    private float w, h;
-    private final ShortBuffer drawListBuffer;
-    private final short drawOrder[] = {0, 1, 2, 0, 2, 3}; // order to draw vertices
+    private float w;
+    protected float h;
+    protected final ShortBuffer drawListBuffer;
+    protected final short[] drawOrder = {0, 1, 2, 0, 2, 3}; // order to draw vertices
 
-    public Rect(float width, float height) {
+    public Rect() {
         super(8);
-        setWH(width, height);
+
         // initialize byte buffer for the draw list
         ByteBuffer dlb = ByteBuffer.allocateDirect(
                 // (# of coordinate values * 2 bytes per short)
@@ -56,14 +57,14 @@ public class Rect extends OpenGLShape{
 
     @Override
     protected void rebuild() {
-        coords[0] = w/2;
+        coords[6] = w/2;
+        coords[7] = h/2;
+        coords[0] = -w/2;
         coords[1] = h/2;
         coords[2] = -w/2;
-        coords[3] = h/2;
-        coords[4] = -w/2;
+        coords[3] = -h/2;
+        coords[4] = w/2;
         coords[5] = -h/2;
-        coords[6] = w/2;
-        coords[7] = -h/2;
 
         for(int i = 0; i < 8; i+=2) {
             double x1 = coords[i];

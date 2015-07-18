@@ -22,8 +22,10 @@ public class Game implements EngineEventsListener, SceneButtonListener {
     ObjectGroup squaresGroup;
     ObjectGroup trianglesGroup;
     StupidTestCamera camera;
-    SceneButton button;
+    SceneButton buttonUp;
+    SceneButton buttonDown;
     Plane plane;
+
 
     public Game() {
         Log.d("hey", "Game()");
@@ -32,16 +34,16 @@ public class Game implements EngineEventsListener, SceneButtonListener {
         engine.setGraphicsFPS(GameConfig.FPS);
         engine.setPhysicsFPS(GameConfig.PHYSICS_FPS);
         final Scene scene = engine.getScene();
-        scene.setHorizontalPeriod(1.5f);
+        scene.setHorizontalPeriod(1.6f);
         scene.setBackgroundColor(0, 0, 1);
 
 
         //2. create objects
         SceneObject squareObject = scene.createObject(0, 0);
-        Square square = new Square();
-        square.setColor(1, 1, 1);
 
-        squareObject.setSprite(square);
+        //square.setColor(1, 1, 1);
+
+        squareObject.setSprite(new TextureSprite(R.drawable.ic_launcher, 0.1f));
         squareObject.setBody(0.1f);
 
         SceneObject triangleObject = scene.createObject(0.7f, 0 * 0.3f);
@@ -54,12 +56,16 @@ public class Game implements EngineEventsListener, SceneButtonListener {
 
         plane = new Plane(scene, -1, 0, 0.16f, 0);
 
+        plane.so.setSprite(new TextureSprite(R.drawable.plane_stub, 0.1f));
 
         //3. create buttons
-        button = new SceneButton(-getScreenRatio() + 0.2f, 1 - 0.2f);
-        scene.addButton(button);
-        button.setSprite(new Square());
-        button.setBody(0.1f);
+        buttonUp = scene.createButton(-getScreenRatio() + 0.2f, 0.2f);
+        buttonUp.setSprite(new TextureSprite(R.drawable.btn_up, 0.2f));
+        buttonUp.setBody(0.2f);
+        buttonDown = scene.createButton(-getScreenRatio() + 0.2f, -0.2f);
+        buttonDown.setSprite(new TextureSprite(R.drawable.btn_up, 0.2f));
+        buttonDown.setAngle(MathHelper.PI);
+        buttonDown.setBody(0.2f);
         scene.setButtonEventListner(this);
 
         //4. create collision listeners
@@ -91,6 +97,14 @@ public class Game implements EngineEventsListener, SceneButtonListener {
 
     public boolean onTouchEvent(MotionEvent e) {
         return false;
+    }
+
+    private int droidId = 0;
+    @Override
+    public void onGlInit() {
+       // droid.loadTexture();
+       // pin.loadTexture();
+       // but.loadTexture();
     }
 
     private float getScreenRatio() {
@@ -131,14 +145,17 @@ public class Game implements EngineEventsListener, SceneButtonListener {
 
     @Override
     public void onButtonDown(SceneButton btn) {
-        if(btn == button) {
+        if(btn == buttonUp) {
             plane.turning = 2;
+        }
+        if(btn == buttonDown) {
+            plane.turning = 1;
         }
     }
 
     @Override
     public void onButtonUp(SceneButton btn, boolean pointInside) {
-        if(btn == button) {
+        if(btn == buttonUp || btn == buttonDown) {
             plane.turning = 0;
         }
     }

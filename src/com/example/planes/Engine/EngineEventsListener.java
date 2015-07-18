@@ -10,4 +10,6 @@ public interface EngineEventsListener {
     void onPhysicsFrame(float physicsFPS);
 
     boolean onTouchEvent(MotionEvent e);
+
+    void onGlInit();
 }

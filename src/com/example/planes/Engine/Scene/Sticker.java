@@ -47,7 +47,7 @@ public class Sticker {
         //debug
         if(sprite == null) throw new RuntimeException("no sprite");
 
-        if(sprite != null) sprite.draw(x, y, 0, transformM);
+        if(sprite != null) sprite.draw(x, y, angle, transformM);
     }
 
     public void setSprite(Sprite sprite) {

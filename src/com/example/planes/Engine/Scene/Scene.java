@@ -108,10 +108,7 @@ public final class Scene {
         setCanRemoveObjects(true);
     }
 
-    public void addButton(SceneButton button) {
-        buttonManager.addButton(button);
-        stickers.add(button);
-    }
+
 
 
 
@@ -190,5 +187,12 @@ public final class Scene {
 
     public void removeCollisionListener(CollisionListener collisionListener) {
         collisionManager.removeCollisionListener(collisionListener);
+    }
+
+    public SceneButton createButton(float x, float y) {
+        SceneButton btn = new SceneButton(x, y);
+        buttonManager.addButton(btn);
+        stickers.add(btn);
+        return btn;
     }
 }

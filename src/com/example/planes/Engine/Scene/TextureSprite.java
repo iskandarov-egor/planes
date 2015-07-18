@@ -3,8 +3,12 @@ package com.example.planes.Engine.Scene;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import com.example.planes.Engine.GLHelper;
+import com.example.planes.Engine.TextureManager;
+import com.example.planes.MyApplication;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,14 +17,28 @@ import java.nio.FloatBuffer;
 /**
  * Created by egor on 17.07.15.
  */
-public class TextureSprite extends Square {
+public class TextureSprite extends Rect {
     public static FloatBuffer uvBuffer;
-    public TextureSprite() {
-        super();
+    private static int tProgram;
+    private int textureName;
+    private boolean loaded = false;
+    private int fileId;
 
+    public TextureSprite(int fileId, float height) {
+        super();
+        if(fileId == 0) throw new IllegalArgumentException("0 id");
+        this.fileId = fileId;
+        h = height;
     }
 
-    public static void loadImage(Context context) {
+    public void loadTexture() {
+        this.textureName = TextureManager.getTexture(fileId);
+        Drawable d = MyApplication.context.getResources().getDrawable(fileId);
+        setWH(h * (float)d.getIntrinsicWidth()/d.getIntrinsicHeight(), h);
+        loaded = true;
+    }
+
+    public static void loadImage() {
         // Create our UV coordinates.
         float[] uvs = new float[] {
                 0.0f, 0.0f,
@@ -37,59 +55,34 @@ public class TextureSprite extends Square {
         uvBuffer.position(0);
 
         // Generate Textures, if more needed, alter these numbers.
-        int[] texturenames = new int[1];
-        GLES20.glGenTextures(1, texturenames, 0);
 
-        // Retrieve our image from resources.
-        int id = context.getResources().getIdentifier("drawable/ic_launcher", null,
-                context.getPackageName());
-
-        // Temporary create a bitmap
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
-
-
-        // Bind texture to texturename
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
-
-        // Set filtering
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-
-        // Set wrapping mode
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
-
-        // Load the bitmap into the bound texture.
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-
-        // We are done using the bitmap so we should recycle it.
-        bmp.recycle();
 
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
                 vs_Image);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
                 fs_Image);
 
-//        mProgram = GLES20.glCreateProgram();
-//        GLES20.glAttachShader(mProgram, vertexShader);
-//        GLES20.glAttachShader(mProgram, fragmentShader);
-//        GLES20.glLinkProgram(mProgram);
-
+        tProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(tProgram, vertexShader);
+        GLES20.glAttachShader(tProgram, fragmentShader);
+        GLES20.glLinkProgram(tProgram);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         // Set our shader programm
 
     }
 
     @Override
     void draw(float x, float y, float angle, float[] m) {
-        GLES20.glUseProgram(mProgram);
+        if(!loaded) {
+            loadTexture();
+        }
+        if(angle != this.angle) rotate(angle);
+        GLES20.glUseProgram(tProgram);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureName);
         // get handle to vertex shader's vPosition member
         int mPositionHandle =
-                GLES20.glGetAttribLocation(mProgram, "vPosition");
+                GLES20.glGetAttribLocation(tProgram, "vPosition");
 
         // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -100,7 +93,7 @@ public class TextureSprite extends Square {
                 vertexStride/**/, vertexBuffer);
 
         // Get handle to texture coordinates location
-        int mTexCoordLoc = GLES20.glGetAttribLocation(mProgram,
+        int mTexCoordLoc = GLES20.glGetAttribLocation(tProgram,
                 "a_texCoord" );
 
         // Enable generic vertex attribute array
@@ -112,18 +105,24 @@ public class TextureSprite extends Square {
                 0, uvBuffer);
 
         // Get handle to shape's transformation matrix
-        int mtrxhandle = GLES20.glGetUniformLocation(mProgram,
+        int mtrxhandle = GLES20.glGetUniformLocation(tProgram,
                 "uMVPMatrix");
 
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
         // Get handle to textures locations
-        int mSamplerLoc = GLES20.glGetUniformLocation (mProgram,
+        int mSamplerLoc = GLES20.glGetUniformLocation (tProgram,
                 "s_texture" );
 
         // Set the sampler texture unit to 0, where we have saved the texture.
         GLES20.glUniform1i ( mSamplerLoc, 0);
+
+        int dispHandle = GLES20.glGetUniformLocation(mProgram, "disp");
+        disp[0] = x;
+        disp[1] = y;
+
+        GLES20.glUniform4fv(dispHandle, 1, disp, 0);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
@@ -135,30 +134,21 @@ public class TextureSprite extends Square {
 
     }
 
-//    @Override
-//    protected void rebuild() {
-//
-//    }
-
-//    @Override
-//    protected void rotate(float angle) {
-//
-//    }
-
     @Override
     public float getRadius() {
         return 0;
     }
 
     public static final String vs_Image =
+            "uniform vec4 disp;" +
             "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "attribute vec2 a_texCoord;" +
-                    "varying vec2 v_texCoord;" +
-                    "void main() {" +
-                    "  gl_Position = uMVPMatrix * vPosition;" +
-                    "  v_texCoord = a_texCoord;" +
-                    "}";
+            "attribute vec4 vPosition;" +
+            "attribute vec2 a_texCoord;" +
+            "varying vec2 v_texCoord;" +
+            "void main() {" +
+            "  gl_Position = uMVPMatrix * (vPosition + disp);" +
+            "  v_texCoord = a_texCoord;" +
+            "}";
     public static final String fs_Image =
             "precision mediump float;" +
                     "varying vec2 v_texCoord;" +
