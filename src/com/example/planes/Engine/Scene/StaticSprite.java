@@ -49,12 +49,13 @@ public class StaticSprite extends Sprite {
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(coords);
         vertexBuffer.position(0);
-        rebuild(0, 0, 0);
+
 
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
         h = height;
         w = h;
+        rebuild(0, 0, 0);
     }
 
     @Override
@@ -119,6 +120,7 @@ public class StaticSprite extends Sprite {
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
                 GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
+
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTexCoordLoc);
@@ -127,7 +129,7 @@ public class StaticSprite extends Sprite {
 
     @Override
     public float getRadius() {
-        return radius;
+        return (float) (Math.hypot(w, h)/2);
     }
 
     @Override

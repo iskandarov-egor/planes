@@ -21,7 +21,6 @@ public final class Scene {
     private final List<Sticker> stickers = new ArrayList<>();
     private final CollisionManager collisionManager = new CollisionManager(this);
     private final ButtonManager buttonManager = new ButtonManager(this);
-    // Буква Z на фоне для наглядности, показывает границы мира
     private final Viewport viewport = new Viewport();
     // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
@@ -44,11 +43,11 @@ public final class Scene {
         return collisionManager;
     }
 
-    float getHorizPeriod(){
+    public float getPeriod(){
         return numberOfScreens * viewport.screenRatio * 2;
     }
 
-    public void setHorizontalPeriod(float numberOfScreens) {
+    public void setPeriod(float numberOfScreens) {
         if(numberOfScreens < 0) throw new IllegalArgumentException("NO");
         this.numberOfScreens = numberOfScreens;
         if(numberOfScreens != 0) {
@@ -72,7 +71,7 @@ public final class Scene {
         float halfWidth = viewport.getHalfWidth();
         for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
-            float horizPeriod = getHorizPeriod();
+            float horizPeriod = getPeriod();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
 
             float x = (object.getAbsoluteX() - viewport.cameraX);
@@ -104,8 +103,8 @@ public final class Scene {
         setCanRemoveObjects(false);
         for(SceneObject object : objects) {
             if(!object.hasParent()) {
-                if (numberOfScreens != 0) {
-                    float horizPeriod = getHorizPeriod();
+                if (false && numberOfScreens != 0) {
+                    float horizPeriod = getPeriod();
                     float x = object.getX();
                     while (x > horizPeriod / 2) x -= horizPeriod;
                     while (x < -horizPeriod / 2) x += horizPeriod;
@@ -160,7 +159,7 @@ public final class Scene {
     }
 
     public SceneObject createObject(float x, float y) {
-        SceneObject object = new SceneObject(x, y);
+        SceneObject object = new SceneObject(x, y, this);
         objects.add(object);
         return object;
     }
@@ -171,7 +170,7 @@ public final class Scene {
 
     public void onScreenChanged(int width, int height) {
         viewport.onScreenChanged(width, height);
-      //  if(numberOfScreens != 0) zigzag.setWH(getHorizPeriod(), 2);
+      //  if(numberOfScreens != 0) zigzag.setWH(getPeriod(), 2);
     }
 
 //    public void addToGroup(ObjectGroup group, SceneObject object) {
@@ -195,9 +194,15 @@ public final class Scene {
     }
 
     public SceneButton createButton(float x, float y) {
-        SceneButton btn = new SceneButton(x, y);
+        SceneButton btn = new SceneButton(x, y, this);
         buttonManager.addButton(btn);
         stickers.add(btn);
         return btn;
+    }
+
+    public Sticker createSticker(float x, float y) {
+        Sticker sticker = new Sticker(x, y, this);
+        stickers.add(sticker);
+        return sticker;
     }
 }

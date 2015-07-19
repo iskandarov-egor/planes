@@ -14,12 +14,14 @@ abstract class AbstractSceneObject {
     protected float dx = 0;
     protected float dy = 0;
     protected AbstractSceneObject parent = null;
+    private final Scene scene;
 
     protected Sprite sprite = null;
     protected Body body = null;
-    public AbstractSceneObject(float x, float y) {
+    AbstractSceneObject(float x, float y, Scene scene) {
         this.x = x;
         this.y = y;
+        this.scene = scene;
     }
     public float getX() {
         return x;
@@ -93,5 +95,9 @@ abstract class AbstractSceneObject {
 
     public void setX(float x) {
         this.x = x;
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 }

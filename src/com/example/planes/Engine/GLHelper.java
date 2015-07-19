@@ -12,10 +12,8 @@ import com.example.planes.MyApplication;
 public class GLHelper {
     public static final int createTexture(int fileId) {
         // Generate Textures, if more needed, alter these numbers.
-        int[] texturenames = new int[2];
-        //int[] texturenames2 = new int[1];
-        GLES20.glGenTextures(2, texturenames, 0);
-        //GLES20.glGenTextures(1, texturenames2, 0);
+        int[] texturenames = new int[1];
+        GLES20.glGenTextures(1, texturenames, 0);
 
         // Retrieve our image from resources.
 
@@ -46,9 +44,5 @@ public class GLHelper {
         // We are done using the bitmap so we should recycle it.
         bmp.recycle();
         return texturenames[0];
-    }
-
-    public static final void useTexture(int name) {
-
     }
 }

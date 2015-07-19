@@ -1,12 +1,14 @@
-package com.example.planes.Models;
+package com.example.planes.Game.Models;
 
+import android.view.MotionEvent;
+import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Utils.MathHelper;
 
 /**
  * Created by egor on 15.07.15.
  */
-public class Plane {
+public class Plane implements Movable{
     public SceneObject so;
     private float k = 0.002666f;
     private float acc = 0.025f* k *60*60;
@@ -16,21 +18,16 @@ public class Plane {
     private float lift = 0.015f*60;
     private float normDrag = 0.008f*60;
     private boolean gazing = true;
-    private float x, y;
     private float vx, vy;
     private float angle;
 
 
-    public Plane(Scene scene, float x, float y) {
-        so = scene.createObject(x, y);
-
-        so.setBody(0.1f);
-        this.x = x;
-        this.y = y;
+    public Plane(SceneObject object) {
+        so = object;
     }
 
-    public Plane(Scene scene, float x, float y, float speed, float angle) {
-        this(scene, x, y);
+    public Plane(SceneObject object, float speed, float angle) {
+        this(object);
         this.vx = (float) (speed*Math.cos(angle));
         this.vy = (float) (speed*Math.sin(angle));
     }
@@ -48,7 +45,7 @@ public class Plane {
             so.setAngle(angle);
         }
 
-        if(gazing) {
+        if(gazing && so.getY() < GameConfig.worldHeight) {
             float vx1 = (float) (acc*Math.cos(angle)) / physicsFPS;
             float vy1 = (float) (acc*Math.sin(angle)) / physicsFPS;
 
@@ -76,10 +73,8 @@ public class Plane {
         vx = (float) (vtan*Math.cos(angle) - vnorm*Math.sin(angle));
         vy = (float) (vnorm*Math.cos(angle) + vtan*Math.sin(angle));
 
-        x += vx / physicsFPS;
-        y += vy / physicsFPS;
 
-        so.setXY(x, y);
+        so.setXY(so.getX()+vx / physicsFPS, so.getY()+vy / physicsFPS);
 
     }
 
@@ -87,5 +82,17 @@ public class Plane {
         float resist = 0.5f;
         float maxV = acc / tanDrag;
         return this.dirVel*(1-Math.min(resist, resist*(Math.abs(v)/maxV)));
+    }
+
+    public SceneObject getSceneObject() {
+        return so;
+    }
+
+    public float getVx() {
+        return vx;
+    }
+
+    public float getVy() {
+        return vy;
     }
 }

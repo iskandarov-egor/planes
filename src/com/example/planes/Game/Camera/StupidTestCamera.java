@@ -1,4 +1,4 @@
-package com.example.planes;
+package com.example.planes.Game.Camera;
 
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Utils.MathHelper;

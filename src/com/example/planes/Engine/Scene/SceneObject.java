@@ -10,11 +10,9 @@ import com.example.planes.Engine.Utils;
 public class SceneObject extends AbstractSceneObject{
     protected SceneObject parent = null;
 
-    public SceneObject(float x, float y) {
-        super(x, y);
+    public SceneObject(float x, float y, Scene scene) {
+        super(x, y, scene);
     }
-
-
 
     public boolean intersects(SceneObject object, float period) {
         //debug
@@ -25,8 +23,6 @@ public class SceneObject extends AbstractSceneObject{
         return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX(),
                 object.getAbsoluteY() - getAbsoluteY(), period);
     }
-
-
 
     public void setParent(SceneObject parent) {
         // todo написать

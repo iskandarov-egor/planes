@@ -13,4 +13,9 @@ public class GameConfig {
 
     public static final float bulletDamage = 1;
     public static final float smallPlaneHealth = 3;
+
+    public static float worldHeight = 1;
+    public static float worldPeriod = 1.6f;
+    public static int cloudsMin = 5;
+    public static int cloudsMax = 10;
 }
