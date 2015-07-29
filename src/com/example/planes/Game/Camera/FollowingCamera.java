@@ -1,5 +1,8 @@
 package com.example.planes.Game.Camera;
 
+import com.example.planes.Config.GameConfig;
+import com.example.planes.Engine.Scene.Viewport;
+import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Models.Plane;
 
 /**
@@ -7,18 +10,20 @@ import com.example.planes.Game.Models.Plane;
  */
 public class FollowingCamera extends Camera{
     private Plane plane = null;
-    private float distance = 0.8f;
+    private float distance = GameConfig.cameraDistance;
     private float x, y;
-
+    private float zoom = 1;
+    private Viewport view;
     public FollowingCamera(Plane plane) {
         this.plane = plane;
         x = plane.getSceneObject().getX();
         y = plane.getSceneObject().getY();
+        view = plane.getSceneObject().getScene().getViewport();
     }
 
     @Override
     public void onFrame(float fps) {
-        float period = plane.getSceneObject().getScene().getPeriod();
+        float period = plane.getSceneObject().getScene().getWorldWidth();
         float px = plane.getSceneObject().getX();
         float py = plane.getSceneObject().getY();
         float vx = plane.getVx();
@@ -35,6 +40,15 @@ public class FollowingCamera extends Camera{
         while(x > period/2) x -= period;
         while(x < -period/2) x += period;
 
-        plane.getSceneObject().getScene().getViewport().setPosition(x, y);
+
+        float bottom = (-1 + y)*zoom;
+
+        if(bottom < -1) y = -1/zoom +1;
+        view.setPosition(x, y);
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+        view.setZoom(zoom);
     }
 }

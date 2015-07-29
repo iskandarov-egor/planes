@@ -52,6 +52,7 @@ class ButtonManager {
                     case MotionEvent.ACTION_DOWN:
                         listener.onButtonDown(btn);
                         held = btn;
+                        canRemove = true;
                         return true;
                 }
 

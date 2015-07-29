@@ -10,18 +10,11 @@ import com.example.planes.MyApplication;
  * Created by egor on 18.07.15.
  */
 public class GLHelper {
-    public static final int createTexture(int fileId) {
+
+    public static int createTexture(Bitmap bmp) {
         // Generate Textures, if more needed, alter these numbers.
         int[] texturenames = new int[1];
         GLES20.glGenTextures(1, texturenames, 0);
-
-        // Retrieve our image from resources.
-
-
-        // Temporary create a bitmap
-        Bitmap bmp = BitmapFactory.decodeResource(MyApplication.context.getResources(), fileId);
-
-
         // Bind texture to texturename
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
@@ -42,7 +35,14 @@ public class GLHelper {
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
         // We are done using the bitmap so we should recycle it.
-        bmp.recycle();
+
         return texturenames[0];
+    }
+
+    public static int createTexture(int fileId) {
+        Bitmap bmp = BitmapFactory.decodeResource(MyApplication.getContext().getResources(), fileId);
+        int name = createTexture(bmp);
+        bmp.recycle();
+        return name;
     }
 }

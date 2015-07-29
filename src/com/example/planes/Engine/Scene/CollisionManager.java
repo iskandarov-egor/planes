@@ -41,7 +41,7 @@ final class CollisionManager {
                         for (int j = i + 1; j < groups.size(); j++) {
                             for (SceneObject other : groups.get(j).getList()) { // for each object in another group
                                 if (scene.contains(other) && object != other) {
-                                    if (object.intersects(other, scene.getPeriod())) {
+                                    if (object.intersects(other, scene.getWorldWidth())) {
                                         listener.processCollision(object, other);
                                     } else {
                                         listener.processNoCollision(object, other);

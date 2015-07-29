@@ -100,4 +100,12 @@ abstract class AbstractSceneObject {
     public Scene getScene() {
         return scene;
     }
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
 }

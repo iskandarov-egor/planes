@@ -6,6 +6,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.example.planes.Engine.Scene.Scene;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * Created by egor on 15.07.15.
  */
@@ -53,6 +56,15 @@ public class Engine {
     public void onGraphicsGrame(float graphicsFPS) {
         scene.onGraphicsFrame(graphicsFPS);
         if(listener != null) listener.onGraphicsFrame(graphicsFPS);
+
+        //process touch events
+        MotionEvent e = touchQueue.poll();
+        while(e != null) {
+            if(!scene.onTouchEvent(e)) {
+                listener.onTouchEvent(e);
+            }
+            e = touchQueue.poll();
+        }
     }
 
     public void onPhysicsFrame(float physicsFPS) {
@@ -87,9 +99,10 @@ public class Engine {
         this.listener = listener;
     }
 
+    ConcurrentLinkedQueue<MotionEvent> touchQueue = new ConcurrentLinkedQueue<>();
     public boolean onTouchEvent(MotionEvent e) {
-        if(scene.onTouchEvent(e)) return true;
-        return listener.onTouchEvent(e);
+        touchQueue.add(e);
+        return true;
     }
 
     public void setScene(Scene scene) {

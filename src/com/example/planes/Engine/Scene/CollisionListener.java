@@ -63,7 +63,7 @@ public final class CollisionListener {
     void processNoCollision(SceneObject object, SceneObject other) {
         if(areColliding(object, other)) {
             stopCollision(object, other);
-            onCollisionEnd.process(object, other);
+            if(onCollisionEnd != null) onCollisionEnd.process(object, other);
         }
     }
 
@@ -101,6 +101,7 @@ public final class CollisionListener {
                 return (object == p.object && other == p.other) || (object == p.other && other == p.object);
             } else return this == o;
         }
+
 
     }
     private List<Pair> colliding = new LinkedList<>(); // array maybe?

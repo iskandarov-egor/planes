@@ -7,6 +7,8 @@ package com.example.planes.Engine.Scene;
 public abstract class Sprite {
 
     boolean loaded = false;
+    protected float w;
+    protected float h;
     //Картинка кароч
     public Sprite() {
 
@@ -19,4 +21,12 @@ public abstract class Sprite {
     public abstract void rebuild(float dx, float dy, float angle);
 
     public abstract void load();
+
+    public float getH() {
+        return h;
+    }
+
+    public float getW() {
+        return w;
+    }
 }

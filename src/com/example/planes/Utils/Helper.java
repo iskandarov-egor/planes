@@ -20,7 +20,7 @@ public class Helper {
     }
 
     public static float getScreenRatio() {
-        WindowManager wm = (WindowManager) MyApplication.context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) MyApplication.getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -28,8 +28,8 @@ public class Helper {
         return (float)size.x / size.y;
     }
 
-    private static int getScreenHeight(){
-        WindowManager wm = (WindowManager) MyApplication.context.getSystemService(Context.WINDOW_SERVICE);
+    public static int getScreenHeight(){
+        WindowManager wm = (WindowManager) MyApplication.getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -38,7 +38,7 @@ public class Helper {
     }
 
     public static Point getDrawableWH(int id) {
-        Drawable d = MyApplication.context.getResources().getDrawable(id);
+        Drawable d = MyApplication.getContext().getResources().getDrawable(id);
         return new Point(d.getIntrinsicWidth(), d.getIntrinsicHeight());
     }
 }

@@ -80,4 +80,13 @@ public final class Viewport {
         return new Utils.FloatPoint(2*(x / screenHeight - 0.5f*screenRatio),
                 2*(0.5f - y / screenHeight));
     }
+
+    public Utils.FloatPoint screenToWorld(float x, float y) {
+        Utils.FloatPoint eng = screenToEngine(x, y);
+        eng.x -= cameraX;
+        eng.y -= cameraY;
+        eng.x *= currentZoom;
+        eng.y *= currentZoom;
+        return eng;
+    }
 }

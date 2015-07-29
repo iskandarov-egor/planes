@@ -1,6 +1,7 @@
 package com.example.planes.Engine.Scene;
 
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -21,16 +22,15 @@ public class StaticSprite extends Sprite {
     private static int tProgram;
     private int textureName;
 
-    private int fileId;
-    private float w;
-    protected float h;
+    private int fileId = 0;
+    private Bitmap bitmap = null;
+
     protected static final ShortBuffer drawListBuffer;
     protected static final short[] drawOrder = {0, 1, 2, 0, 2, 3}; // order to draw vertices
     protected static final int COORDS_PER_VERTEX = 2;
     protected static final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
     protected FloatBuffer vertexBuffer;
     protected final float[] coords;
-    private float radius = 0;
 
     static {
         ByteBuffer dlb = ByteBuffer.allocateDirect(
@@ -42,7 +42,7 @@ public class StaticSprite extends Sprite {
         drawListBuffer.position(0);
     }
 
-    public StaticSprite(int fileId, float height) {
+    private StaticSprite(float height) {
         coords = new float[8];
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -51,18 +51,34 @@ public class StaticSprite extends Sprite {
         vertexBuffer.position(0);
 
 
+        h = height;
+
+        rebuild(0, 0, 0);
+    }
+
+    public StaticSprite(Bitmap bmp, float height) {
+        this(height);
+        if(bmp == null) throw new NullPointerException();
+        bitmap = bmp;
+        w = h * ((float)bitmap.getWidth()) / bitmap.getHeight();
+    }
+
+    public StaticSprite(int fileId, float height) {
+        this(height);
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
-        h = height;
-        w = h;
-        rebuild(0, 0, 0);
+        Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
+        w = h * ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
     }
 
     @Override
     public void load() {
-        this.textureName = TextureManager.getTexture(fileId);
-        Drawable d = MyApplication.context.getResources().getDrawable(fileId);
-        w = h * (float)d.getIntrinsicWidth()/d.getIntrinsicHeight();
+        if(bitmap == null) {
+            this.textureName = TextureManager.getTexture(fileId);
+        } else {
+            this.textureName = TextureManager.getTexture(bitmap);
+        }
+
         loaded = true;
     }
 

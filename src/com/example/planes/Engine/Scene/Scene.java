@@ -43,7 +43,7 @@ public final class Scene {
         return collisionManager;
     }
 
-    public float getPeriod(){
+    public float getWorldWidth(){
         return numberOfScreens * viewport.screenRatio * 2;
     }
 
@@ -71,7 +71,7 @@ public final class Scene {
         float halfWidth = viewport.getHalfWidth();
         for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
-            float horizPeriod = getPeriod();
+            float horizPeriod = getWorldWidth();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
 
             float x = (object.getAbsoluteX() - viewport.cameraX);
@@ -104,7 +104,7 @@ public final class Scene {
         for(SceneObject object : objects) {
             if(!object.hasParent()) {
                 if (false && numberOfScreens != 0) {
-                    float horizPeriod = getPeriod();
+                    float horizPeriod = getWorldWidth();
                     float x = object.getX();
                     while (x > horizPeriod / 2) x -= horizPeriod;
                     while (x < -horizPeriod / 2) x += horizPeriod;
@@ -147,6 +147,13 @@ public final class Scene {
         }
     }
 
+    public void removeSticker(Sticker sticker) {
+        //debug
+        if(!stickers.contains(sticker)) throw new RuntimeException("no such sticker");
+
+        stickers.remove(sticker);
+    }
+
     private void setCanRemoveObjects(boolean canRemoveObjects) {
         this.canRemoveObjects = canRemoveObjects;
         if(!removeQueue.isEmpty() && canRemoveObjects) {
@@ -170,7 +177,7 @@ public final class Scene {
 
     public void onScreenChanged(int width, int height) {
         viewport.onScreenChanged(width, height);
-      //  if(numberOfScreens != 0) zigzag.setWH(getPeriod(), 2);
+      //  if(numberOfScreens != 0) zigzag.setWH(getWorldWidth(), 2);
     }
 
 //    public void addToGroup(ObjectGroup group, SceneObject object) {
@@ -205,4 +212,5 @@ public final class Scene {
         stickers.add(sticker);
         return sticker;
     }
+
 }
