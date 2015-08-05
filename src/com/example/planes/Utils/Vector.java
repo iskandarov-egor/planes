@@ -16,6 +16,9 @@ public class Vector {
         y = vector.y;
     }
 
+    public Vector() {
+        x = 0; y = 0;
+    }
 
 
     public void set(float x, float y) {

@@ -8,19 +8,22 @@ import android.content.*;
 import android.util.Log;
 import com.example.planes.MyApplication;
 
+import java.util.UUID;
+
 /**
  * Created by egor on 23.07.15.
  */
 public class Connector {
+    public static final UUID uuid = UUID.fromString("7ae01e41-3df2-4aa9-97bd-107081d1b773");
     AcceptThread acceptThread;
     ConnectorListener listener;
     BluetoothAdapter adapter;
-    ContextWrapper act;
+    ContextWrapper app;
     private BroadcastReceiver foundReceiver = null;
 
     public Connector(ConnectorListener listener) {
         this.listener = listener;
-        act = MyApplication.get();
+        app = MyApplication.get();
         adapter = BluetoothAdapter.getDefaultAdapter();
         if(adapter == null) {
             Log.d("whoops", "well shit");
@@ -33,24 +36,24 @@ public class Connector {
             throw new RuntimeException("already accepting");  //debug
         }
         if(isSearching()) {
-            throw  new RuntimeException("was seaching"); //debug
+            stopSearching();
         }
 
         assertBT();
         getAcceptThread().start();
     }
 
+    private static final int REQUEST_ENABLE_BT = 83638;
     private void assertBT() {
         if(!BluetoothAdapter.getDefaultAdapter().isEnabled()) throw new RuntimeException("bt not enabled");
     }
 
     public void connectTo (BluetoothDevice device) {
         if(isAccepting()) {
-            //stopAccepting();
-            throw new RuntimeException("was accepting");  //debug
+            stopAccepting();
         }
         if(isSearching()) {
-            throw  new RuntimeException("was seaching"); //debug
+            stopSearching();
         }
 
         assertBT();
@@ -64,7 +67,7 @@ public class Connector {
 
     public void startSearching() {  //todo app
         if(isAccepting()) {
-            throw new RuntimeException("was accepting");
+            stopAccepting();
         }
         if(isSearching()) {
             throw  new RuntimeException("was seaching"); //debug
@@ -74,7 +77,7 @@ public class Connector {
 
         BroadcastReceiver mReceiver = getFoundReceiver();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        act.registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+        app.registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
     }
 
@@ -115,7 +118,7 @@ public class Connector {
 
     public void stopSearching() {
         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-        act.unregisterReceiver(getFoundReceiver());
+        app.unregisterReceiver(getFoundReceiver());
     }
 
     public void onAccepted(BluetoothSocket socket) {
@@ -130,5 +133,9 @@ public class Connector {
 
     public void onMessage(Message msg, RemoteAbonent remoteAbonent) {
         listener.onMessage(remoteAbonent, msg);
+    }
+
+    public void onConnectFailed() {
+        listener.onConnectFailed();
     }
 }

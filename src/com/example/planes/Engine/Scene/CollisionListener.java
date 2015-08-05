@@ -15,6 +15,7 @@ public final class CollisionListener {
     private CollisionProcessor onCollisionStart;
     private CollisionProcessor onCollision;
     private CollisionProcessor onCollisionEnd;
+    private final Scene scene;
     //private Scene scene;
 
 //    public void setScene(Scene scene) {
@@ -42,6 +43,8 @@ public final class CollisionListener {
     }
 
     public CollisionListener(ObjectGroup group1, ObjectGroup group2) {
+        if(group1.getScene() != group2.getScene()) throw new RuntimeException("diff scenes");
+        scene = group1.getScene();
         addGroup(group1);
         addGroup(group2);
     }
@@ -79,7 +82,7 @@ public final class CollisionListener {
         while (i.hasNext()) {
             Pair pair = i.next();
             if(pair.object == object || pair.other == object) {
-                onCollisionEnd.process(pair.object, pair.other);
+                if(onCollisionEnd != null) onCollisionEnd.process(pair.object, pair.other);
                 i.remove();
                 counter--;
             }

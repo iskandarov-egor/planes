@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.util.Log;
+import com.example.planes.Engine.MyGLRenderer;
 import com.example.planes.Engine.TextureManager;
 import com.example.planes.MyApplication;
 
@@ -18,12 +19,12 @@ import java.nio.ShortBuffer;
  */
 public class StaticSprite extends Sprite {
     protected final float[] disp = {0,0,0,0};
-    public static FloatBuffer uvBuffer;
-    private static int tProgram;
+    protected FloatBuffer uvBuffer;
+
     private int textureName;
 
-    private int fileId = 0;
-    private Bitmap bitmap = null;
+    protected int fileId = 0;
+    protected Bitmap bitmap = null;
 
     protected static final ShortBuffer drawListBuffer;
     protected static final short[] drawOrder = {0, 1, 2, 0, 2, 3}; // order to draw vertices
@@ -40,9 +41,11 @@ public class StaticSprite extends Sprite {
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
+
+
     }
 
-    private StaticSprite(float height) {
+    protected StaticSprite(float height, float width) {
         coords = new float[8];
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -50,25 +53,46 @@ public class StaticSprite extends Sprite {
         vertexBuffer.put(coords);
         vertexBuffer.position(0);
 
+        // Create our UV coordinates.
+        float[] uvs = new float[] {
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
+        };
+
+        // The texture buffer
+        bb = ByteBuffer.allocateDirect(uvs.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        uvBuffer = bb.asFloatBuffer();
+        uvBuffer.put(uvs);
+        uvBuffer.position(0);
 
         h = height;
+        w = width;
 
         rebuild(0, 0, 0);
     }
 
+    protected static float getWidthBy(float h, int fileId) {
+        Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
+        return h * ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
+    }
+
+    protected static float getWidthBy(float h, Bitmap bitmap) {
+        return h * ((float)bitmap.getWidth()) / bitmap.getHeight();
+    }
+
     public StaticSprite(Bitmap bmp, float height) {
-        this(height);
+        this(height, getWidthBy(height, bmp));
         if(bmp == null) throw new NullPointerException();
         bitmap = bmp;
-        w = h * ((float)bitmap.getWidth()) / bitmap.getHeight();
     }
 
     public StaticSprite(int fileId, float height) {
-        this(height);
+        this(height, getWidthBy(height, fileId));
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
-        Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
-        w = h * ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
     }
 
     @Override
@@ -79,7 +103,7 @@ public class StaticSprite extends Sprite {
             this.textureName = TextureManager.getTexture(bitmap);
         }
 
-        loaded = true;
+        textureSurfaceVersion = MyGLRenderer.surfaceVersion;
     }
 
     @Override
@@ -171,81 +195,6 @@ public class StaticSprite extends Sprite {
     }
 
 
-    public static void loadImage() {
-        // Create our UV coordinates.
-        float[] uvs = new float[] {
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
-        };
-
-        // The texture buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        uvBuffer = bb.asFloatBuffer();
-        uvBuffer.put(uvs);
-        uvBuffer.position(0);
-
-        // Generate Textures, if more needed, alter these numbers.
-
-
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
-                vs_Image);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
-                fs_Image);
-
-        tProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(tProgram, vertexShader);
-        GLES20.glAttachShader(tProgram, fragmentShader);
-        GLES20.glLinkProgram(tProgram);
-        GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        // Set our shader programm
-
-    }
-
-    public static int loadShader(int type, String shaderCode){
-        Log.d("hey", "loadShader called ");
-        int shader = GLES20.glCreateShader(type);
-        if (shader == 0) {
-            Log.d("hey", "shader 0");
-            throw new RuntimeException("Error creating shader.");
-        }
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-
-        final int[] compileStatus = new int[1];
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-        if (compileStatus[0] == GLES20.GL_FALSE)
-        {
-            GLES20.glDeleteShader(shader);
-            shader = 0;
-            throw new RuntimeException("Error creating shader.");
-        }
-
-
-        return shader;
-    }
-
-    public static final String vs_Image =
-            "uniform vec4 disp;" +
-                    "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "attribute vec2 a_texCoord;" +
-                    "varying vec2 v_texCoord;" +
-                    "void main() {" +
-                    "  gl_Position = uMVPMatrix * (vPosition + disp);" +
-                    "  v_texCoord = a_texCoord;" +
-                    "}";
-    public static final String fs_Image =
-            "precision mediump float;" +
-                    "varying vec2 v_texCoord;" +
-                    "uniform sampler2D s_texture;" +
-                    "void main() {" +
-                    "  gl_FragColor = texture2D( s_texture, v_texCoord );" +
-                    "}";
 
     public static void checkGlError(String glOperation) {
         int error;

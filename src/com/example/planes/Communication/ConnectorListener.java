@@ -10,4 +10,6 @@ public interface ConnectorListener {
     void onMessage(RemoteAbonent abonent, Message msg);
     void onFound(BluetoothDevice device);
     void onConnected(RemoteAbonent abonent);
+
+    void onConnectFailed();
 }

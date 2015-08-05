@@ -18,11 +18,22 @@ public class MathHelper {
 
     // повернуть точку вокруг другой точки на угол
     public static void rotate(Vector point, float centerX, float centerY, float angle) {
-        double x1 = point.x - centerX;
-        double y1 = point.y - centerY;
+        float x1 = point.x - centerX;
+        float y1 = point.y - centerY;
+        float cos = (float) Math.cos(angle);
+        float sin = (float) Math.sin(angle);
 
-        point.x = (float)(x1 * Math.cos(angle) - y1 * Math.sin(angle)) + centerX;
-        point.y = (float)(x1 * Math.sin(angle) + y1 * Math.cos(angle)) + centerY;
+        point.x = x1 * cos - y1 * sin + centerX;
+        point.y = x1 * cos + y1 * cos + centerY;
+    }
+
+    public static float mod(float x, float y) {
+        x %= y;
+        return (x < 0)?x + y:x;
+    }
+
+    public static float modpi2(float x) {
+        return mod(x, PI2);
     }
 
     public static float pullToX(float y, float by, float x) {
@@ -34,5 +45,9 @@ public class MathHelper {
             if(y > x) y = x;
         }
         return y;
+    }
+
+    public static boolean isBetween(float x, float lim1, float lim2) {
+        return x > lim1 != x > lim2;
     }
 }

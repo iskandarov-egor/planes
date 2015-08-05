@@ -19,8 +19,7 @@ class AcceptThread extends Thread {
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
         try {
-            tmp = adapter.listenUsingRfcommWithServiceRecord("arbitrary", UUID.fromString
-                    ("7ae01e41-3df2-4aa9-97bd-107081d1b773"));
+            tmp = adapter.listenUsingRfcommWithServiceRecord("arbitrary", Connector.uuid);
         } catch (IOException e) {
             Log.d("error", Log.getStackTraceString(e));
         }

@@ -35,7 +35,7 @@ public class Spawner {
     }
 
     public Plane createPlane(float x, float y) {
-        return new Plane(scene, x, y, 0.16f, 0);
+        return new Plane(scene, x, y, 0f, 0);
     }
 
     public Cloud createCloud(int i) {
@@ -44,26 +44,4 @@ public class Spawner {
             return new Cloud(so, 0.1f, 0);
     }
 
-    public SceneButton createButtonDown() {
-        SceneButton buttonDown = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, -Config.btnMargin);
-        buttonDown.setSprite(new StaticSprite(R.drawable.btn_up, Config.btnRadius));
-        buttonDown.setAngle(MathHelper.PI);
-        buttonDown.setBody(Config.btnRadius);
-        return buttonDown;
-    }
-
-    public SceneButton createButtonUp() {
-        SceneButton buttonUp = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, Config.btnMargin);
-        buttonUp.setSprite(new StaticSprite(R.drawable.btn_up, Config.btnRadius));
-        buttonUp.setBody(Config.btnRadius);
-        return buttonUp;
-    }
-
-
-    public SceneButton createButtonFire() {
-        SceneButton btn = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, Config.btnMargin);
-        btn.setSprite(new StaticSprite(R.drawable.btn_fire, Config.btnRadius));
-        btn.setBody(Config.btnRadius);
-        return btn;
-    }
 }

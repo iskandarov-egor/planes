@@ -22,4 +22,7 @@ public abstract class Message {
         else return null;
     }
 
+    public int getType() {
+        return type;
+    }
 }

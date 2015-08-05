@@ -14,6 +14,7 @@ abstract class AbstractSceneObject {
     protected float dx = 0;
     protected float dy = 0;
     protected AbstractSceneObject parent = null;
+    protected boolean visible = true;
     private final Scene scene;
 
     protected Sprite sprite = null;
@@ -64,6 +65,7 @@ abstract class AbstractSceneObject {
     }
 
     public void setAngle(float angle) {
+        angle = Utils.modpi2(angle);
         if(this.angle != angle) {
             this.angle = angle;
             rebuild();
@@ -77,8 +79,8 @@ abstract class AbstractSceneObject {
 
 
     public void setXY(float x, float y) {
-        this.x = x;
-        this.y = y;
+        setX(x);
+        setY(y);
     }
 
     public void setDisplacement(float dx, float dy) {
@@ -91,6 +93,10 @@ abstract class AbstractSceneObject {
 
     public boolean hasParent() {
         return parent != null;
+    }
+
+    void onGraphicsFrame(float graphicsFPS) {
+        if(sprite != null) sprite.onFrame(graphicsFPS);
     }
 
     public void setX(float x) {
@@ -107,5 +113,45 @@ abstract class AbstractSceneObject {
 
     public float getAngle() {
         return angle;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    private boolean removed = false;
+
+    public void remove() {
+        if(removed) throw new RuntimeException();
+        removed = true;
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+
+    void draw(float x, float y, float[] transform) {
+        //debug
+        if(transform == null) throw new NullPointerException("transform");
+
+        if(sprite != null) {
+            if(!sprite.isLoaded()) {
+                sprite.load();
+                sprite.rebuild(dx, dy, angle);
+            }
+            sprite.draw(x, y, transform);
+        }
+    }
+
+    public float getDy() {
+        return dy;
+    }
+
+    public float getDx() {
+        return dx;
     }
 }

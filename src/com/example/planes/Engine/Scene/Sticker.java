@@ -18,20 +18,8 @@ public class Sticker extends AbstractSceneObject{
     }
 
     void draw(float[] transformM) {
-        //debug
-        if(sprite == null) throw new RuntimeException("no sprite");
-
-        if(sprite != null) {
-            if(!sprite.loaded) {
-                sprite.load();
-            }
-            sprite.draw(x, y, transformM);
-        }
+        super.draw(x, y, transformM);
     }
-
-
-
-
 
 
 }

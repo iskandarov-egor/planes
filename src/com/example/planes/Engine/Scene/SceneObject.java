@@ -4,14 +4,22 @@ import com.example.planes.Engine.Body.Body;
 import com.example.planes.Engine.Body.Circle;
 import com.example.planes.Engine.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by egor on 15.07.15.
  */
 public class SceneObject extends AbstractSceneObject{
     protected SceneObject parent = null;
+    private List<ObjectGroup> groups = new ArrayList<>(1);
 
     public SceneObject(float x, float y, Scene scene) {
         super(x, y, scene);
+    }
+
+    void onAddedToGroup(ObjectGroup group) {
+        groups.add(group);
     }
 
     public boolean intersects(SceneObject object, float period) {
@@ -28,20 +36,22 @@ public class SceneObject extends AbstractSceneObject{
         // todo написать
     }
 
-    void draw(float x, float y, float[] transform) {
-        //debug
-        if(transform == null) throw new NullPointerException("transform");
 
-        if(sprite != null) {
-            if(!sprite.loaded) {
-                sprite.load();
-                sprite.rebuild(dx, dy, angle);
-            }
-            sprite.draw(x, y, transform);
-        }
+
+    @Override
+    public void setX(float x) {
+        float horizPeriod = getScene().getWorldWidth();
+        while (x > horizPeriod / 2) x -= horizPeriod;
+        while (x < -horizPeriod / 2) x += horizPeriod;
+        this.x = x;
     }
 
-    void onGraphicsFrame(float graphicsFPS) {
-        if(sprite != null) sprite.onFrame(graphicsFPS);
+    @Override
+    public void remove() {
+        super.remove();
+        getScene().removeObject(this);
+        for(ObjectGroup group : groups) {
+            group.onObjectRemoved(this);
+        }
     }
 }

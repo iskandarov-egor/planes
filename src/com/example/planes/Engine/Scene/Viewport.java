@@ -81,6 +81,10 @@ public final class Viewport {
                 2*(0.5f - y / screenHeight));
     }
 
+    public float screenToEngine(float len) {
+        return 2*(len / screenHeight);
+    }
+
     public Utils.FloatPoint screenToWorld(float x, float y) {
         Utils.FloatPoint eng = screenToEngine(x, y);
         eng.x -= cameraX;

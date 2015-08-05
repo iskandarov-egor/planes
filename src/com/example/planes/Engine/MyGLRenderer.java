@@ -1,11 +1,9 @@
 package com.example.planes.Engine;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import com.example.planes.Engine.Scene.Scene;
-import com.example.planes.Engine.Scene.StaticSprite;
+import com.example.planes.Engine.Scene.Sprite;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -14,12 +12,13 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by name on 08.07.15.
  */
-final class MyGLRenderer implements GLSurfaceView.Renderer {
+public final class MyGLRenderer implements GLSurfaceView.Renderer {
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
     private Engine engine;
+    public static int surfaceVersion = 0;
 
-    public MyGLRenderer(Engine engine) {
+    MyGLRenderer(Engine engine) {
         Log.d("hey", "MyGLRenderer called");
         this.engine = engine;
     }
@@ -34,9 +33,11 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         Log.d("hey", "onSurfaceCreated called");
+        surfaceVersion++;
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        StaticSprite.loadImage();
-        engine.listener.onGLInit();
+        Sprite.onSurfaceCreated();
+        TextureManager.onSurfaceCreated();
+        engine.listener.onSurfaceCreated();
     }
 
     private long now, dt = 0;
@@ -124,4 +125,7 @@ final class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
 
+    public boolean isRunning() {
+        return isRunning;
+    }
 }

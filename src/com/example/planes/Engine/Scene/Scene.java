@@ -71,6 +71,7 @@ public final class Scene {
         float halfWidth = viewport.getHalfWidth();
         for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
+            if(!object.getVisible()) continue;
             float horizPeriod = getWorldWidth();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
 
@@ -95,12 +96,13 @@ public final class Scene {
         }
 
         for(Sticker sticker : stickers) {
-            sticker.draw(viewport.ratioMatrix);
+            sticker.onGraphicsFrame(graphicsFPS);
+            if(sticker.getVisible()) sticker.draw(viewport.ratioMatrix);
         }
     }
 
     public void onPhysicsFrame(float physicsFPS) {
-        setCanRemoveObjects(false);
+        setCanModifyObjects(false);
         for(SceneObject object : objects) {
             if(!object.hasParent()) {
                 if (false && numberOfScreens != 0) {
@@ -113,7 +115,11 @@ public final class Scene {
             }
         }
         collisionManager.doCollisions();
-        setCanRemoveObjects(true);
+        setCanModifyObjects(true);
+    }
+
+    boolean getCanModifyObjects() {
+        return canModifyObjects;
     }
 
     public void addSticker(Sticker sticker) {
@@ -121,7 +127,7 @@ public final class Scene {
         stickers.add(sticker);
     }
 
-    boolean canRemoveObjects = true;
+    boolean canModifyObjects = true;
 
     private Queue<SceneObject> removeQueue = new ArrayDeque<>();
 
@@ -140,7 +146,7 @@ public final class Scene {
         if(!objects.contains(object)) throw new RuntimeException("no such object");
         if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
 
-        if(canRemoveObjects) {
+        if(canModifyObjects) {
             removeObjectNow(object);
         } else {
             removeQueue.add(object);
@@ -154,14 +160,17 @@ public final class Scene {
         stickers.remove(sticker);
     }
 
-    private void setCanRemoveObjects(boolean canRemoveObjects) {
-        this.canRemoveObjects = canRemoveObjects;
-        if(!removeQueue.isEmpty() && canRemoveObjects) {
+    private void setCanModifyObjects(boolean canModifyObjects) {
+        this.canModifyObjects = canModifyObjects;
+        if(!removeQueue.isEmpty() && canModifyObjects) {
             SceneObject object = removeQueue.poll();
             while(object != null) {
                 removeObjectNow(object);
                 object = removeQueue.poll();
             }
+        }
+        if(canModifyObjects) {
+            collisionManager.onCanModify();
         }
     }
 
@@ -188,8 +197,8 @@ public final class Scene {
         collisionManager.addCollisionListener(listener);
     }
 
-    public boolean onTouchEvent(MotionEvent e) {
-        return buttonManager.onTouch(e);
+    public boolean onTouchEvent(int action, float x, float y, int pointerId, int vid) {
+        return buttonManager.onTouch(action, x, y, pointerId, vid);
     }
 
     public boolean contains(SceneObject object) {
@@ -200,8 +209,8 @@ public final class Scene {
         collisionManager.removeCollisionListener(collisionListener);
     }
 
-    public SceneButton createButton(float x, float y) {
-        SceneButton btn = new SceneButton(x, y, this);
+    public SceneButton createButton(float x, float y, Sprite sprite) {
+        SceneButton btn = new SceneButton(x, y, this, sprite);
         buttonManager.addButton(btn);
         stickers.add(btn);
         return btn;

@@ -27,4 +27,7 @@ public class GameConfig {
     public static final float landingGearAngleLeft = 1f;
     public static final float landingGearAngleRight = 5f;
     public static final float bulletSpeed = 3f;
+    public static final float bulletPath = worldPeriod;
+    public static final boolean immortality = true;
+
 }

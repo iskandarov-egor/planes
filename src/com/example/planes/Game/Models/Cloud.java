@@ -5,7 +5,7 @@ import com.example.planes.Engine.Scene.SceneObject;
 /**
  * Created by egor on 19.07.15.
  */
-public class Cloud implements Movable{
+public class Cloud implements Prop {
     private SceneObject so;
     private float vx = 0;
     private float vy = 0;
@@ -18,5 +18,10 @@ public class Cloud implements Movable{
 
     public void onPhysicsFrame(float fps) {
         so.setXY(so.getX() + vx/fps, so.getY() + vy/fps);
+    }
+
+
+    public SceneObject getSceneObject() {
+        return so;
     }
 }

@@ -24,7 +24,7 @@ public class Helper {
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        if(size.x < size.y) throw new RuntimeException("что то не так"); //debug
+        /////if(size.x < size.y) throw new RuntimeException("что то не так"); //debug
         return (float)size.x / size.y;
     }
 

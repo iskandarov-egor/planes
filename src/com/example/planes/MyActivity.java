@@ -24,10 +24,13 @@ public class MyActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d("hey", "activity oncreate");
+        Log.d("hey", "saved state " + String.valueOf(savedInstanceState));
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         List<RemoteAbonent> them = new ArrayList<>();
         int numPlayers = -1;
         int playerId = -1;
@@ -38,8 +41,6 @@ public class MyActivity extends Activity {
         game = new Game(them, numPlayers, playerId);
 
         setContentView(game.createView(this));
-
-
     }
 
     @Override

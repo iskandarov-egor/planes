@@ -7,9 +7,9 @@ import android.view.MotionEvent;
  */
 public interface EngineEventsListener {
     void onGraphicsFrame(float graphicsFPS);
-    void onPhysicsFrame(float physicsFPS);
+    void onPhysicsFrame(float fps);
 
     boolean onTouchEvent(MotionEvent e);
 
-    void onGLInit();
+    void onSurfaceCreated();
 }

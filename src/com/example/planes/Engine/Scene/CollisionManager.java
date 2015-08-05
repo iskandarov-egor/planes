@@ -17,7 +17,7 @@ final class CollisionManager {
 
     void onObjectRemoved(SceneObject object) {
         //debug
-        if(!scene.canRemoveObjects) throw new RuntimeException("что то не так");
+        if(!scene.canModifyObjects) throw new RuntimeException("что то не так");
         if(!canModify) throw new RuntimeException("что то совсем не так");
 
         for(CollisionListener listener : colListeners) {
@@ -37,15 +37,13 @@ final class CollisionManager {
             List<ObjectGroup> groups = listener.getGroups();
             for(int i = 0; i < groups.size(); i++){
                 for(SceneObject object : groups.get(i).getList()) { // for each object in the group
-                    if(scene.contains(object)) {
-                        for (int j = i + 1; j < groups.size(); j++) {
-                            for (SceneObject other : groups.get(j).getList()) { // for each object in another group
-                                if (scene.contains(other) && object != other) {
-                                    if (object.intersects(other, scene.getWorldWidth())) {
-                                        listener.processCollision(object, other);
-                                    } else {
-                                        listener.processNoCollision(object, other);
-                                    }
+                    for (int j = i + 1; j < groups.size(); j++) {
+                        for (SceneObject other : groups.get(j).getList()) { // for each object in another group
+                            if (object != other) {
+                                if (object.intersects(other, scene.getWorldWidth())) {
+                                    listener.processCollision(object, other);
+                                } else {
+                                    listener.processNoCollision(object, other);
                                 }
                             }
                         }
@@ -65,6 +63,14 @@ final class CollisionManager {
     public void removeCollisionListener(CollisionListener collisionListener) {
         if(!canModify) throw new RuntimeException("cannot remove collision listener while processing collisions");
         colListeners.remove(collisionListener);
+    }
+
+    void onCanModify() {
+        for(CollisionListener list : colListeners) {
+            for(ObjectGroup group : list.getGroups()) {
+                group.onCanModify();
+            }
+        }
     }
 
 //    public void addToGroup(ObjectGroup group, SceneObject object) {

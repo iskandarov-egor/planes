@@ -1,6 +1,7 @@
 package com.example.planes.Engine;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,10 @@ public class TextureManager {
     private static Map<Integer, Integer> intMap = new HashMap<>();
     private static Map<Bitmap, Integer> bmpMap = new HashMap<>();
     public static int getTexture(int fileId) {
-        if(intMap.containsKey(fileId)) return intMap.get(fileId);
+        if(intMap.containsKey(fileId)) {
+            Log.d("hey", "texture is in da map!");
+            return intMap.get(fileId);
+        }
 
         int id = GLHelper.createTexture(fileId);
         intMap.put(fileId, id);
@@ -25,5 +29,10 @@ public class TextureManager {
         int id = GLHelper.createTexture(bitmap);
         bmpMap.put(bitmap, id);
         return id;
+    }
+
+    public static void onSurfaceCreated() {
+        intMap.clear();
+        bmpMap.clear();
     }
 }

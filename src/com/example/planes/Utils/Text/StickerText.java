@@ -21,7 +21,6 @@ public class StickerText {
     private static Map<Pair, Bitmap> map = new HashMap<>();
     private String text;
     private int ph;
-    private float fontSize;
     private Paint.FontMetrics metrics;
     private int color = Color.BLACK;
 
@@ -35,6 +34,12 @@ public class StickerText {
         write(text);
     }
 
+    public void setVisible(boolean visible) {
+        for(Sticker sticker: stickers) {
+            sticker.setVisible(visible);
+        }
+    }
+
     public void setColor(int color) {
         this.color = color;
     }
@@ -45,24 +50,40 @@ public class StickerText {
         }
         stickers.clear();
         ph = (int) (0.5f * h * Helper.getScreenHeight());
-        fontSize = getFontSizeByHeight(ph);
+        float fontSize = getFontSizeByHeight(ph);
         paint.setTextSize(fontSize);
         metrics = paint.getFontMetrics();
 
+        widths = new float[text.length()];
+
+        paint.getTextWidths((CharSequence)text, 0, text.length(), widths);
+
         paint.setColor(color);
 
-        float curx = x;
+        float curx = -scene.getViewport().screenToEngine(getLength()/2) + x;
+
+        float cury = -scene.getViewport().screenToEngine(metrics.descent - metrics.ascent)/2 + y;
         for(int i = 0; i < text.length(); i++) {
             StaticSprite letter = new StaticSprite(getLetter(i), h);
             curx += letter.getW()/2;
-            Sticker sticker = scene.createSticker(curx, y);
+            Sticker sticker = scene.createSticker(curx, cury);
 
             sticker.setSprite(letter);
             stickers.add(sticker);
             curx += letter.getW()/2;
+
         }
     }
-    private static float[] widths = new float[1];
+
+    private float getLength() {
+        float w = 0;
+        for(int i = 0; i < widths.length; i++) {
+            w += widths[i];
+        }
+        return w;
+    }
+
+    private static float[] widths;
 
     Paint paint = new Paint();
     private Bitmap getLetter(int idx) {
@@ -70,16 +91,10 @@ public class StickerText {
         Pair pair = new Pair(text.charAt(idx), h);
         Bitmap bitmap = map.get(pair);
         if(bitmap == null) {
-
-
-            paint.getTextWidths((CharSequence)text, idx, idx + 1, widths);
-
-            int pw = (int)widths[0];
+            int pw = (int)widths[idx];
             bitmap = Bitmap.createBitmap(pw, ph, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             bitmap.eraseColor(Color.YELLOW);
-
-
             canvas.drawText(String.valueOf(text.charAt(idx)), 0, -metrics.ascent, paint);
             map.put(pair, bitmap);
         }
@@ -110,7 +125,6 @@ public class StickerText {
 
     Paint paint2 = new Paint();
     private float getFontSizeByHeight(int height) {
-
         for (int i = 1; i < 272; i++) {
             paint2.setTextSize(i);
             Paint.FontMetrics m = paint2.getFontMetrics();

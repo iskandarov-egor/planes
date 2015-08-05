@@ -7,6 +7,9 @@ import android.view.View;
 import com.example.planes.Engine.Scene.Scene;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -18,10 +21,11 @@ public class Engine {
     private MyGLRenderer gLRenderer;
 
     public Engine() {
-        Log.d("hey", "activity oncreate");
+        Log.d("hey", "Engine()");
 
         scene = new Scene();
         gLRenderer = new MyGLRenderer(this);
+
     }
 
     public View createView(Context context) {
@@ -30,9 +34,12 @@ public class Engine {
         return view;
     }
 
+    private boolean running = false;
+
     public void run() {
         //if (view == null) throw new RuntimeException("run called before view assignment");
-
+        if(running) throw new RuntimeException("engine already running");
+        running = true;
         Log.d("hey", "Engine.run called");
         gLRenderer.run();
     }
@@ -58,10 +65,10 @@ public class Engine {
         if(listener != null) listener.onGraphicsFrame(graphicsFPS);
 
         //process touch events
-        MotionEvent e = touchQueue.poll();
+        Event e = touchQueue.poll();
         while(e != null) {
-            if(!scene.onTouchEvent(e)) {
-                listener.onTouchEvent(e);
+            if(!scene.onTouchEvent(e.action, e.x, e.y, e.id, e.vid)) {
+                //listener.onTouchEvent(e); //todo
             }
             e = touchQueue.poll();
         }
@@ -79,6 +86,7 @@ public class Engine {
 
     public void onResume() {
         view.onResume();
+        if(running && !gLRenderer.isRunning()) gLRenderer.run();
     }
 
     public void onPause() {
@@ -99,13 +107,37 @@ public class Engine {
         this.listener = listener;
     }
 
-    ConcurrentLinkedQueue<MotionEvent> touchQueue = new ConcurrentLinkedQueue<>();
-    public boolean onTouchEvent(MotionEvent e) {
-        touchQueue.add(e);
+    BlockingQueue<Event> touchQueue = new ArrayBlockingQueue<Event>(1, true);
+    public boolean onTouchEvent(MotionEvent e, int vid) {
+        final int pointerIndex = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        final int pointerId = e.getPointerId(pointerIndex);
+        float x = e.getX(pointerIndex);
+        float y = e.getY(pointerIndex);
+
+        try {
+            touchQueue.put(new Event(e.getAction(), pointerId, x, y, vid));
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         return true;
     }
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    private static class Event {
+        int action;
+        int id, vid;
+        float x, y;
+
+        public Event(int action, int id,float x, float y, int vid) {
+            this.action = action;
+            this.id = id;
+            this.x = x;
+            this.vid = vid;
+            this.y = y;
+        }
     }
 }

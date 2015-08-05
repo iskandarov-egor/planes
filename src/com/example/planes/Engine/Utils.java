@@ -22,6 +22,11 @@ public final class Utils {
     static {
         Matrix.setIdentityM(idMatrix, 0);
     }
+
+    public static float modpi2(float angle) {
+        return mod(angle, PI2);
+    }
+
     public static class FloatPoint {
         public float x, y;
 
