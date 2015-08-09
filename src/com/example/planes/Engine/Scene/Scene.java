@@ -113,8 +113,10 @@ public final class Scene {
                     object.setX(x);
                 }
             }
+            object.onPhysicsFrame(physicsFPS);
         }
         collisionManager.doCollisions();
+
         setCanModifyObjects(true);
     }
 
@@ -174,8 +176,14 @@ public final class Scene {
         }
     }
 
-    public SceneObject createObject(float x, float y) {
+    public SceneObject createObject1(float x, float y) {
         SceneObject object = new SceneObject(x, y, this);
+        objects.add(object);
+        return object;
+    }
+
+    public SceneObject addObject(SceneObject object) {
+        if(objects.contains(object)) throw new RuntimeException();
         objects.add(object);
         return object;
     }

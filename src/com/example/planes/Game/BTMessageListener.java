@@ -65,9 +65,9 @@ public class BTMessageListener implements MessageListener {
     }
 
     private void fire(Plane plane) {
-        Bullet bullet = plane.fire();
-        game.getGameObjects().add(bullet);
-        game.getBulletsGroup().add(bullet.getSceneObject());
+        Bullet bullet = plane.fire(game.getBulletsGroup());
+//        game.getGameObjects().add(bullet);
+//        game.getBulletsGroup().add(bullet.getSceneObject());
     }
 
     private void onEngine(Plane plane) {
@@ -79,10 +79,10 @@ public class BTMessageListener implements MessageListener {
     }
 
     private void processControlMessage(ControlMessage msg, Plane plane) {
-        plane.getSceneObject().setXY(msg.getX(), msg.getY());
+        plane.setXY(msg.getX(), msg.getY());
         plane.setVy(msg.getVy());
         plane.setVx(msg.getVx());
-        plane.getSceneObject().setAngle(msg.getAngle());
+        plane.setAngle(msg.getAngle());
     }
 
     private int indexOf(RemoteAbonent sender) {

@@ -8,18 +8,16 @@ import com.example.planes.Utils.MathHelper;
 /**
  * Created by egor on 29.07.15.
  */
-public abstract class GameObject {
+public abstract class GameObject extends SceneObject{
     private static final float g = 0.00003999f *60*60;
     private float vx, vy;
     protected float tanDrag = 0.008f*60;
     protected float normDrag = 0.008f*60;
-    protected SceneObject so;
     private float angle = 0;
-    private boolean removed = false;
     private boolean customGroundPhys = false;
 
     public GameObject(Scene scene, float x, float y, float speed, float angle) {
-        so = scene.createObject(x, y);
+        super(x, y, scene);
         this.vx = (float) (speed*Math.cos(angle));
         this.vy = (float) (speed*Math.sin(angle));
     }
@@ -41,7 +39,7 @@ public abstract class GameObject {
     }
 
     protected void applySpeed(float physicsFPS) {
-        so.setXY(so.getX()+vx / physicsFPS, so.getY() + vy / physicsFPS);
+        setXY(getX()+vx / physicsFPS, getY() + vy / physicsFPS);
     }
 
     protected void applyDrag(float physicsFPS) {
@@ -54,20 +52,21 @@ public abstract class GameObject {
     }
 
     protected void applyGround(float physicsFPS) {
-        float y = so.getY();
+        float y = getY();
         if(!customGroundPhys) {
 
             float ground = Game.getGroundLevel();
 
-            if (y + vy / physicsFPS - so.getRadius() < ground) {
-                y = ground + so.getRadius();
+            if (y + vy / physicsFPS - getRadius() < ground) {
+                y = ground + getRadius();
                 vy = 0;
 
             }
         }
-        so.setY(y);
+        setY(y);
     }
 
+    @Override
     public void onPhysicsFrame(float physicsFPS) {
         /////////////////GRAV
         applyGravity(physicsFPS);
@@ -91,23 +90,11 @@ public abstract class GameObject {
         this.vy = vy;
     }
 
-    public float getAngle() {
-        return so.getAngle();
-    }
 
     public boolean isTouchingGround() {
         float ground = Game.getGroundLevel();
-        return so.getY() <= ground + so.getRadius();
+        return getY() <= ground + getRadius();
     }
 
-    public SceneObject getSceneObject() {
-        return so;
-    }
 
-    public boolean isRemoved() {
-        return removed;
-    }
-    public void remove() {
-        removed = true;
-    }
 }

@@ -31,8 +31,8 @@ public class Game implements EngineEventsListener {
     private Engine engine;
     private Camera camera;
     private Plane myPlane;
-    private List<Prop> props = new ArrayList<>();
-    private List<GameObject> gameObjects = new ArrayList<>();
+    ///private List<Prop> props = new ArrayList<>();
+    ///private List<GameObject> gameObjects = new ArrayList<>();
     private List<Plane> planes = new ArrayList<>();
     private int deadCount = 0;
     private int myId;
@@ -87,11 +87,11 @@ public class Game implements EngineEventsListener {
         // create ground
         SceneObject ground = spawner.createGround();
 
-        SceneObject cross = scene.createObject(0, getGroundLevel());
+        SceneObject cross = scene.createObject1(0, getGroundLevel());
         cross.setSprite(new StaticSprite(R.drawable.cross, 0.1f));
 
         //create clouds
-        for (int i = 0; i < GameConfig.cloudsMin; i++) props.add(spawner.createCloud(i));
+        for (int i = 0; i < GameConfig.cloudsMin; i++) spawner.createCloud(i);
 
         //create planes
         float w = scene.getWorldWidth();
@@ -101,12 +101,13 @@ public class Game implements EngineEventsListener {
             float x = (numPlayers == 1)?0:-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1);
             Plane plane = new Plane(scene, x, 0, 0, 0);
             plane.setVx(0.15f);
-            plane.getSceneObject().setXY(plane.getX(), getGroundLevel()
-                    + plane.getSceneObject().getSprite().getH()*0.5f - plane.getSceneObject().getDy());
+            plane.setXY(plane.getX(), getGroundLevel()
+                    + plane.getSprite().getH() * 0.5f - plane.getDy());
             plane.stopEngine();
             planes.add(plane);
-            gameObjects.add(plane);
-            planesGroup.add(plane.getSceneObject());
+            scene.addObject(plane);
+            ////gameObjects.add(plane);
+            planesGroup.add(plane);
         }
         myPlane = planes.get(myId);
 
@@ -154,15 +155,15 @@ public class Game implements EngineEventsListener {
 
     @Override
     public void onPhysicsFrame(float fps) {
-        Iterator<GameObject> i = gameObjects.iterator();
-        while(i.hasNext()) {
-            GameObject g = i.next();
-            g.onPhysicsFrame(fps);
-            if(g.isRemoved()) i.remove();
-        }
-        for(Prop prop : props) {
-            prop.onPhysicsFrame(fps);
-        }
+//        Iterator<GameObject> i = gameObjects.iterator();
+//        while(i.hasNext()) {
+//            GameObject g = i.next();
+//            g.onPhysicsFrame(fps);
+//            if(g.isRemoved()) i.remove();
+//        }
+//        for(Prop prop : props) {
+//            prop.onPhysicsFrame(fps);
+//        }
         for(Plane plane : planes) {
             if(planeTouchingGround(plane)) {
                 if(plane.getAngle() > GameConfig.landingGearAngleLeft &&
@@ -192,8 +193,8 @@ public class Game implements EngineEventsListener {
         return new CollisionProcessor() {
                 @Override
                 public void process(SceneObject object, SceneObject other) {
-                    killPlaneIfAlive((Plane) getGameObjectBySO(object));
-                    killPlaneIfAlive((Plane) getGameObjectBySO(other));
+                    killPlaneIfAlive((Plane) (object));
+                    killPlaneIfAlive((Plane) (other));
                 }
             };
     }
@@ -202,8 +203,8 @@ public class Game implements EngineEventsListener {
         return new CollisionProcessor() {
             @Override
             public void process(SceneObject object, SceneObject other) {
-                killPlaneIfAlive((Plane) getGameObjectBySO(object));
-                Bullet bullet  = (Bullet) getGameObjectBySO(other);
+                killPlaneIfAlive((Plane) (object));
+                Bullet bullet  = (Bullet) (other);
                 bullet.onHit();
             }
         };
@@ -227,13 +228,13 @@ public class Game implements EngineEventsListener {
         }
     }
 
-    private GameObject getGameObjectBySO(SceneObject so) {
-        for(GameObject g : gameObjects) {
-            if(g.getSceneObject() == so) return g;
-        }
-        throw new RuntimeException("no such obje");
-        //return null;
-    }
+//    private GameObject getGameObjectBySO(SceneObject so) {
+//        for(GameObject g : gameObjects) {
+//            if(g.getSceneObject() == so) return g;
+//        }
+//        throw new RuntimeException("no such obje");
+//        //return null;
+//    }
 
     public static float getGroundLevel() {
 
@@ -244,17 +245,17 @@ public class Game implements EngineEventsListener {
         return myPlane;
     }
 
-    List<Prop> getProps() {
-        return props;
-    }
+//    List<Prop> getProps() {
+//        return props;
+//    }
 
     public ObjectGroup getBulletsGroup() {
         return bulletsGroup;
     }
 
-    public List<GameObject> getGameObjects() {
-        return gameObjects;
-    }
+//    public List<GameObject> getGameObjects() {
+//        return gameObjects;
+//    }
 
     public Plane getPlane(int index) {
 

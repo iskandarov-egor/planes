@@ -16,18 +16,18 @@ public class FollowingCamera extends Camera{
     private float zoom = 1;
     private Viewport view;
     public FollowingCamera(Plane plane) {
-        x = plane.getSceneObject().getX();
-        y = plane.getSceneObject().getY();
-        view = plane.getSceneObject().getScene().getViewport();
+        x = plane.getX();
+        y = plane.getY();
+        view = plane.getScene().getViewport();
         this.plane = plane;
     }
 
     @Override
     public void onFrame(float fps) {
         if(plane == null) return;
-        float period = plane.getSceneObject().getScene().getWorldWidth();
-        float px = plane.getSceneObject().getX();
-        float py = plane.getSceneObject().getY();
+        float period = plane.getScene().getWorldWidth();
+        float px = plane.getX();
+        float py = plane.getY();
         float vx = plane.getVx();
         float vy = plane.getVy();
         float v = (float) Math.hypot(vx, vy);

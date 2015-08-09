@@ -29,7 +29,7 @@ public class Spawner {
     public SceneObject createGround() {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
         float groundH = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
-        SceneObject ground = scene.createObject(0, -1 + groundH/2);
+        SceneObject ground = scene.createObject1(0, -1 + groundH / 2);
         ground.setSprite(new StaticSprite(R.drawable.ground, groundH));
         return ground;
     }
@@ -39,9 +39,11 @@ public class Spawner {
     }
 
     public Cloud createCloud(int i) {
-            SceneObject so = scene.createObject(((i*171717 + 6487)%1111)/500f-1, ((i*191991 + 1358)%1111)/1000f);
-            so.setSprite(new StaticSprite(R.drawable.cloud, 0.2f));
-            return new Cloud(so, 0.1f, 0);
+        float x = ((i*171717 + 6487)%1111)/500f-1;
+        float y = ((i * 191991 + 1358) % 1111) / 1000f;
+        Cloud cloud = new Cloud(scene, x, y, 0.1f, 0);
+        scene.addObject(cloud);
+        return cloud;
     }
 
 }

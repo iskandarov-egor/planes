@@ -13,6 +13,8 @@ public class Sticker extends AbstractSceneObject{
         super(x, y, scene);
     }
 
+
+
     public void setParent(Sticker parent) {
         // todo
     }

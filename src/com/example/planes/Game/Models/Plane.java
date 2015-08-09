@@ -35,10 +35,11 @@ public class Plane extends GameObject {
 
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle);
+
         tanDrag = 0.008f*60;
         normDrag = 0.008f*60;
-        so.setSprite(new StaticSprite(R.drawable.plane_stub, Config.planeHeight));
-        so.setBody(Config.planeHeight);
+        setSprite(new StaticSprite(R.drawable.plane_stub, Config.planeHeight));
+        setBody(Config.planeHeight);
         setCustomGroundPhys(true);
     }
 
@@ -46,9 +47,6 @@ public class Plane extends GameObject {
         alive = true;
     }
 
-    public float getX() {
-        return so.getX();
-    }
 
     public boolean getAlive() {
         return alive;
@@ -71,14 +69,14 @@ public class Plane extends GameObject {
         float v = (float) (vx*Math.cos(angle)+vy*Math.sin(angle));
         if(dir == Direction.RIGHT && alive) {
             angle -= angleVelFunc(v);
-            so.setAngle(angle);
+            setAngle(angle);
         }
         if(dir == Direction.LEFT && alive) {
             angle += angleVelFunc(v);
-            so.setAngle(angle);
+            setAngle(angle);
         }
 
-        if(alive && engineOn && so.getY() < GameConfig.worldCeiling) {
+        if(alive && engineOn && getY() < GameConfig.worldCeiling) {
             float vx1 = (float) (acc *  Math.cos(angle)) / fps;
             float vy1 = (float) (acc * Math.sin(angle)) / fps;
 
@@ -125,10 +123,6 @@ public class Plane extends GameObject {
         }
     }
 
-    @Override
-    public boolean isRemoved() {
-        return false;
-    }
 
     private static int shots = 0;
 
@@ -142,9 +136,6 @@ public class Plane extends GameObject {
         }
     }
 
-    public SceneObject getSceneObject() {
-        return so;
-    }
 
     public void goLeft() {
         dir = Direction.LEFT;
@@ -162,9 +153,6 @@ public class Plane extends GameObject {
         alive = false;
     }
 
-    public float getY() {
-        return so.getY();
-    }
 
     public void startEngine() {
         engineOn = true;
@@ -174,19 +162,21 @@ public class Plane extends GameObject {
         engineOn = false;
     }
 
-    public Bullet fire() {
+    public Bullet fire(ObjectGroup bulletsGroup) {
         Utils.FloatPoint nose = getNose();
         float v = (float) Math.hypot(getVx(), getVy()) + GameConfig.bulletSpeed;
-        Bullet bullet = new Bullet(so.getScene(), nose.x, nose.y, v, getAngle());
+        Bullet bullet = new Bullet(getScene(), nose.x, nose.y, v, getAngle());
+        getScene().addObject(bullet);
         Log.d("shots fired", String.valueOf(shots));
         shots++;
+        bulletsGroup.add(bullet);
         return bullet;
     }
 
     public Utils.FloatPoint getNose() {
         Utils.FloatPoint nose = new Utils.FloatPoint(0, 0);
-        nose.x = (float) (so.getX() + (so.getRadius()*1.5f) * Math.cos(getAngle()));
-        nose.y = (float) (so.getY() + so.getRadius()*1.5f * Math.sin(getAngle()));
+        nose.x = (float) (getX() + (getRadius()*1.5f) * Math.cos(getAngle()));
+        nose.y = (float) (getY() + getRadius()*1.5f * Math.sin(getAngle()));
         return nose;
     }
 
@@ -203,12 +193,12 @@ public class Plane extends GameObject {
         }
 
         boolean isTouchingGround(Plane plane) {
-            float y = plane.getSceneObject().getY() + d * (float)Math.sin(z + plane.getAngle());
+            float y = plane.getY() + d * (float)Math.sin(z + plane.getAngle());
             return y < Game.getGroundLevel();
         }
 
         void correctPlane(Plane plane) {
-            SceneObject so = plane.getSceneObject();
+            SceneObject so = plane;
             float o = MathHelper.modpi2(z + plane.getAngle());
 
             float s = MathHelper.modpi2((float) Math.asin((Game.getGroundLevel() - so.getY()) / d));

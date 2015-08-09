@@ -24,6 +24,9 @@ abstract class AbstractSceneObject {
         this.y = y;
         this.scene = scene;
     }
+
+
+
     public float getX() {
         return x;
     }

@@ -18,6 +18,11 @@ public class SceneObject extends AbstractSceneObject{
         super(x, y, scene);
     }
 
+
+    public void onPhysicsFrame(float fps) {
+
+    }
+
     void onAddedToGroup(ObjectGroup group) {
         groups.add(group);
     }
