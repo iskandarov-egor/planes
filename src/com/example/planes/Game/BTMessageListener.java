@@ -6,6 +6,7 @@ import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.Message.ReceivedMessage;
 import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
+import com.example.planes.Game.Models.Bullet;
 import com.example.planes.Game.Models.Plane;
 
 import java.util.ArrayList;
@@ -57,9 +58,16 @@ public class BTMessageListener implements MessageListener {
                     case GO_RIGHT: plane.goRight(); break;
                     case GO_STRAIGHT: plane.goStraight(); break;
                     case ENGINE: onEngine(plane); break;
+                    case FIRE: fire(plane); break;
                 }
                 break;
         }
+    }
+
+    private void fire(Plane plane) {
+        Bullet bullet = plane.fire();
+        game.getGameObjects().add(bullet);
+        game.getBulletsGroup().add(bullet.getSceneObject());
     }
 
     private void onEngine(Plane plane) {

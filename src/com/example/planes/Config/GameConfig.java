@@ -17,7 +17,7 @@ public class GameConfig {
 
 
     public static float worldCeiling = 1;
-    public static float worldPeriod = 1.6f;
+    public static float worldPeriod = 2f;
     public static int cloudsMin = 5;
     public static int cloudsMax = 10;
 

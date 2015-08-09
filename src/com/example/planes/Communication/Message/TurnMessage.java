@@ -14,7 +14,7 @@ public class TurnMessage extends ControlMessage {
     }
 
     public static enum Action {
-        GO_LEFT, GO_RIGHT, GO_STRAIGHT, ENGINE
+        GO_LEFT, GO_RIGHT, GO_STRAIGHT, ENGINE, FIRE
     }
 
     private final Action action;

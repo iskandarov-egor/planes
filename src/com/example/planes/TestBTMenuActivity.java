@@ -68,6 +68,7 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
         public void onClick(View view) {
             GameConfig.type = GameConfig.TYPE_NO_BT;
             Log.d("hey", "testBT button clicked");
+            Game.NewGame(new ArrayList<RemoteAbonent>(0), 0);
             Intent intent = new Intent(that, MyActivity.class);
             Log.d("hey", "testBT button - intent");
             startActivity(intent);

@@ -31,13 +31,7 @@ public class MyActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        List<RemoteAbonent> them = new ArrayList<>();
-        int numPlayers = -1;
-        int playerId = -1;
-        if(GameConfig.type == GameConfig.TYPE_NO_BT) {
-            numPlayers = GameConfig.numPlayersTypeNoBt;
-            playerId = 0;
-        }
+
         game = Game.getInstance();
 
         setContentView(game.createView(this));

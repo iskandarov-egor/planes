@@ -28,7 +28,7 @@ public class Spawner {
 
     public SceneObject createGround() {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
-        float groundH = Helper.getScreenRatio() * 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
+        float groundH = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
         SceneObject ground = scene.createObject(0, -1 + groundH/2);
         ground.setSprite(new StaticSprite(R.drawable.ground, groundH));
         return ground;

@@ -68,12 +68,14 @@ public class Controls implements SceneButtonListener{
                 buttonStopGo.setSprite(goSprite);
                 game.getMyPlane().stopEngine();
             }
+            game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.ENGINE, game.getMyPlane()));
         }
         if(btn == buttonFire) {
             Log.d("multitouch madness", ".. it is a FAYA ZA MISAELOZ");
             Bullet bullet = game.getMyPlane().fire();
             game.getGameObjects().add(bullet);
             game.getBulletsGroup().add(bullet.getSceneObject());
+            game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.FIRE, game.getMyPlane()));
         }
         if(btn == buttonResurrect) {
             game.getMyPlane().getSceneObject().setXY(0, 0);

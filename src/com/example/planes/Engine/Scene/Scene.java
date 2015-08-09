@@ -44,7 +44,7 @@ public final class Scene {
     }
 
     public float getWorldWidth(){
-        return numberOfScreens * viewport.screenRatio * 2;
+        return numberOfScreens /** viewport.screenRatio */* 2;
     }
 
     public void setPeriod(float numberOfScreens) {

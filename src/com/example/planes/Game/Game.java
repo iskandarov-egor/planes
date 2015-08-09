@@ -45,7 +45,7 @@ public class Game implements EngineEventsListener {
 
     static {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
-        float h = 2 * Helper.getScreenRatio() * GameConfig.worldPeriod / groundWH.x * groundWH.y;
+        float h = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
         groundLevel = -1 + h*(1 - BmpConfig.groundLevel);
     }
 
@@ -97,13 +97,13 @@ public class Game implements EngineEventsListener {
         float w = scene.getWorldWidth();
         planesGroup = new ObjectGroup(scene);
         bulletsGroup = new ObjectGroup(scene);
-        int numPlayers = getNumPlayers();
         for (int i = 0; i < numPlayers; i++) {
-            Plane plane = new Plane(scene, -w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1), 0, 0, 0);
+            float x = (numPlayers == 1)?0:-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1);
+            Plane plane = new Plane(scene, x, 0, 0, 0);
             plane.setVx(0.15f);
             plane.getSceneObject().setXY(plane.getX(), getGroundLevel()
                     + plane.getSceneObject().getSprite().getH()*0.5f - plane.getSceneObject().getDy());
-            plane.startEngine();
+            plane.stopEngine();
             planes.add(plane);
             gameObjects.add(plane);
             planesGroup.add(plane.getSceneObject());
