@@ -13,6 +13,8 @@ public class GameConfig {
 
     public static final float bulletDamage = 1;
     public static final float smallPlaneHealth = 3;
+    public static final int TYPE_BT = 463675;
+
 
     public static float worldCeiling = 1;
     public static float worldPeriod = 1.6f;
@@ -20,7 +22,10 @@ public class GameConfig {
     public static int cloudsMax = 10;
 
     public static final int TYPE_NO_BT = 607;
+    public static final int TYPE_BT_SERVER = 87364;
+    public static final int TYPE_BT_CLIENT = -87364;
     public static int type = TYPE_NO_BT;
+
     public static final int numPlayersTypeNoBt = 2;
     public static final boolean collisions = true;
     public static final float cameraDistance = 0.8f;

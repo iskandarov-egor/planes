@@ -25,7 +25,6 @@ public class Engine {
 
         scene = new Scene();
         gLRenderer = new MyGLRenderer(this);
-
     }
 
     public View createView(Context context) {

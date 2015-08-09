@@ -12,7 +12,6 @@ class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
-        public static final int MESSAGE_READ = 564;
         private final RemoteAbonent abonent;
 
         public ConnectedThread(BluetoothSocket socket, RemoteAbonent abon) {
@@ -70,7 +69,7 @@ class ConnectedThread extends Thread {
 //                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
 //                        .sendToTarget();
             } catch (IOException e) {
-                Log.e("error", "Exception during write", e);
+                Log.e("error", "Exception during write", e); // todo
             }
         }
 

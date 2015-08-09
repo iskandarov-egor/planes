@@ -1,13 +1,15 @@
 package com.example.planes.Communication;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.*;
 import android.util.Log;
+import com.example.planes.Communication.Message.Message;
 import com.example.planes.MyApplication;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,6 +22,8 @@ public class Connector {
     BluetoothAdapter adapter;
     ContextWrapper app;
     private BroadcastReceiver foundReceiver = null;
+
+    private List<RemoteAbonent> remotes = new ArrayList<>(1);
 
     public Connector(ConnectorListener listener) {
         this.listener = listener;
@@ -106,10 +110,22 @@ public class Connector {
         return acceptThread;
     }
 
-    private boolean isAccepting() {
+    public boolean isAccepting() {
         if(acceptThread == null) return false;
         Thread.State state = acceptThread.getState();
         return state != Thread.State.NEW && state != Thread.State.TERMINATED;
+    }
+
+    public void stopAcceptingSafe() {
+        if(isAccepting()) {
+            stopAccepting();
+        }
+    }
+
+    public void stopSearchingSafe() {
+        if(isSearching()) {
+            stopSearching();
+        }
     }
 
     public void stopAccepting() {
@@ -122,20 +138,21 @@ public class Connector {
     }
 
     public void onAccepted(BluetoothSocket socket) {
-        RemoteAbonent abonent = new RemoteAbonent(socket, this);
+        RemoteAbonent abonent = new RemoteAbonent(socket);
         listener.onAccepted(abonent);
     }
 
     public void onConnected(BluetoothSocket socket) {
-        RemoteAbonent abonent = new RemoteAbonent(socket, this);
+        RemoteAbonent abonent = new RemoteAbonent(socket);
         listener.onConnected(abonent);
-    }
-
-    public void onMessage(Message msg, RemoteAbonent remoteAbonent) {
-        listener.onMessage(remoteAbonent, msg);
     }
 
     public void onConnectFailed() {
         listener.onConnectFailed();
+    }
+
+    public void destruct() {
+        stopAcceptingSafe();
+        stopSearchingSafe();
     }
 }

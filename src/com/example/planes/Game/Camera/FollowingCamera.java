@@ -5,6 +5,7 @@ import com.example.planes.Engine.Scene.Viewport;
 import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Models.Plane;
 
+
 /**
  * Created by egor on 19.07.15.
  */
@@ -15,14 +16,15 @@ public class FollowingCamera extends Camera{
     private float zoom = 1;
     private Viewport view;
     public FollowingCamera(Plane plane) {
-        this.plane = plane;
         x = plane.getSceneObject().getX();
         y = plane.getSceneObject().getY();
         view = plane.getSceneObject().getScene().getViewport();
+        this.plane = plane;
     }
 
     @Override
     public void onFrame(float fps) {
+        if(plane == null) return;
         float period = plane.getSceneObject().getScene().getWorldWidth();
         float px = plane.getSceneObject().getX();
         float py = plane.getSceneObject().getY();
@@ -50,5 +52,9 @@ public class FollowingCamera extends Camera{
     public void setZoom(float zoom) {
         this.zoom = zoom;
         view.setZoom(zoom);
+    }
+
+    public void setPlane(Plane plane) {
+        this.plane = plane;
     }
 }

@@ -32,10 +32,13 @@ class AcceptThread extends Thread {
         while (true) {
             try {
                 socket = mmServerSocket.accept();
+                Log.d("acc", "left normal");
             } catch (IOException e) {
+                Log.d("acc", "left through except");
                 if(!cancelled) Log.d("error", Log.getStackTraceString(e));
                 break;
             }
+
             // If a connection was accepted
             if (socket != null) {
                 connector.onAccepted(socket);

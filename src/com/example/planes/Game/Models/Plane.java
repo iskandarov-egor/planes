@@ -9,7 +9,6 @@ import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Game;
 import com.example.planes.R;
 import com.example.planes.Utils.MathHelper;
-import com.example.planes.Utils.Vector;
 
 /**
  * Created by egor on 15.07.15.
@@ -19,15 +18,20 @@ public class Plane extends GameObject {
     private float acc = 0.00006665f*60*60;
     private float dirVel = 0.027f;
     private float lift = 0.015f*60;
-    private boolean gazing = false;
+    private boolean engineOn = false;
     private boolean alive = true;
 
-    private static final float frontWheelDx = Config.planeHeight * (BmpConfig.frontWheelX);
-    private static final float frontWheelDy = Config.planeHeight * (BmpConfig.frontWheelY);
-    private static final float backWheelDx = Config.planeHeight * (BmpConfig.backWheelX);
-    private static final float backWheelDy = Config.planeHeight * (BmpConfig.backWheelY);
-    private static final Wheel frontWheel = new Wheel(frontWheelDx, frontWheelDy);
-    private static final Wheel backWheel = new Wheel(backWheelDx, backWheelDy);
+    private static final Wheel frontWheel;
+    private static final Wheel backWheel;
+
+    static {
+        float frontWheelDx = Config.planeHeight * (BmpConfig.frontWheelX);
+        float frontWheelDy = Config.planeHeight * (BmpConfig.frontWheelY);
+        float backWheelDx = Config.planeHeight * (BmpConfig.backWheelX);
+        float backWheelDy = Config.planeHeight * (BmpConfig.backWheelY);
+        frontWheel = new Wheel(frontWheelDx, frontWheelDy);
+        backWheel = new Wheel(backWheelDx, backWheelDy);
+    }
 
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle);
@@ -50,6 +54,10 @@ public class Plane extends GameObject {
         return alive;
     }
 
+    public boolean isEngineOn() {
+        return engineOn;
+    }
+
     private enum Direction {
         LEFT, RIGHT, STRAIGHT
     }
@@ -70,7 +78,7 @@ public class Plane extends GameObject {
             so.setAngle(angle);
         }
 
-        if(alive && gazing && so.getY() < GameConfig.worldCeiling) {
+        if(alive && engineOn && so.getY() < GameConfig.worldCeiling) {
             float vx1 = (float) (acc *  Math.cos(angle)) / fps;
             float vy1 = (float) (acc * Math.sin(angle)) / fps;
 
@@ -159,11 +167,11 @@ public class Plane extends GameObject {
     }
 
     public void startEngine() {
-        gazing = true;
+        engineOn = true;
     }
 
     public void stopEngine() {
-        gazing = false;
+        engineOn = false;
     }
 
     public Bullet fire() {

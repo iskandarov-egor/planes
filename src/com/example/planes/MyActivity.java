@@ -38,7 +38,7 @@ public class MyActivity extends Activity {
             numPlayers = GameConfig.numPlayersTypeNoBt;
             playerId = 0;
         }
-        game = new Game(them, numPlayers, playerId);
+        game = Game.getInstance();
 
         setContentView(game.createView(this));
     }

@@ -1,20 +1,22 @@
 package com.example.planes.Communication;
 
 import android.bluetooth.BluetoothSocket;
-import android.os.Handler;
+import com.example.planes.Communication.Message.Message;
+import com.example.planes.Communication.Message.ReceivedMessage;
 
 /**
  * Created by egor on 23.07.15.
  */
 public class RemoteAbonent {
-    private final Connector connector;
+   // private final Connector connector;
     //private BluetoothDevice device;
     private BluetoothSocket socket;
     private ConnectedThread thread;
+    private MessageListener listener;
 
-    public RemoteAbonent(BluetoothSocket socket, Connector connector) {
+    public RemoteAbonent(BluetoothSocket socket) {
         this.socket = socket;
-        this.connector = connector;
+
         thread = new ConnectedThread(socket, this);
         thread.start();
     }
@@ -24,10 +26,22 @@ public class RemoteAbonent {
     }
 
     public void onMessage(byte[] buffer, int bytes) {
-        Message message = Message.getMessage(buffer, bytes);
-        connector.onMessage(message, this);
+        if(listener != null) {
+            Message message = Message.getMessage(buffer, bytes);
+            listener.onMessage(new ReceivedMessage(message, this));
+        }
+    }
+
+    public void setListener(MessageListener listener) {
+        this.listener = listener;
     }
 
     private final RemoteAbonent that = this;
+
+    public void onDestruct() {
+        if(thread == null) throw new RuntimeException("что то не так");
+        thread.cancel();
+        thread = null;
+    }
 
 }

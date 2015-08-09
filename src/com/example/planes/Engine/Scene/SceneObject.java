@@ -41,8 +41,10 @@ public class SceneObject extends AbstractSceneObject{
     @Override
     public void setX(float x) {
         float horizPeriod = getScene().getWorldWidth();
-        while (x > horizPeriod / 2) x -= horizPeriod;
-        while (x < -horizPeriod / 2) x += horizPeriod;
+        if(horizPeriod != 0) {
+            while (x > horizPeriod / 2) x -= horizPeriod;
+            while (x < -horizPeriod / 2) x += horizPeriod;
+        }
         this.x = x;
     }
 

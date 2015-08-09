@@ -6,21 +6,26 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import com.example.planes.Communication.*;
+import com.example.planes.Communication.Message.Message;
+import com.example.planes.Communication.Message.ReceivedMessage;
+import com.example.planes.Communication.Message.StartGameMessage;
+import com.example.planes.Communication.Message.StupidMessage;
 import com.example.planes.Config.GameConfig;
+import com.example.planes.Game.Game;
+import com.example.planes.Communication.MessageListener;
 
 import java.util.ArrayDeque;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Queue;
 
 /**
  * Created by egor on 05.08.15.
  */
-public class TestBTMenuActivity extends Activity implements ConnectorListener {
+public class TestBTMenuActivity extends Activity implements ConnectorListener, MessageListener {
     TestBTMenuActivity that = this;
     final Connector connector = new Connector(this);
     Button noBtBtn;
@@ -108,17 +113,20 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_ENABLE_BT) {
             if(resultCode == RESULT_OK) {
-                Runnable r = btRunnables.remove();
+                Runnable r = btRunnables.poll();
                 while (r != null) {
                     r.run();
-                    if(btRunnables.remove() == null) throw new RuntimeException("must contain even number of elem");
+                    if(btRunnables.poll() == null) throw new RuntimeException("must contain even number of elem");
+                    r = btRunnables.poll();
                 }
             } else {
-                btRunnables.remove();
-                Runnable r = btRunnables.remove();
+                btRunnables.poll();
+                Runnable r = btRunnables.poll();
                 while (r != null) {
                     r.run();
-                    if(btRunnables.remove() == null) throw new RuntimeException("must contain odd number of elem");
+                    Runnable t = btRunnables.poll();
+                    r = btRunnables.poll();
+                    if(r == null && t != null) throw new RuntimeException("must contain even number of elem");
                 }
             }
         }
@@ -170,44 +178,72 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("hey", "testBTactivity ondestroy");
+        connector.destruct();
     }
 
     @Override
     public void onAccepted(RemoteAbonent abonent) {
         Log.d("hey", "onaccepted");
+        connector.stopAcceptingSafe();
+        abonent.sendMessage(new StartGameMessage(1));
+        startGame(abonent, 0);
     }
 
     @Override
-    public void onMessage(RemoteAbonent abonent, Message msg) {
-        if(msg.getType() == Message.TYPE_STUPID_MESSAGE) {
-            beServBtn.setText(((StupidMessage)msg).getString());
+    public void onMessage(final ReceivedMessage rmsg) {
+        final Message msg = rmsg.getMessage();
+        RemoteAbonent abonent = rmsg.getSender();
+        if(msg.getType() == Message.STUPID_MESSAGE) {
+            beServBtn.post(new Runnable() {
+                @Override
+                public void run() {
+                    beServBtn.setText(((StupidMessage)msg).getString());
+                }
+            });
             if(((StupidMessage)msg).getString().equals("you are a nigger")) {
                 abonent.sendMessage(new StupidMessage("no, you are"));
             }
         }
+        if(msg.getType() == Message.START_GAME_MESSAGE) {
+            startGame(abonent, ((StartGameMessage) msg).getYourId());
+        }
+    }
+
+
+    private void startGame(RemoteAbonent abonent, int myId) {
+        GameConfig.type = GameConfig.TYPE_BT;
+
+
+        ArrayList<RemoteAbonent> them = new ArrayList<>(1);
+        them.add(abonent);
+        Game.NewGame(them, myId);
+
+        Intent intent = new Intent(that, MyActivity.class);
+
+        startActivity(intent);
     }
 
     @Override
     public void onFound(BluetoothDevice device) {
         Log.d("hey", "onFound bt device");
-        ParcelUuid[] uuids = device.getUuids();
-        for(ParcelUuid i : uuids) {
-            if(i.getUuid() == Connector.uuid) {
-                Log.d("hey", "onFound bt device UUID matched");
+        String name = device.getName();
+            if(name.equals( "planesbt")) {
+                Log.d("hey", "onFound bt device name matched");
                 connector.connectTo(device);
             }
-        }
     }
 
     @Override
     public void onConnected(RemoteAbonent abonent) {
         Log.d("hey", "on connected");
+        abonent.setListener(this);
         abonent.sendMessage(new StupidMessage("you are a nigger"));
     }
 
     @Override
     public void onConnectFailed() {
         Log.d("hey", "on conn failed");
-        connBtn.setText("sorry, son");
     }
+
+
 }

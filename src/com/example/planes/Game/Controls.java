@@ -1,6 +1,7 @@
 package com.example.planes.Game;
 
 import android.util.Log;
+import com.example.planes.Communication.Message.TurnMessage;
 import com.example.planes.Config.Config;
 import com.example.planes.Engine.Scene.AnimatedSprite;
 import com.example.planes.Engine.Scene.Scene;
@@ -27,7 +28,8 @@ public class Controls implements SceneButtonListener{
     public Controls(Game game) {
         this.game = game;
         Scene scene = game.getEngine().getScene();
-        buttonDown = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, -Config.btnMargin,
+        float r = -Helper.getScreenRatio();
+        buttonDown = scene.createButton(r + Config.btnMargin, -Config.btnMargin,
                 new StaticSprite(R.drawable.btn_up, 2 * Config.btnRadius));
         buttonDown.setAngle(MathHelper.PI);
         buttonUp = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, Config.btnMargin,
@@ -48,33 +50,34 @@ public class Controls implements SceneButtonListener{
         if(btn == buttonUp) {
             Log.d("multitouch madness", ".. it is a goLeft");
             leftDown = true;
-            game.getPlane().goLeft();
+            goLeft();
         }
         if(btn == buttonDown) {
             Log.d("multitouch madness", ".. it is a goRight");
             rightDown = true;
-            game.getPlane().goRight();
+            goRight();
+
         }
         if(btn == buttonStopGo) {
             Log.d("multitouch madness", ".. it is a stopGo");
             goin = !goin;
             if(goin){
                 buttonStopGo.setSprite(stopSprite);
-                game.getPlane().startEngine();
+                game.getMyPlane().startEngine();
             } else {
                 buttonStopGo.setSprite(goSprite);
-                game.getPlane().stopEngine();
+                game.getMyPlane().stopEngine();
             }
         }
         if(btn == buttonFire) {
             Log.d("multitouch madness", ".. it is a FAYA ZA MISAELOZ");
-            Bullet bullet = game.getPlane().fire();
+            Bullet bullet = game.getMyPlane().fire();
             game.getGameObjects().add(bullet);
             game.getBulletsGroup().add(bullet.getSceneObject());
         }
         if(btn == buttonResurrect) {
-            game.getPlane().getSceneObject().setXY(0, 0);
-            game.getPlane().resurrect();
+            game.getMyPlane().getSceneObject().setXY(0, 0);
+            game.getMyPlane().resurrect();
         }
     }
 
@@ -92,9 +95,24 @@ public class Controls implements SceneButtonListener{
             Log.d("multitouch madness", ".. it is a FAYA ZA MISAELOZ");
         }
         if(btn == buttonUp || btn == buttonDown) {
-            if (rightDown) game.getPlane().goRight();
-            else if (leftDown) game.getPlane().goLeft();
-            else game.getPlane().goStraight();
+            if (rightDown) goRight();
+            else if (leftDown) goLeft();
+            else goStraight();
         }
+    }
+
+    private void goRight() {
+        game.getMyPlane().goRight();
+        game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.GO_RIGHT, game.getMyPlane()));
+    }
+
+    private void goLeft() {
+        game.getMyPlane().goLeft();
+        game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.GO_LEFT, game.getMyPlane()));
+    }
+
+    private void goStraight() {
+        game.getMyPlane().goStraight();
+        game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.GO_STRAIGHT, game.getMyPlane()));
     }
 }

@@ -1,8 +1,9 @@
-package com.example.planes.Communication;
+package com.example.planes.Communication.Message;
+
+import com.example.planes.Communication.Message.Message;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 /**
  * Created by egor on 23.07.15.
@@ -12,28 +13,29 @@ public class StupidMessage extends Message {
     private static String utf = "UTF-8";
 
     public StupidMessage(String string) {
-        type = TYPE_STUPID_MESSAGE;
-        byte[] bytes = new byte[0];
+        super(STUPID_MESSAGE, string.getBytes().length);
+        byte[] bytes = null;
         try {
             bytes = string.getBytes(utf);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        ByteBuffer ruff = ByteBuffer.allocate(4 + bytes.length);
-        ruff.putInt(TYPE_STUPID_MESSAGE);
-        ruff.put(bytes);
-        this.bytes = ruff.array();
+
+        contents.put(bytes);
     }
 
-    public StupidMessage(byte[] bytes, int offset, int howmany) {
+    public StupidMessage(ByteBuffer bb) {
+        super(STUPID_MESSAGE, bb.array().length - bb.position());
         try {
-            string = new String(bytes, offset, howmany, utf);
+            string = new String(bb.array(), bb.position(), bb.array().length - bb.position(), utf);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        contents.put(string.getBytes());
     }
 
     public String getString() {
         return string;
     }
+
 }

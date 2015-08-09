@@ -5,6 +5,8 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import com.example.planes.Communication.Connector;
+import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
@@ -25,20 +27,21 @@ import java.util.List;
  * Created by egor on 12.07.15.
  */
 public class Game implements EngineEventsListener {
+    private static Game instance = null;
     private Engine engine;
     private Camera camera;
-    private Plane plane;
+    private Plane myPlane;
     private List<Prop> props = new ArrayList<>();
     private List<GameObject> gameObjects = new ArrayList<>();
     private List<Plane> planes = new ArrayList<>();
     private int deadCount = 0;
-    private int playerId;
-    private int numPlayers;
+    private int myId;
     private static final float groundLevel;
     private Controls controls;
     private StickerText msgDead;
     ObjectGroup bulletsGroup;
     ObjectGroup planesGroup;
+    private BTMessageListener messageListener = null;
 
     static {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
@@ -46,10 +49,32 @@ public class Game implements EngineEventsListener {
         groundLevel = -1 + h*(1 - BmpConfig.groundLevel);
     }
 
-    public Game(List<RemoteAbonent> them, int numPlayers, int playerId) {
-        this.playerId = playerId;
-        this.numPlayers = numPlayers;
+    private int numPlayers;
+
+    public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
+
+        instance = new Game(playerId, otherPlayers);
+
+    }
+
+    public BTMessageListener getMessageListener() {
+        return messageListener;
+    }
+
+    public int getMyId() {
+        return myId;
+    }
+
+
+    private Game(int playerId, ArrayList<RemoteAbonent> otherPlayers) {
         Log.d("hey", "Game()");
+        myId = playerId;
+        messageListener = new BTMessageListener(this, otherPlayers);
+        for(RemoteAbonent abonent : otherPlayers) {
+            abonent.setListener(messageListener);
+        }
+        numPlayers = otherPlayers.size() + 1;
+
         //1. create scene
         this.engine = new Engine();
         engine.setGraphicsFPS(GameConfig.FPS);
@@ -62,39 +87,44 @@ public class Game implements EngineEventsListener {
         // create ground
         SceneObject ground = spawner.createGround();
 
+        SceneObject cross = scene.createObject(0, getGroundLevel());
+        cross.setSprite(new StaticSprite(R.drawable.cross, 0.1f));
+
+        //create clouds
+        for (int i = 0; i < GameConfig.cloudsMin; i++) props.add(spawner.createCloud(i));
+
         //create planes
         float w = scene.getWorldWidth();
         planesGroup = new ObjectGroup(scene);
         bulletsGroup = new ObjectGroup(scene);
+        int numPlayers = getNumPlayers();
         for (int i = 0; i < numPlayers; i++) {
-            Plane plane = spawner.createPlane(-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1), 0);
+            Plane plane = new Plane(scene, -w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1), 0, 0, 0);
             plane.setVx(0.15f);
+            plane.getSceneObject().setXY(plane.getX(), getGroundLevel()
+                    + plane.getSceneObject().getSprite().getH()*0.5f - plane.getSceneObject().getDy());
             plane.startEngine();
             planes.add(plane);
             gameObjects.add(plane);
             planesGroup.add(plane.getSceneObject());
         }
-        plane = planes.get(playerId);
-        plane.stopEngine();
-        plane.setVx(0);
-        //plane.getSceneObject().setXY(plane.getX(), ground.getY() + ground.getSprite().getH() / 2);
-
-        SceneObject cross = scene.createObject(0, getGroundLevel());
-        cross.setSprite(new StaticSprite(R.drawable.cross, 0.1f));
+        myPlane = planes.get(myId);
 
         createOnCollisionStartListener(planesGroup, planesGroup, getPlanesVsPlanes());
         createOnCollisionStartListener(planesGroup, bulletsGroup, getPlanesVsBullets());
-
-        //create clouds
-        for (int i = 0; i < GameConfig.cloudsMin; i++) props.add(spawner.createCloud(i));
+        camera = new FollowingCamera(myPlane);
 
         //init controls
         controls = new Controls(this);
         scene.setButtonEventListner(controls);
 
         engine.setEventsListener(this);
-        camera = new FollowingCamera(plane);
+
         engine.run();
+    }
+
+    public static Game getInstance() {
+        return instance;
     }
 
     private void createOnCollisionStartListener(ObjectGroup group1, ObjectGroup group2, CollisionProcessor processor) {
@@ -119,6 +149,7 @@ public class Game implements EngineEventsListener {
     @Override
     public void onGraphicsFrame(float graphicsFPS) {
         camera.onFrame(graphicsFPS);
+        messageListener.processMessages();
     }
 
     @Override
@@ -183,10 +214,11 @@ public class Game implements EngineEventsListener {
         if(!plane.getAlive()) return;
         plane.die();
         deadCount++;
+        int numPlayers = getNumPlayers();
         if(numPlayers - deadCount == 1 && numPlayers != 1 || deadCount == 1 && numPlayers == 1) {
             Log.d("game", "round over");
         }
-        if (plane == this.plane) {
+        if (plane == this.myPlane) {
             if(msgDead == null ) {
                 msgDead = new StickerText(engine.getScene(), "dead", 0, 0.5f, 0.1f);
             } else {
@@ -208,8 +240,8 @@ public class Game implements EngineEventsListener {
         return groundLevel;
     }
 
-    public Plane getPlane() {
-        return plane;
+    public Plane getMyPlane() {
+        return myPlane;
     }
 
     List<Prop> getProps() {
@@ -223,4 +255,18 @@ public class Game implements EngineEventsListener {
     public List<GameObject> getGameObjects() {
         return gameObjects;
     }
+
+    public Plane getPlane(int index) {
+
+        return planes.get(index);
+    }
+
+    private int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public boolean amIServer() {
+        return myId == 0;
+    }
+
 }
