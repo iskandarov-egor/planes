@@ -46,4 +46,22 @@ public class Vector {
         x += dx;
         y += dy;
     }
+
+    public void rotate(float centerX, float centerY, float angle) {
+        float x1 = x - centerX;
+        float y1 = y - centerY;
+        float cos = (float) Math.cos(angle);
+        float sin = (float) Math.sin(angle);
+
+        x = x1 * cos - y1 * sin + centerX;
+        y = x1 * sin + y1 * cos + centerY;
+    }
+
+    public void rotate(float angle) {
+        rotate(0, 0, angle);
+    }
+
+    public static float vecProduct(Vector v1, Vector v2) {
+        return v1.x*v2.y - v2.x*v1.y;
+    }
 }

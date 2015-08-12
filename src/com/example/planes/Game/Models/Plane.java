@@ -34,11 +34,11 @@ public class Plane extends GameObject {
     }
 
     public Plane(Scene scene, float x, float y, float speed, float angle) {
-        super(scene, x, y, speed, angle);
+        super(scene, x, y, speed, angle, Config.planeHeight);
 
         tanDrag = 0.008f*60;
         normDrag = 0.008f*60;
-        setSprite(new StaticSprite(R.drawable.plane_stub, Config.planeHeight));
+        setSprite(new StaticSprite(R.drawable.plane_stub));
         setBody(Config.planeHeight);
         setCustomGroundPhys(true);
     }

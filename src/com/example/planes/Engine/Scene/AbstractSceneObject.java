@@ -19,18 +19,18 @@ abstract class AbstractSceneObject {
 
     protected Sprite sprite = null;
     protected Body body = null;
-    AbstractSceneObject(float x, float y, Scene scene) {
+    private float h;
+
+    AbstractSceneObject(float x, float y, Scene scene, float height) {
         this.x = x;
         this.y = y;
         this.scene = scene;
+        h = height;
     }
-
-
 
     public float getX() {
         return x;
     }
-
 
     public float getY() {
         return y;
@@ -46,14 +46,28 @@ abstract class AbstractSceneObject {
         return y;
     }
 
+    public float getH() {
+        return h;
+    }
+
+    public void setH(float h) {
+        this.h = h;
+        rebuild();
+    }
+
     public void setSprite(Sprite sprite) {
 
         this.sprite = sprite;
-        if(sprite != null) sprite.rebuild(dx, dy, angle);
+        if(sprite != null) sprite.rebuild(dx, dy, angle, h);
     }
 
     public void setBody(float radius) {
-        this.body = new Circle(radius);
+        setBody(new Circle(radius));
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
+        if(this.body != null) body.rebuild(dx, dy, angle, h);
     }
 
     public float getRadius() {
@@ -71,13 +85,13 @@ abstract class AbstractSceneObject {
         angle = Utils.modpi2(angle);
         if(this.angle != angle) {
             this.angle = angle;
-            rebuild();
+            rebuild(); // todo no need to rebuild sprite each phys frame
         }
     }
 
     private void rebuild() {
-        if(sprite != null) sprite.rebuild(dx, dy, angle);
-        if(body != null) body.rebuild(dx, dy, angle);
+        if(sprite != null) sprite.rebuild(dx, dy, angle, h);
+        if(body != null) body.rebuild(dx, dy, angle, h);
     }
 
 
@@ -126,6 +140,7 @@ abstract class AbstractSceneObject {
         this.visible = visible;
     }
 
+
     private boolean removed = false;
 
     public void remove() {
@@ -144,7 +159,7 @@ abstract class AbstractSceneObject {
         if(sprite != null) {
             if(!sprite.isLoaded()) {
                 sprite.load();
-                sprite.rebuild(dx, dy, angle);
+                sprite.rebuild(dx, dy, angle, h);
             }
             sprite.draw(x, y, transform);
         }

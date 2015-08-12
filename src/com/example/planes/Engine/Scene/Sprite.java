@@ -18,11 +18,15 @@ public abstract class Sprite {
 
     }
 
+
+
     abstract void draw(float x, float y, float[] transform);
+
+    public abstract void rebuild(float dx, float dy, float angle, float height);
+
     abstract void onFrame(float graphicsFPS);
 
     public abstract float getRadius();
-    public abstract void rebuild(float dx, float dy, float angle);
 
     public abstract void load();
 

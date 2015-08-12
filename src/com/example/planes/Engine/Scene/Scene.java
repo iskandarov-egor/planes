@@ -176,8 +176,8 @@ public final class Scene {
         }
     }
 
-    public SceneObject createObject1(float x, float y) {
-        SceneObject object = new SceneObject(x, y, this);
+    public SceneObject createObject(float x, float y, float height) {
+        SceneObject object = new SceneObject(x, y, this, height);
         objects.add(object);
         return object;
     }
@@ -217,15 +217,15 @@ public final class Scene {
         collisionManager.removeCollisionListener(collisionListener);
     }
 
-    public SceneButton createButton(float x, float y, Sprite sprite) {
-        SceneButton btn = new SceneButton(x, y, this, sprite);
+    public SceneButton createButton(float x, float y, Sprite sprite, float height) {
+        SceneButton btn = new SceneButton(x, y, this, sprite, height);
         buttonManager.addButton(btn);
         stickers.add(btn);
         return btn;
     }
 
-    public Sticker createSticker(float x, float y) {
-        Sticker sticker = new Sticker(x, y, this);
+    public Sticker createSticker(float x, float y, float height) {
+        Sticker sticker = new Sticker(x, y, this, height);
         stickers.add(sticker);
         return sticker;
     }

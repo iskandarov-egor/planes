@@ -5,8 +5,6 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import com.example.planes.Communication.Connector;
-import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
@@ -20,7 +18,6 @@ import com.example.planes.Utils.Helper;
 import com.example.planes.Utils.Text.StickerText;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -87,8 +84,8 @@ public class Game implements EngineEventsListener {
         // create ground
         SceneObject ground = spawner.createGround();
 
-        SceneObject cross = scene.createObject1(0, getGroundLevel());
-        cross.setSprite(new StaticSprite(R.drawable.cross, 0.1f));
+        SceneObject cross = scene.createObject(0, getGroundLevel(), 0.1f);
+        cross.setSprite(new StaticSprite(R.drawable.cross));
 
         //create clouds
         for (int i = 0; i < GameConfig.cloudsMin; i++) spawner.createCloud(i);

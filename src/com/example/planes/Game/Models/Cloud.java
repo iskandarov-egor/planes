@@ -1,5 +1,6 @@
 package com.example.planes.Game.Models;
 
+import com.example.planes.Config.Config;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
@@ -13,10 +14,10 @@ public class Cloud extends SceneObject implements Prop {
     private float vy = 0;
 
     public Cloud(Scene scene, float x, float y, float vx, float vy) {
-        super(x, y, scene);
+        super(x, y, scene, Config.cloudHeight);
         this.vx = vx;
         this.vy = vy;
-        setSprite(new StaticSprite(R.drawable.cloud, 0.2f));
+        setSprite(new StaticSprite(R.drawable.cloud));
     }
 
     public void onPhysicsFrame(float fps) {

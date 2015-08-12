@@ -9,8 +9,8 @@ import com.example.planes.Engine.Utils;
  */
 public class Sticker extends AbstractSceneObject{
 
-    Sticker(float x, float y, Scene scene) {
-        super(x, y, scene);
+    Sticker(float x, float y, Scene scene, float height) {
+        super(x, y, scene, height);
     }
 
 

@@ -24,7 +24,7 @@ public class MathHelper {
         float sin = (float) Math.sin(angle);
 
         point.x = x1 * cos - y1 * sin + centerX;
-        point.y = x1 * cos + y1 * cos + centerY;
+        point.y = x1 * sin + y1 * cos + centerY;
     }
 
     public static float mod(float x, float y) {
@@ -48,6 +48,6 @@ public class MathHelper {
     }
 
     public static boolean isBetween(float x, float lim1, float lim2) {
-        return x > lim1 != x > lim2;
+        return x > lim1 != x >= lim2;
     }
 }

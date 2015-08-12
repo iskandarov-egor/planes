@@ -16,8 +16,8 @@ public abstract class GameObject extends SceneObject{
     private float angle = 0;
     private boolean customGroundPhys = false;
 
-    public GameObject(Scene scene, float x, float y, float speed, float angle) {
-        super(x, y, scene);
+    public GameObject(Scene scene, float x, float y, float speed, float angle, float height) {
+        super(x, y, scene, height);
         this.vx = (float) (speed*Math.cos(angle));
         this.vy = (float) (speed*Math.sin(angle));
     }

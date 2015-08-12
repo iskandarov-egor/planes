@@ -4,6 +4,7 @@ package com.example.planes.Engine.Scene;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
+import android.os.Parcelable;
 import android.util.Log;
 import com.example.planes.Engine.MyGLRenderer;
 import com.example.planes.Engine.TextureManager;
@@ -45,7 +46,7 @@ public class StaticSprite extends Sprite {
 
     }
 
-    protected StaticSprite(float height, float width) {
+    protected StaticSprite() {
         coords = new float[8];
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -68,11 +69,13 @@ public class StaticSprite extends Sprite {
         uvBuffer.put(uvs);
         uvBuffer.position(0);
 
-        h = height;
-        w = width;
+//        h = height;
+//        w = width;
 
-        rebuild(0, 0, 0);
+        //rebuild(0, 0, 0);
     }
+
+    float aspectRatio;
 
     protected static float getWidthBy(float h, int fileId) {
         Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
@@ -83,16 +86,19 @@ public class StaticSprite extends Sprite {
         return h * ((float)bitmap.getWidth()) / bitmap.getHeight();
     }
 
-    public StaticSprite(Bitmap bmp, float height) {
-        this(height, getWidthBy(height, bmp));
+    public StaticSprite(Bitmap bmp) {
+        this();
         if(bmp == null) throw new NullPointerException();
         bitmap = bmp;
+        aspectRatio = ((float)bitmap.getWidth()) / bitmap.getHeight();
     }
 
-    public StaticSprite(int fileId, float height) {
-        this(height, getWidthBy(height, fileId));
+    public StaticSprite(int fileId) {
+        this();
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
+        Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
+        aspectRatio = ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
     }
 
     @Override
@@ -173,7 +179,9 @@ public class StaticSprite extends Sprite {
     }
 
     @Override
-    public void rebuild(float dx, float dy, float angle) {
+    public void rebuild(float dx, float dy, float angle, float height) {
+        h = height;
+        w = h * aspectRatio;
         coords[6] = w/2 + dx;
         coords[7] = h/2 + dy;
         coords[0] = -w/2 + dx;

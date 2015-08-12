@@ -29,7 +29,7 @@ public class AnimatedSprite extends StaticSprite {
     };
 
     private AnimatedSprite(float height, float width, int numFrames, float frameTime) {
-        super(height, width);
+        super();
         this.numFrames = numFrames;
         this.frameTime = frameTime;
 

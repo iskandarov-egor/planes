@@ -64,9 +64,9 @@ public class StickerText {
 
         float cury = -scene.getViewport().screenToEngine(metrics.descent - metrics.ascent)/2 + y;
         for(int i = 0; i < text.length(); i++) {
-            StaticSprite letter = new StaticSprite(getLetter(i), h);
+            StaticSprite letter = new StaticSprite(getLetter(i));
             curx += letter.getW()/2;
-            Sticker sticker = scene.createSticker(curx, cury);
+            Sticker sticker = scene.createSticker(curx, cury, h);
 
             sticker.setSprite(letter);
             stickers.add(sticker);

@@ -14,8 +14,8 @@ public class SceneObject extends AbstractSceneObject{
     protected SceneObject parent = null;
     private List<ObjectGroup> groups = new ArrayList<>(1);
 
-    public SceneObject(float x, float y, Scene scene) {
-        super(x, y, scene);
+    public SceneObject(float x, float y, Scene scene, float height) {
+        super(x, y, scene, height);
     }
 
 
@@ -33,8 +33,8 @@ public class SceneObject extends AbstractSceneObject{
         if(period < 0) throw new IllegalArgumentException("period");
 
         if(body == null || object.body == null ) throw new NullPointerException("no body");
-        return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX(),
-                object.getAbsoluteY() - getAbsoluteY(), period);
+        return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX() + object.dx - dx,
+                object.getAbsoluteY() - getAbsoluteY() + object.dy - dy, period);
     }
 
     public void setParent(SceneObject parent) {

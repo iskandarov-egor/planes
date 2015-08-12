@@ -30,16 +30,16 @@ public class Controls implements SceneButtonListener{
         Scene scene = game.getEngine().getScene();
         float r = -Helper.getScreenRatio();
         buttonDown = scene.createButton(r + Config.btnMargin, -Config.btnMargin,
-                new StaticSprite(R.drawable.btn_up, 2 * Config.btnRadius));
+                new StaticSprite(R.drawable.btn_up), 2 * Config.btnRadius);
         buttonDown.setAngle(MathHelper.PI);
         buttonUp = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, Config.btnMargin,
-                new StaticSprite(R.drawable.btn_up, 2 * Config.btnRadius));
+                new StaticSprite(R.drawable.btn_up), 2 * Config.btnRadius);
         buttonFire = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, Config.btnMargin,
-                new StaticSprite(R.drawable.btn_fire, 2 * Config.btnRadius));
-        stopSprite = new StaticSprite(R.drawable.btn_stop, 2*Config.btnRadius);
-        goSprite = new StaticSprite(R.drawable.btn_go, 2*Config.btnRadius);
-        buttonStopGo = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, -Config.btnMargin, goSprite);
-        buttonResurrect = scene.createButton(0, .8f, new AnimatedSprite(R.drawable.propeller, 0.3f, 8, 1f));
+                new StaticSprite(R.drawable.btn_fire), 2 * Config.btnRadius);
+        stopSprite = new StaticSprite(R.drawable.btn_stop);
+        goSprite = new StaticSprite(R.drawable.btn_go);
+        buttonStopGo = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, -Config.btnMargin, goSprite, 2 * Config.btnRadius);
+        buttonResurrect = scene.createButton(0, .8f, new AnimatedSprite(R.drawable.propeller, 0.3f, 8, 1f), 2 * Config.btnRadius);
     }
     private boolean leftDown = false;
     private boolean rightDown = false;

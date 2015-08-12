@@ -41,7 +41,7 @@ public class Circle extends Body {
     }
 
     @Override
-    public void rebuild(float dx, float dy, float angle) {
+    public void rebuild(float dx, float dy, float angle, float h) {
         //
     }
 

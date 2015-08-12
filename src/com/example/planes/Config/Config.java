@@ -9,7 +9,9 @@ public abstract class Config {
     public static final float btnMargin = 0.2f;
     public static final float btnRadius = 0.15f;
     public static final float planeHeight = 0.15f;
+    public static final float bulletHeight = 0.05f;
     public static final float planeDx = 0;
     public static final float planeDy = 0;
+    public static final float cloudHeight = 0.2f;
 
 }
