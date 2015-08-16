@@ -21,7 +21,7 @@ public final class Viewport {
 
     Viewport() {
         Matrix.setLookAtM(cameraM, 0, 0, 0, 1, 0, 0, 0f, 0f, 1.0f, 0.0f);
-        updateScreenMatrix();
+        
     }
 
     float cameraX = 0;
@@ -38,11 +38,11 @@ public final class Viewport {
     }
 
     float currentZoom = 1;
-    float screenRatio = 1;
+    float screenRatio = 0;
 
     // размеры экрана в пикселиях
-    int screenWidth;
-    int screenHeight;
+    int screenWidth = 0;
+    int screenHeight = 0;
 
     // полуширина экрана с учетом зума
     float getHalfWidth(){
@@ -77,11 +77,14 @@ public final class Viewport {
     }
 
     public Utils.FloatPoint screenToEngine(float x, float y) {
+        if(screenHeight == 0) throw new RuntimeException("viewport not ready");
+
         return new Utils.FloatPoint(2*(x / screenHeight - 0.5f*screenRatio),
                 2*(0.5f - y / screenHeight));
     }
 
     public float screenToEngine(float len) {
+        if(screenHeight == 0) throw new RuntimeException("viewport not ready");
         return 2*(len / screenHeight);
     }
 

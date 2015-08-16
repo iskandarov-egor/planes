@@ -35,7 +35,6 @@ public abstract class GameObject extends SceneObject{
 
     protected void applyGravity(float physicsFPS) {
         vy -= g / physicsFPS;
-
     }
 
     protected void applySpeed(float physicsFPS) {
@@ -60,7 +59,6 @@ public abstract class GameObject extends SceneObject{
             if (y + vy / physicsFPS - getRadius() < ground) {
                 y = ground + getRadius();
                 vy = 0;
-
             }
         }
         setY(y);
@@ -90,11 +88,6 @@ public abstract class GameObject extends SceneObject{
         this.vy = vy;
     }
 
-
-    public boolean isTouchingGround() {
-        float ground = Game.getGroundLevel();
-        return getY() <= ground + getRadius();
-    }
 
 
 }

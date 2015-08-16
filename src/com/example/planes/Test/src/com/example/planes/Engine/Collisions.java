@@ -22,15 +22,15 @@ public class Collisions extends junit.framework.TestCase{
     }
 
     public void before() {
-        scene = new Scene();
+        scene = new Scene(null);
         apples = new ObjectGroup(scene);
         cars = new ObjectGroup(scene);
         greens = new ObjectGroup(scene);
         reds = new ObjectGroup(scene);
-        greenApple = scene.createObject(0, 0);
-        redApple = scene.createObject(0, 0);
-        redCar = scene.createObject(0, 0);
-        greenCar = scene.createObject(0, 0);
+        greenApple = scene.createObject(0, 0, 1);
+        redApple = scene.createObject(0, 0, 1);
+        redCar = scene.createObject(0, 0, 1);
+        greenCar = scene.createObject(0, 0, 1);
         greenApple.setBody(1);
         redApple.setBody(1);
         redCar.setBody(1);
@@ -50,11 +50,19 @@ public class Collisions extends junit.framework.TestCase{
 
         CollisionListener listener = new CollisionListener(apples, apples);
         final int[] countStart = new int[1];
+        final int[] countEach = new int[1];
         countStart[0] = 0;
+        countEach[0] = 0;
         listener.setOnCollisionStart(new CollisionProcessor() {
             @Override
             public void process(SceneObject object, SceneObject other) {
                 countStart[0]++;
+            }
+        });
+        listener.setOnCollision(new CollisionProcessor() {
+            @Override
+            public void process(SceneObject object, SceneObject other) {
+                countEach[0]++;
             }
         });
         final int[] countEnd = new int[1];
@@ -68,8 +76,11 @@ public class Collisions extends junit.framework.TestCase{
         });
         scene.addCollisionListener(listener);
         scene.onPhysicsFrame(11);
+        scene.onPhysicsFrame(11);
+        scene.onPhysicsFrame(11);
         assertEquals(countStart[0], 1);
         assertEquals(countEnd[0], 0);
+        assertEquals(countEach[0], 3);
         greenApple.setXY(10, 10);
         scene.onPhysicsFrame(11);
         assertEquals(countStart[0], 1);
@@ -127,7 +138,7 @@ public class Collisions extends junit.framework.TestCase{
         listener.setOnCollisionStart(new CollisionProcessor() {
             @Override
             public void process(SceneObject object, SceneObject other) {
-                scene.removeObject(other);
+                other.remove();
                 countStart[0]++;
             }
         });
@@ -147,10 +158,10 @@ public class Collisions extends junit.framework.TestCase{
 
     public void testApplesVsCarsVsReds(){
         before();
-        greenApple = scene.createObject(77, 77);
-        redApple = scene.createObject(77, 77);
-        redCar = scene.createObject(111, 111);
-        greenCar = scene.createObject(111, 111);
+        greenApple = scene.createObject(77, 77, 1);
+        redApple = scene.createObject(77, 77, 1);
+        redCar = scene.createObject(111, 111, 1);
+        greenCar = scene.createObject(111, 111, 1);
         greenApple.setBody(1);
         redApple.setBody(1);
         redCar.setBody(1);

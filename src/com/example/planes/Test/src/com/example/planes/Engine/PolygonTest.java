@@ -1,6 +1,11 @@
 package com.example.planes.Engine;
 
-import com.example.planes.Engine.Body.Polygon;
+import com.example.planes.Config.Config;
+import com.example.planes.Engine.Body.Point;
+import com.example.planes.Engine.Body.ComplexPolygon;
+import com.example.planes.Engine.Body.SimplePolygon;
+import com.example.planes.Engine.Scene.Scene;
+import com.example.planes.Engine.Scene.SceneObject;
 
 /**
  * Created by egor on 04.08.15.
@@ -17,7 +22,7 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {0, 0, 89, 459, 0, 0};
         float[] X = {477, 587, 0 ,0};
         float[] Y = {418, 98, 0 , 0};
-        assertTrue(Polygon.linesIntersect(x, y, X, Y, 2, 0).length == 2);
+        assertTrue(SimplePolygon.linesIntersect(x, y, X, Y, 2, 0).length == 2);
 
     }
 
@@ -26,7 +31,7 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {0, 0, 22, 33, 0, 0};
         float[] X = {1, 111, 0 ,0};
         float[] Y = {24, 24, 0 , 0};
-        assertTrue(Polygon.linesIntersect(x, y, X, Y, 2, 0).length == 2);
+        assertTrue(SimplePolygon.linesIntersect(x, y, X, Y, 2, 0).length == 2);
     }
 
     public void testLines3() {
@@ -34,7 +39,7 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {22, 33, 0, 0};
         float[] X = {0, 1, 111, 0 ,0};
         float[] Y = {0, 24, 24, 0 , 0};
-        assertTrue(Polygon.linesIntersect(x, y, X, Y, 0, 1).length == 2);
+        assertTrue(SimplePolygon.linesIntersect(x, y, X, Y, 0, 1).length == 2);
     }
 
     public void testSquares() {
@@ -42,8 +47,8 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {0, 0, 11, 11};
         float[] X = {0, 11, 11, 0};
         float[] Y = {0, 0, 11, 11};
-        Polygon p1 = new Polygon(x, y);
-        Polygon p2 = new Polygon(X, Y);
+        SimplePolygon p1 = new SimplePolygon(x, y);
+        SimplePolygon p2 = new SimplePolygon(X, Y);
         float o = p1.intersects1(p2, 5, 5, 0)[1];
         assertTrue(o == 5 || p1.isPointInside(X[0] + 5, Y[0] + 5) || p2.isPointInside(x[0] - 5, y[0] - 5));
     }
@@ -59,8 +64,8 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] correct4 = {513, 385};
         float[] correct5 = {506, 390};
         float[] correct6 = {478, 375};
-        Polygon p1 = new Polygon(x, y);
-        Polygon p2 = new Polygon(X, Y);
+        SimplePolygon p1 = new SimplePolygon(x, y);
+        SimplePolygon p2 = new SimplePolygon(X, Y);
         float[] o = p1.intersects1(p2, 0, 0, 0);
         assertTrue(o.length == 2);
 
@@ -86,17 +91,40 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {12, 12, 23, 23};
         float[] X = {0, 11, 11, 0};
         float[] Y = {0, 0, 11, 11};
-        Polygon p1 = new Polygon(x, y);
-        Polygon p2 = new Polygon(X, Y);
+        SimplePolygon p1 = new SimplePolygon(x, y);
+        SimplePolygon p2 = new SimplePolygon(X, Y);
         assertTrue(p1.intersects1(p2, 0, 0, 0).length == 0);
-        p1.rebuild(0, 0, -0.5f, h);
+        p1.rebuild(0, 0, -0.5f, 1);
         assertTrue(p1.intersects1(p2, 0, 0, 0).length == 2);
     }
+
+    public void test() {
+        float[] x = {0, 0.5f, 1};
+        float[] y = {0, 2, 0};
+        float[] X = {0, 1, 1, 0};
+        float[] Y = {0, 0, 1, 1};
+
+        ComplexPolygon p1 = new ComplexPolygon(x, y);
+        ComplexPolygon p2 = new ComplexPolygon(X, Y);
+        Scene scene = new Scene(null);
+        SceneObject o1 = new SceneObject(0, 0, scene, 1);
+        o1.setBody(p1);
+
+        SceneObject o2 = new SceneObject(0, 1.9f, scene, 1);
+        o2.setBody(p2);
+        SimplePolygon sp1 = new SimplePolygon(x, y);
+        SimplePolygon sp2 = new SimplePolygon(X, Y);
+        assertTrue(sp1.intersects(sp2, 0, 1.9f, 0));
+        assertTrue(p1.intersects(p2, 0, 1.9f, 0));
+
+        assertTrue(o1.intersects(o2, 0));
+    }
+
 
     public void testPoint() {
         float[] x = {127, 170, 354};
         float[] y = {190, 330, 86};
-        Polygon p = new Polygon(x, y);
+        ComplexPolygon p = new ComplexPolygon(x, y);
         assertTrue(p.isPointInside(166, 282));
         assertTrue(p.isPointInside(218, 155));
         assertTrue(p.isPointInside(200, 200));
@@ -110,8 +138,8 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {0, 0, 11, 11};
         float[] X = {7, 18, 18, 7};
         float[] Y = {0, 0, 11, 11};
-        Polygon p1 = new Polygon(x, y);
-        Polygon p2 = new Polygon(X, Y);
+        ComplexPolygon p1 = new ComplexPolygon(x, y);
+        ComplexPolygon p2 = new ComplexPolygon(X, Y);
         assertFalse(p1.intersects(p2, 0, 5, 111));
         assertTrue(p1.intersects(p2, 0, 5, 18));
         assertFalse(p2.intersects(p1, 0, -5, 111));
@@ -123,17 +151,37 @@ public class PolygonTest extends  junit.framework.TestCase{
         float[] y = {-5, -5, 5, 5};
         float[] X = {-5, 5, 5, -5};
         float[] Y = {6, 6, 16, 16};
-        Polygon p1 = new Polygon(x, y);
-        Polygon p2 = new Polygon(X, Y);
+        ComplexPolygon p1 = new ComplexPolygon(x, y);
+        ComplexPolygon p2 = new ComplexPolygon(X, Y);
+        SimplePolygon sp1 = new SimplePolygon(x, y);
+        SimplePolygon sp2 = new SimplePolygon(X, Y);
+        assertFalse(sp1.intersects(sp2, 89, 0, 110));
         assertFalse(p1.intersects(p2, 89, 0, 110));
+
         assertFalse(p1.intersects(p2, 89, -11, 110));
-        p1.rebuild(0, 0, 0.8f, h);
+        p1.rebuild(0, 0, 0.8f, 1);
+        sp1.rebuild(0, 0, 0.8f, 1);
+        assertFalse(sp1.intersects(sp2, 89, -11, 110));
         assertFalse(p1.intersects(p2, 89, -11, 110));
+
         assertFalse(p2.intersects(p1, -89, 11, 110));
+        assertTrue(sp1.intersects(sp2, 89, -11, 100));
         assertTrue(p1.intersects(p2, 89, -11, 100));
+
         assertTrue(p2.intersects(p1, -89, 11, 100));
-        assertFalse(p1.intersects(p2, 89, -11, 110));
-        assertFalse(p2.intersects(p1, -89, 11, 110));
+    }
+
+    public void testPlanePoint() {
+        ComplexPolygon plane = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
+        for(int i = 1; i < Config.planePolyX.length; i++) {
+            plane.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
+        }
+        Point bullet = new Point();
+        assertTrue(plane.isPointInside(0.2f, 0.1f));
+        assertTrue(plane.intersects(bullet, 0.2f, 0.1f, 10));
+        assertTrue(bullet.intersects(plane, -0.2f, -0.1f, 10));
+        assertFalse(plane.intersects(bullet, 10f, 0.1f, 100));
+        assertTrue(plane.intersects(bullet, 10f, 0.1f, 10.5f));
     }
 
     private boolean pointNear(float[] o, float[] correct) {

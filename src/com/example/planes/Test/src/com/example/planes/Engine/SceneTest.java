@@ -12,16 +12,16 @@ public class SceneTest extends junit.framework.TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        scene = new Scene();
+        scene = new Scene(null);
 
     }
 
     public void testObjects(){
-        SceneObject car = scene.createObject(10, 0);
-        SceneObject bike = scene.createObject(20, 0);
-        SceneObject apple = scene.createObject(30, 0);
-        SceneObject tank = scene.createObject(40, 0);
-        scene.removeObject(apple);
+        SceneObject car = scene.createObject(10, 0, 1);
+        SceneObject bike = scene.createObject(20, 0, 1);
+        SceneObject apple = scene.createObject(30, 0, 1);
+        SceneObject tank = scene.createObject(40, 0, 1);
+        apple.remove();
         assertTrue(scene.contains(car));
         assertTrue(scene.contains(bike));
         assertTrue(scene.contains(tank));

@@ -121,7 +121,7 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
 
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
-        engine.getScene().onScreenChanged(width, height);
+        engine.onScreenChanged(width, height);
     }
 
 

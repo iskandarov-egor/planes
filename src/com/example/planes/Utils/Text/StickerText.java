@@ -23,25 +23,35 @@ public class StickerText {
     private int ph;
     private Paint.FontMetrics metrics;
     private int color = Color.BLACK;
+    private boolean visible = true;
 
     public StickerText(Scene scene, String text, float x, float y, float height) {
+        this(scene, x, y, height);
+        this.text = text;
+        if(scene.getEngine().isReady()) {
+            write(text);
+        }
+
+    }
+
+    public StickerText(Scene scene, float x, float y, float height) {
         this.scene = scene;
         this.x = x;
         this.y = y;
-        this.text = text;
         h = height;
         paint.setAntiAlias(true);
-        write(text);
     }
 
     public void setVisible(boolean visible) {
+        this.visible = visible;
         for(Sticker sticker: stickers) {
             sticker.setVisible(visible);
         }
     }
 
-    public void setColor(int color) {
-        this.color = color;
+    public void setText(String text) {
+        this.text = text;
+        if(scene.getEngine().isReady()) write(text);
     }
 
     private void write(String text) {
@@ -50,7 +60,7 @@ public class StickerText {
         }
         stickers.clear();
         ph = (int) (0.5f * h * Helper.getScreenHeight());
-        float fontSize = getFontSizeByHeight(ph);
+        float fontSize = getFontSizeByHeight(ph); //todo!!
         paint.setTextSize(fontSize);
         metrics = paint.getFontMetrics();
 
@@ -60,19 +70,29 @@ public class StickerText {
 
         paint.setColor(color);
 
-        float curx = -scene.getViewport().screenToEngine(getLength()/2) + x;
+        float halfLen = getLength()/2;
+        float engineHalfLen =  scene.getViewport().screenToEngine(halfLen);
+        float curx = -engineHalfLen + x;
+        float scrToEngRatio = engineHalfLen / halfLen;
 
         float cury = -scene.getViewport().screenToEngine(metrics.descent - metrics.ascent)/2 + y;
         for(int i = 0; i < text.length(); i++) {
             StaticSprite letter = new StaticSprite(getLetter(i));
-            curx += letter.getW()/2;
+            curx += widths[i] * scrToEngRatio / 2;
             Sticker sticker = scene.createSticker(curx, cury, h);
 
             sticker.setSprite(letter);
+            sticker.setVisible(visible);
             stickers.add(sticker);
-            curx += letter.getW()/2;
+            curx += widths[i] * scrToEngRatio / 2;
 
         }
+    }
+
+
+
+    public void onScreenChanged() {
+        if(text != null && text.length() != 0) write(text);
     }
 
     private float getLength() {

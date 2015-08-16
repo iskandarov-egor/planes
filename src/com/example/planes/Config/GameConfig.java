@@ -24,6 +24,7 @@ public class GameConfig {
     public static final int TYPE_NO_BT = 607;
     public static final int TYPE_BT_SERVER = 87364;
     public static final int TYPE_BT_CLIENT = -87364;
+    public static final int noBtEnemies = 1;
     public static int type = TYPE_NO_BT;
 
     public static final int numPlayersTypeNoBt = 2;
@@ -33,6 +34,6 @@ public class GameConfig {
     public static final float landingGearAngleRight = 5f;
     public static final float bulletSpeed = 3f;
     public static final float bulletPath = worldPeriod;
-    public static final boolean immortality = true;
+    public static final boolean immortality = false;
 
 }

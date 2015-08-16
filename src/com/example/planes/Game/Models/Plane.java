@@ -4,6 +4,7 @@ import android.util.Log;
 import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.Config;
 import com.example.planes.Config.GameConfig;
+import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Game;
@@ -33,15 +34,24 @@ public class Plane extends GameObject {
         backWheel = new Wheel(backWheelDx, backWheelDy);
     }
 
+    private boolean crashed = false;
+    private Player player;
+
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle, Config.planeHeight);
 
         tanDrag = 0.008f*60;
         normDrag = 0.008f*60;
         setSprite(new StaticSprite(R.drawable.plane_stub));
-        setBody(Config.planeHeight);
+
+        ComplexPolygon poly = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
+        for(int i = 1; i < Config.planePolyX.length; i++) {
+            poly.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
+        }
+        setBody(poly);
         setCustomGroundPhys(true);
     }
+
 
     public void resurrect() {
         alive = true;
@@ -54,6 +64,24 @@ public class Plane extends GameObject {
 
     public boolean isEngineOn() {
         return engineOn;
+    }
+
+    public void onTouchingGround() {
+        if(!frontWheel.isTouchingGround(this) && !backWheel.isTouchingGround(this) && !GameConfig.immortality) {
+            crashed = true;
+        }
+    }
+
+    public boolean isCrashed() {
+        return crashed;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     private enum Direction {
@@ -91,7 +119,7 @@ public class Plane extends GameObject {
 
         float lift = this.lift*(Math.abs(tanV)) / fps;
 
-        vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (tanV*Math.cos(angle)));
+        vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (tanV * Math.cos(angle)));
         vy = MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (tanV * Math.sin(angle)));
 
         setVx(vx);
@@ -100,13 +128,18 @@ public class Plane extends GameObject {
         applyDrag(fps);
 
 ////////////////////// GEAR vs GROUND
-        applyGround(fps);
+        applyGear(fps);
+        if(crashed) {
+            if(getVy() < 0) {
+                setVy(0);
+            }
+        }
 
         applySpeed(fps);
     }
 
-    @Override
-    protected void applyGround(float fps) {
+
+    protected void applyGear(float fps) {
         boolean frontWheelTouching = frontWheel.isTouchingGround(this);
         boolean backWheelTouching = backWheel.isTouchingGround(this);
         if(frontWheelTouching && !backWheelTouching) {

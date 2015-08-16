@@ -126,7 +126,7 @@ public final class CollisionListener {
 
     public void setOnCollision(CollisionProcessor onCollision) {
         //debug
-        if(onCollisionEnd == null) throw new NullPointerException("processor");
+        if(onCollision == null) throw new NullPointerException("processor");
 
         this.onCollision = onCollision;
     }

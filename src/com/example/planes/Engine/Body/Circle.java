@@ -11,8 +11,8 @@ public class Circle extends Body {
 
     public float radius;
 
-    @Override
-    public boolean intersects(Body body, float dx, float dy, float period) {
+
+    public boolean intersects(Circle body, float dx, float dy, float period) {
         //debug
         if(body == null) throw new NullPointerException("body is null");
         if(period < 0) throw new IllegalArgumentException("period");
@@ -43,6 +43,16 @@ public class Circle extends Body {
     @Override
     public void rebuild(float dx, float dy, float angle, float h) {
         //
+    }
+
+    @Override
+    protected float getLeft() {
+        return -radius;
+    }
+
+    @Override
+    protected float getRight() {
+        return radius;
     }
 
 

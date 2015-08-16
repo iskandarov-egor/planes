@@ -3,6 +3,7 @@ package com.example.planes.Engine.Scene;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.view.MotionEvent;
+import com.example.planes.Engine.Engine;
 import com.example.planes.Engine.SceneButtonListener;
 import com.example.planes.Engine.Utils;
 
@@ -25,9 +26,11 @@ public final class Scene {
     // количество экранов в горизонтальном периоде повторения сцены
     private float numberOfScreens = 0;
     private float[] backgroundColor = {0, 0, 0};
+    private final Engine engine;
 
-    public Scene() {
+    public Scene(Engine engine) {
         Log.d("hey", "Scene() called");
+        this.engine = engine;
     }
 
     public void setBackgroundColor(float R, float G, float B) {
@@ -143,7 +146,7 @@ public final class Scene {
         //object.setScene(null);
     }
 
-    public void removeObject(SceneObject object) {
+    void removeObject(SceneObject object) {
         //debug
         if(!objects.contains(object)) throw new RuntimeException("no such object");
         if(removeQueue.contains(object)) throw new RuntimeException("already queued for removal");
@@ -230,4 +233,7 @@ public final class Scene {
         return sticker;
     }
 
+    public Engine getEngine() {
+        return engine;
+    }
 }

@@ -33,12 +33,18 @@ final class CollisionManager {
 
     void doCollisions() {
         setCanModify(false);
-        for(CollisionListener listener : colListeners) {
+        for(CollisionListener listener : colListeners) {  // for each listener
             List<ObjectGroup> groups = listener.getGroups();
-            for(int i = 0; i < groups.size(); i++){
-                for(SceneObject object : groups.get(i).getList()) { // for each object in the group
-                    for (int j = i + 1; j < groups.size(); j++) {
-                        for (SceneObject other : groups.get(j).getList()) { // for each object in another group
+            for(int i = 0; i < groups.size(); i++){ // for each group in listener
+                ObjectGroup group1 = groups.get(i);
+                for(int soi = 0; soi < group1.getList().size(); soi++) { // for each object in the group
+                    SceneObject object = group1.getList().get(soi);
+                    for (int j = i + 1; j < groups.size(); j++) { // another group in listener
+                        ObjectGroup group2= groups.get(j);
+                        int soj = 0;
+                        if(group1 == group2) soj = soi + 1;
+                        for (;soj < group2.getList().size(); soj++) { // for each object in another group
+                            SceneObject other = group2.getList().get(soj);
                             if (object != other) {
                                 if (object.intersects(other, scene.getWorldWidth())) {
                                     listener.processCollision(object, other);

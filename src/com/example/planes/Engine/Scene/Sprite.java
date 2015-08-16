@@ -30,13 +30,13 @@ public abstract class Sprite {
 
     public abstract void load();
 
-    public float getH() {
-        return h;
-    }
-
-    public float getW() {
-        return w;
-    }
+//    public float getH() {
+//        return h;
+//    }
+//
+//    public float getW() {
+//        return w;
+//    }
 
     public static void onSurfaceCreated() {
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,

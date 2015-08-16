@@ -80,7 +80,7 @@ class ButtonManager {
         }
         Log.d("multitouch madness", "looks like it is a DOWN or something");
         for (SceneButton btn : buttons) {
-            if (btn.isPointInside(ex, ey)) {
+            if (btn.isPointInside(ex, ey) && btn.getVisible()) {
 
                 if(type == MotionEvent.ACTION_DOWN || type == MotionEvent.ACTION_POINTER_DOWN) {
                     Log.d("multitouch madness", ".. found button, fire and put in held");

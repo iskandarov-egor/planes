@@ -28,17 +28,16 @@ public class Game implements EngineEventsListener {
     private Engine engine;
     private Camera camera;
     private Plane myPlane;
-    ///private List<Prop> props = new ArrayList<>();
-    ///private List<GameObject> gameObjects = new ArrayList<>();
     private List<Plane> planes = new ArrayList<>();
     private int deadCount = 0;
     private int myId;
     private static final float groundLevel;
     private Controls controls;
-    private StickerText msgDead;
     ObjectGroup bulletsGroup;
     ObjectGroup planesGroup;
+    private List<Player> players;
     private BTMessageListener messageListener = null;
+    private int roundNumber = 0;
 
     static {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
@@ -65,12 +64,15 @@ public class Game implements EngineEventsListener {
 
     private Game(int playerId, ArrayList<RemoteAbonent> otherPlayers) {
         Log.d("hey", "Game()");
+        numPlayers = otherPlayers.size() + 1;
+        players = new ArrayList<>(numPlayers);
         myId = playerId;
         messageListener = new BTMessageListener(this, otherPlayers);
         for(RemoteAbonent abonent : otherPlayers) {
             abonent.setListener(messageListener);
         }
-        numPlayers = otherPlayers.size() + 1;
+
+        if(GameConfig.type == GameConfig.TYPE_NO_BT) numPlayers = 2;
 
         //1. create scene
         this.engine = new Engine();
@@ -79,6 +81,8 @@ public class Game implements EngineEventsListener {
         final Scene scene = engine.getScene();
         scene.setPeriod(GameConfig.worldPeriod);
         scene.setBackgroundColor(0, 0, 1);
+        msgScore = new StickerText(engine.getScene(), 0, 0.5f, 0.1f);
+
 
         Spawner spawner = new Spawner(this);
         // create ground
@@ -91,26 +95,28 @@ public class Game implements EngineEventsListener {
         for (int i = 0; i < GameConfig.cloudsMin; i++) spawner.createCloud(i);
 
         //create planes
-        float w = scene.getWorldWidth();
         planesGroup = new ObjectGroup(scene);
         bulletsGroup = new ObjectGroup(scene);
         for (int i = 0; i < numPlayers; i++) {
-            float x = (numPlayers == 1)?0:-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1);
-            Plane plane = new Plane(scene, x, 0, 0, 0);
-            plane.setVx(0.15f);
-            plane.setXY(plane.getX(), getGroundLevel()
-                    + plane.getSprite().getH() * 0.5f - plane.getDy());
-            plane.stopEngine();
+            players.add(new Player());
+            Plane plane = new Plane(scene, 0, 0, 0, 0);
             planes.add(plane);
             scene.addObject(plane);
-            ////gameObjects.add(plane);
             planesGroup.add(plane);
+            plane.setPlayer(players.get(i));
         }
         myPlane = planes.get(myId);
+        startNewRound();
 
         createOnCollisionStartListener(planesGroup, planesGroup, getPlanesVsPlanes());
+
+        ObjectGroup groundGroup = new ObjectGroup(scene);
+        groundGroup.add(ground);
         createOnCollisionStartListener(planesGroup, bulletsGroup, getPlanesVsBullets());
+        createOnCollisionListener(planesGroup, groundGroup, getPlanesVsGround());
         camera = new FollowingCamera(myPlane);
+
+
 
         //init controls
         controls = new Controls(this);
@@ -119,6 +125,7 @@ public class Game implements EngineEventsListener {
         engine.setEventsListener(this);
 
         engine.run();
+
     }
 
     public static Game getInstance() {
@@ -128,6 +135,12 @@ public class Game implements EngineEventsListener {
     private void createOnCollisionStartListener(ObjectGroup group1, ObjectGroup group2, CollisionProcessor processor) {
         CollisionListener list = new CollisionListener(group1, group2);
         list.setOnCollisionStart(processor);
+        getScene().addCollisionListener(list);
+    }
+
+    private void createOnCollisionListener(ObjectGroup group1, ObjectGroup group2, CollisionProcessor processor) {
+        CollisionListener list = new CollisionListener(group1, group2);
+        list.setOnCollision(processor);
         getScene().addCollisionListener(list);
     }
 
@@ -145,6 +158,19 @@ public class Game implements EngineEventsListener {
     }
 
     @Override
+    public void onScreenChanged(int width, int height) {
+
+
+       msgScore.onScreenChanged();
+
+    }
+
+    @Override
+    public void onEngineReady() {
+
+    }
+
+    @Override
     public void onGraphicsFrame(float graphicsFPS) {
         camera.onFrame(graphicsFPS);
         messageListener.processMessages();
@@ -152,30 +178,7 @@ public class Game implements EngineEventsListener {
 
     @Override
     public void onPhysicsFrame(float fps) {
-//        Iterator<GameObject> i = gameObjects.iterator();
-//        while(i.hasNext()) {
-//            GameObject g = i.next();
-//            g.onPhysicsFrame(fps);
-//            if(g.isRemoved()) i.remove();
-//        }
-//        for(Prop prop : props) {
-//            prop.onPhysicsFrame(fps);
-//        }
-        for(Plane plane : planes) {
-            if(planeTouchingGround(plane)) {
-                if(plane.getAngle() > GameConfig.landingGearAngleLeft &&
-                        plane.getAngle() < GameConfig.landingGearAngleRight) {
-                    killPlaneIfAlive(plane);
-                } else {
 
-                }
-            }
-        }
-    }
-
-    private boolean planeTouchingGround(Plane plane) {
-        return plane.isTouchingGround();
-        //return plane.getY()-plane.getSceneObject().getRadius() < getGroundLevel();
     }
 
     public Engine getEngine() {
@@ -207,31 +210,98 @@ public class Game implements EngineEventsListener {
         };
     }
 
+    public CollisionProcessor getPlanesVsGround() {
+        return new CollisionProcessor() {
+            @Override
+            public void process(SceneObject object, SceneObject other) {
+                Plane plane = (Plane) object;
+
+                plane.onTouchingGround();
+                if(plane.isCrashed()) {
+                    killPlaneIfAlive(plane);
+                }
+
+            }
+        };
+    }
+
+    StickerText msgScore;
+
     private void killPlaneIfAlive(Plane plane) {
         if(GameConfig.immortality) return;
         if(!plane.getAlive()) return;
         plane.die();
         deadCount++;
         int numPlayers = getNumPlayers();
-        if(numPlayers - deadCount == 1 && numPlayers != 1 || deadCount == 1 && numPlayers == 1) {
-            Log.d("game", "round over");
+        boolean oneLeft = numPlayers - deadCount == 1;
+
+        if(oneLeft && numPlayers != 1 || deadCount == 1 && numPlayers == 1) {
+            finalizeRound();
         }
         if (plane == this.myPlane) {
-            if(msgDead == null ) {
-                msgDead = new StickerText(engine.getScene(), "dead", 0, 0.5f, 0.1f);
-            } else {
-                msgDead.setVisible(true);
+            for(Plane otherPlane : planes) {
+                if(otherPlane != myPlane && otherPlane.getAlive()) {
+                    ((FollowingCamera)camera).setPlane(otherPlane);
+                    break;
+                }
             }
         }
     }
 
-//    private GameObject getGameObjectBySO(SceneObject so) {
-//        for(GameObject g : gameObjects) {
-//            if(g.getSceneObject() == so) return g;
-//        }
-//        throw new RuntimeException("no such obje");
-//        //return null;
-//    }
+    private void finalizeRound() {
+        Log.d("game", "round over");
+        if(roundNumber < GameConfig.ROUND_COUNT) {
+
+            Player winner = null;
+            for (Plane otherPlane : planes) {
+                if (otherPlane.getAlive()) {
+                    if (winner != null) throw new RuntimeException(); //debug
+                    winner = otherPlane.getPlayer();
+                    winner.onWin();
+                }
+            }
+            msgScore.setText(makeScoreString());
+            engine.addTimer(new Runnable() {
+                @Override
+                public void run() {
+                    msgScore.setVisible(false);
+                    startNewRound();
+                }
+            }, 2);
+            msgScore.setVisible(true);
+        } else {
+
+        }
+    }
+
+    private void setButtonsVisible(boolean visible) {
+        controls.setButtonsVisible(visible);
+    }
+
+
+    private void startNewRound() {
+        roundNumber++;
+
+        msgScore.setText("Round " + String.valueOf(roundNumber) + "/" + String.valueOf(GameConfig.ROUND_COUNT));
+        msgScore.setVisible(true);
+
+        placePlanes();
+    }
+
+    private void placePlanes() {
+        float w = getScene().getWorldWidth();
+        for (int i = 0; i < numPlayers; i++) {
+            float x = (numPlayers == 1)?0:-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1);
+            Plane plane = planes.get(i);
+            plane.setXY(x, 0);// getGroundLevel()
+            //+ plane.getH() * 0.5f - plane.getDy());
+            plane.stopEngine();
+        }
+    }
+
+    private String makeScoreString() {
+        return "Round over";
+    }
 
     public static float getGroundLevel() {
 
@@ -242,17 +312,9 @@ public class Game implements EngineEventsListener {
         return myPlane;
     }
 
-//    List<Prop> getProps() {
-//        return props;
-//    }
-
     public ObjectGroup getBulletsGroup() {
         return bulletsGroup;
     }
-
-//    public List<GameObject> getGameObjects() {
-//        return gameObjects;
-//    }
 
     public Plane getPlane(int index) {
 

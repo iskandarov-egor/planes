@@ -6,6 +6,7 @@ import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.Message.ReceivedMessage;
 import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
+import com.example.planes.Config.GameConfig;
 import com.example.planes.Game.Models.Bullet;
 import com.example.planes.Game.Models.Plane;
 
@@ -98,12 +99,14 @@ public class BTMessageListener implements MessageListener {
     }
 
     public void broadcastMessage(Message msg) {
+        if(GameConfig.type == GameConfig.TYPE_NO_BT) return;
         for(RemoteAbonent abonent : abonents) {
             if(abonent != null) abonent.sendMessage(msg);
         }
     }
 
     public void broadcastMessageExcept(Message msg, RemoteAbonent exception) {
+        if(GameConfig.type == GameConfig.TYPE_NO_BT) return;
         for(RemoteAbonent abonent : abonents) {
             if(abonent != exception && abonent != null) abonent.sendMessage(msg);
         }

@@ -15,15 +15,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Created by egor on 15.07.15.
  */
-public class Engine {
+public final class Engine {
     private Scene scene;
     private MyGLSurfaceView view;
     private MyGLRenderer gLRenderer;
+    private final EngineTimerManager timerManager = new EngineTimerManager();
 
     public Engine() {
         Log.d("hey", "Engine()");
 
-        scene = new Scene();
+        scene = new Scene(this);
         gLRenderer = new MyGLRenderer(this);
     }
 
@@ -57,7 +58,9 @@ public class Engine {
         gLRenderer.setPhysicsFPS(physicsFPS);
     }
 
-
+    public void addTimer(Runnable runnable, float time) {
+        timerManager.addTask(runnable, time);
+    }
 
     public void onGraphicsGrame(float graphicsFPS) {
         scene.onGraphicsFrame(graphicsFPS);
@@ -76,11 +79,22 @@ public class Engine {
     public void onPhysicsFrame(float physicsFPS) {
         scene.onPhysicsFrame(physicsFPS);
         if(listener != null) listener.onPhysicsFrame(physicsFPS);
+        timerManager.onPhysicsFrame(physicsFPS);
     }
 
+    boolean ready = false;
     void onScreenChanged(int width, int height) {
         // напоминание: если будет много сцен, то им тоже надо будет сообщить
         scene.onScreenChanged(width, height);
+        listener.onScreenChanged(width, height);
+        if(!ready) {
+            ready = true;
+            listener.onEngineReady();
+        }
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     public void onResume() {

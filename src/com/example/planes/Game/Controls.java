@@ -117,4 +117,11 @@ public class Controls implements SceneButtonListener{
         game.getMyPlane().goStraight();
         game.getMessageListener().broadcastMessage(new TurnMessage(TurnMessage.Action.GO_STRAIGHT, game.getMyPlane()));
     }
+
+    public void setButtonsVisible(boolean visible) {
+        buttonUp.setVisible(visible);
+        buttonDown.setVisible(visible);
+        buttonFire.setVisible(visible);
+        buttonStopGo.setVisible(visible);
+    }
 }

@@ -6,14 +6,14 @@ import com.example.planes.Utils.Vector;
 /**
  * Created by egor on 04.08.15.
  */
-public class Polygon extends Body {
+public class SimplePolygon extends Body {
     float[] x;
     float[] y;
-    float[] ax; // с учетом угла и смещения
+    float[] ax; // с учетом угла и смещения и масштаба
     float[] ay;
     float[] d;
 
-    public Polygon(float[] x, float[] y) {
+    public SimplePolygon(float[] x, float[] y) {
         if(x.length != y.length || x.length <= 2) throw new IllegalArgumentException();
 
         int len = x.length;
@@ -39,10 +39,10 @@ public class Polygon extends Body {
         }
     }
 
-    @Override
-    public boolean intersects(Body body, float dx, float dy, float period) {
-        if(body instanceof Polygon) {
-            Polygon p = (Polygon) body;
+
+    public boolean intersects(SimplePolygon body, float dx, float dy, float period) {
+        if(body instanceof SimplePolygon) {
+            SimplePolygon p = (SimplePolygon) body;
             int pleft = p.getLeftMost();
             int left = getLeftMost();
             int right = getRightMost();
@@ -87,10 +87,16 @@ public class Polygon extends Body {
     }
 
     public float[] intersects1(Body body, float dx, float dy, float period) {
-        if(body instanceof Polygon) {
-            Polygon poly = (Polygon) body;
-            if(poly.isPointInside(x[0] - dx, y[0] - dy)) return new float[2]; // true
-            if(isPointInside(poly.x[0] + dx, poly.y[0] + dy)) return new float[2]; // true
+        if(body instanceof SimplePolygon) {
+//            dx = -dx;
+//            dy = -dy;
+            SimplePolygon poly = (SimplePolygon) body;
+            if(poly.isPointInside(ax[0] - dx, ay[0] - dy)) {
+                return new float[2]; // true
+            }
+            if(isPointInside(poly.ax[0] + dx, poly.ay[0] + dy)) {
+                return new float[2]; // true
+            }
             // now at least 1 point is outside, look for intersections
             float[] X = poly.ax.clone();
             float[] Y = poly.ay.clone();
@@ -114,16 +120,18 @@ public class Polygon extends Body {
 
     @Override
     public boolean isPointInside(float dx, float dy) {
-        float x1 = x[1] - x[0];
-        float y1 = y[1] - y[0];
+        float x1 = ax[1] - ax[0];
+        float y1 = ay[1] - ay[0];
 
-        float k = x1*(dy - y[0]) - (dx - x[0])*y1;
+        float k = x1*(dy - ay[0]) - (dx - ax[0])*y1;
         boolean side = k > 0;
-        for(int i = 1; i < x.length - 1; i++) {
-            x1 = x[i + 1] - x[i];
-            y1 = y[i + 1] - y[i];
+        for(int i = 1; i < ax.length - 1; i++) {
+            x1 = ax[i + 1] - ax[i];
+            y1 = ay[i + 1] - ay[i];
 
-            if(x1*(dy - y[i]) - (dx - x[i])*y1 > 0 != side) return false;
+            if(x1*(dy - ay[i]) - (dx - ax[i])*y1 > 0 != side) {
+                return false;
+            }
         }
         return true;
     }
@@ -132,17 +140,26 @@ public class Polygon extends Body {
     public void rebuild(float dx, float dy, float angle, float h) {
         Vector vec = new Vector();
         for(int i = 0; i < x.length - 1; i++) {
-            vec.set(x[i] + dx, y[i] + dy);
+            vec.set(x[i] * h + dx, y[i] * h + dy);
             vec.rotate(angle);
             ax[i] = vec.x;
             ay[i] = vec.y;
         }
-        ax[x.length - 1] = x[x.length - 1];
-        ay[x.length - 1] = y[x.length - 1];
+        ax[x.length - 1] = ax[0];
+        ay[x.length - 1] = ay[0];
+    }
+
+    @Override
+    protected float getLeft() {
+        return ax[getLeftMost()];
+    }
+
+    @Override
+    protected float getRight() {
+        return ax[getRightMost()];
     }
 
     public static float[] linesIntersect(float x[], float y[],float X[], float Y[], int i, int ii) {
-//        if(x[i + 1] )
         float q = (y[i + 1]*x[i] - y[i]*x[i + 1]);
         float Q = (Y[ii + 1]*X[ii] - Y[ii]*X[ii + 1]);
         float dx = x[i + 1] - x[i];

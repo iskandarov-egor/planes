@@ -33,8 +33,11 @@ public class SceneObject extends AbstractSceneObject{
         if(period < 0) throw new IllegalArgumentException("period");
 
         if(body == null || object.body == null ) throw new NullPointerException("no body");
-        return body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX() + object.dx - dx,
-                object.getAbsoluteY() - getAbsoluteY() + object.dy - dy, period);
+        if(body.intersects(object.body, object.getAbsoluteX() - getAbsoluteX() + object.dx - dx,
+                object.getAbsoluteY() - getAbsoluteY() + object.dy - dy, period)) {
+            return true;
+        }
+        return false;
     }
 
     public void setParent(SceneObject parent) {
@@ -60,5 +63,7 @@ public class SceneObject extends AbstractSceneObject{
         for(ObjectGroup group : groups) {
             group.onObjectRemoved(this);
         }
+
+        groups.clear();
     }
 }

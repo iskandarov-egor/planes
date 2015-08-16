@@ -1,7 +1,11 @@
 package com.example.planes.Game;
 
 import android.graphics.Point;
+import com.example.planes.Config.BmpConfig;
+import com.example.planes.Config.Config;
 import com.example.planes.Config.GameConfig;
+import com.example.planes.Engine.Body.ComplexPolygon;
+import com.example.planes.Engine.Body.SimplePolygon;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
@@ -25,9 +29,15 @@ public class Spawner {
 
     public SceneObject createGround() {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
-        float groundH = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
+        float w = scene.getWorldWidth();
+        float groundH = w / groundWH.x * groundWH.y;
         SceneObject ground = scene.createObject(0, -1 + groundH / 2, groundH);
         ground.setSprite(new StaticSprite(R.drawable.ground));
+        float hw = groundWH.x * 0.5f / groundWH.y;
+        float[] x = {-hw, hw, hw, -hw};
+        float[] y = {-0.5f, -0.5f, 0.5f - BmpConfig.groundLevel, 0.5f - BmpConfig.groundLevel};
+        ground.setBody(new ComplexPolygon(x, y));
+
         return ground;
     }
 

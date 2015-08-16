@@ -12,4 +12,7 @@ public interface EngineEventsListener {
     boolean onTouchEvent(MotionEvent e);
 
     void onSurfaceCreated();
+
+    void onScreenChanged(int width, int height);
+    void onEngineReady();
 }
