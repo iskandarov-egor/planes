@@ -7,7 +7,7 @@ import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Engine.Utils;
-import com.example.planes.Game.Game;
+import com.example.planes.Game.Round;
 import com.example.planes.R;
 import com.example.planes.Utils.MathHelper;
 
@@ -227,14 +227,14 @@ public class Plane extends GameObject {
 
         boolean isTouchingGround(Plane plane) {
             float y = plane.getY() + d * (float)Math.sin(z + plane.getAngle());
-            return y < Game.getGroundLevel();
+            return y < Round.getGroundLevel();
         }
 
         void correctPlane(Plane plane) {
             SceneObject so = plane;
             float o = MathHelper.modpi2(z + plane.getAngle());
 
-            float s = MathHelper.modpi2((float) Math.asin((Game.getGroundLevel() - so.getY()) / d));
+            float s = MathHelper.modpi2((float) Math.asin((Round.getGroundLevel() - so.getY()) / d));
             if(s < MathHelper.PI) throw new RuntimeException("level > center");
             if(o < MathHelper.PI) throw new RuntimeException("wheel > center");
             if(o > MathHelper.PI * 1.5f) {

@@ -1,18 +1,13 @@
 package com.example.planes;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import com.example.planes.Communication.RemoteAbonent;
-import com.example.planes.Config.GameConfig;
 import com.example.planes.Game.Game;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.planes.Game.Round;
 
 public class MyActivity extends Activity {
     /**

@@ -28,7 +28,7 @@ public class StickerText {
     public StickerText(Scene scene, String text, float x, float y, float height) {
         this(scene, x, y, height);
         this.text = text;
-        if(scene.getEngine().isReady()) {
+        if(scene.getEngine().isViewportReady()) {
             write(text);
         }
 
@@ -51,7 +51,7 @@ public class StickerText {
 
     public void setText(String text) {
         this.text = text;
-        if(scene.getEngine().isReady()) write(text);
+        if(scene.getEngine().isViewportReady()) write(text);
     }
 
     private void write(String text) {

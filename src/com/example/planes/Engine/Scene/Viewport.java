@@ -96,4 +96,12 @@ public final class Viewport {
         eng.y *= currentZoom;
         return eng;
     }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
 }

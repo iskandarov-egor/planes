@@ -2,10 +2,7 @@ package com.example.planes.Game;
 
 import android.graphics.Point;
 import com.example.planes.Config.BmpConfig;
-import com.example.planes.Config.Config;
-import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Body.ComplexPolygon;
-import com.example.planes.Engine.Body.SimplePolygon;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
@@ -18,11 +15,11 @@ import com.example.planes.Utils.Helper;
  * Created by egor on 19.07.15.
  */
 public class Spawner {
-    private final Game game;
+    private final Round game;
     private final Scene scene;
 
-    public Spawner(Game game) {
-        scene = game.getEngine().getScene();
+    public Spawner(Round game) {
+        scene = game.getScene();
         this.game = game;
         if(scene == null) throw new NullPointerException("scene");
     }

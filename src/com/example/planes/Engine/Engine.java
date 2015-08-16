@@ -6,11 +6,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.example.planes.Engine.Scene.Scene;
 
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by egor on 15.07.15.
@@ -82,19 +79,19 @@ public final class Engine {
         timerManager.onPhysicsFrame(physicsFPS);
     }
 
-    boolean ready = false;
+    boolean viewportReady = false;
     void onScreenChanged(int width, int height) {
         // напоминание: если будет много сцен, то им тоже надо будет сообщить
         scene.onScreenChanged(width, height);
         listener.onScreenChanged(width, height);
-        if(!ready) {
-            ready = true;
+        if(!viewportReady) {
+            viewportReady = true;
             listener.onEngineReady();
         }
     }
 
-    public boolean isReady() {
-        return ready;
+    public boolean isViewportReady() {
+        return viewportReady;
     }
 
     public void onResume() {
@@ -138,6 +135,15 @@ public final class Engine {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    public Scene newScene() {
+        int w = scene.getViewport().getScreenWidth();
+        int h = scene.getViewport().getScreenHeight();
+        viewportReady = false;
+        scene = new Scene(this);
+        onScreenChanged(w, h);
+        return scene;
     }
 
     private static class Event {

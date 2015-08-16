@@ -2,7 +2,7 @@ package com.example.planes.Game.Models;
 
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
-import com.example.planes.Game.Game;
+import com.example.planes.Game.Round;
 import com.example.planes.Utils.MathHelper;
 
 /**
@@ -54,7 +54,7 @@ public abstract class GameObject extends SceneObject{
         float y = getY();
         if(!customGroundPhys) {
 
-            float ground = Game.getGroundLevel();
+            float ground = Round.getGroundLevel();
 
             if (y + vy / physicsFPS - getRadius() < ground) {
                 y = ground + getRadius();

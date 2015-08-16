@@ -17,7 +17,7 @@ import com.example.planes.Utils.MathHelper;
  * Created by egor on 30.07.15.
  */
 public class Controls implements SceneButtonListener{
-    private final Game game;
+    private final Round game;
     private SceneButton buttonUp;
     private SceneButton buttonDown;
     private SceneButton buttonStopGo;
@@ -25,9 +25,9 @@ public class Controls implements SceneButtonListener{
     private SceneButton buttonResurrect;
     private StaticSprite stopSprite, goSprite;
 
-    public Controls(Game game) {
-        this.game = game;
-        Scene scene = game.getEngine().getScene();
+    public Controls(Round round) {
+        this.game = round;
+        Scene scene = round.getScene();
         float r = -Helper.getScreenRatio();
         buttonDown = scene.createButton(r + Config.btnMargin, -Config.btnMargin,
                 new StaticSprite(R.drawable.btn_up), 2 * Config.btnRadius);

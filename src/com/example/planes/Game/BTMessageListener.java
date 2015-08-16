@@ -17,10 +17,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by egor on 06.08.15.
  */
 public class BTMessageListener implements MessageListener {
-    private final Game game;
+    private final Round game;
     private ArrayList<RemoteAbonent> abonents = new ArrayList<>();
 
-    public BTMessageListener(Game game, ArrayList<RemoteAbonent> otherPlayers) {
+    public BTMessageListener(Round game, ArrayList<RemoteAbonent> otherPlayers) {
         this.game = game;
         configure(otherPlayers, game.getMyId());
     }
