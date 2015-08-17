@@ -19,7 +19,7 @@ public class Plane extends GameObject {
 //    private float dirVel = 0.027f;
 //    private float lift = 0.015f*60;
     private float acc = k*0.025f*60*60;
-    private float dirVel = 0.033f;
+    private float dirVel = 0.033f * 60;
     private float lift = 0.2f*60;
     private boolean engineOn = false;
     private boolean alive = true;
@@ -53,6 +53,10 @@ public class Plane extends GameObject {
         //setBody(poly);
         setBody(0.1f);
         setCustomGroundPhys(true);
+        SceneObject propeller = new SceneObject(0.3f, 0, scene, 0.1f);
+        propeller.setParent(this);
+        propeller.setSprite(new AnimatedSprite(R.drawable.propeller, 8, 0.05f));
+        scene.addObject(propeller);
     }
 
 
@@ -98,11 +102,11 @@ public class Plane extends GameObject {
         float angle = getAngle();
         float v = (float) (vx*Math.cos(angle)+vy*Math.sin(angle));
         if(dir == Direction.RIGHT && alive) {
-            angle -= angleVelFunc(v);
+            angle -= angleVelFunc(v, fps);
             setAngle(angle);
         }
         if(dir == Direction.LEFT && alive) {
-            angle += angleVelFunc(v);
+            angle += angleVelFunc(v, fps);
             setAngle(angle);
         }
 
@@ -165,13 +169,13 @@ public class Plane extends GameObject {
 
     private static int shots = 0;
 
-    private float angleVelFunc(float v) {
+    private float angleVelFunc(float v, float fps) {
         float resist = 0.5f;
         float maxV2 = 0.5f * acc / tanDrag;
         if(v < maxV2) {
-            return dirVel*(Math.min(1, (Math.abs(v)/maxV2)));
+            return dirVel*(Math.min(1, (Math.abs(v)/maxV2))) / fps;
         } else {
-            return dirVel*(1 - Math.min(resist, resist * (Math.abs(v - maxV2) / maxV2)));
+            return dirVel*(1 - Math.min(resist, resist * (Math.abs(v - maxV2) / maxV2))) / fps;
         }
     }
 

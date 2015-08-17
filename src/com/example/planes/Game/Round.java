@@ -256,7 +256,6 @@ public class Round implements EngineEventsListener {
         }
         getScene().addObject(new Explosion(plane));
         plane.remove();
-
     }
 
     private void finalizeRound() {

@@ -13,7 +13,7 @@ abstract class AbstractSceneObject {
     protected float angle = 0;
     protected float dx = 0;
     protected float dy = 0;
-    protected AbstractSceneObject parent = null;
+
     protected boolean visible = true;
     private final Scene scene;
 
@@ -37,15 +37,6 @@ abstract class AbstractSceneObject {
         return y;
     }
 
-    public float getAbsoluteX() {
-        if(parent != null) return parent.getAbsoluteX() + x;
-        return x;
-    }
-
-    public float getAbsoluteY() {
-        if(parent != null) return parent.getAbsoluteY() + y;
-        return y;
-    }
 
     public float getH() {
         return h;
@@ -59,6 +50,7 @@ abstract class AbstractSceneObject {
     public void setSprite(Sprite sprite) {
 
         this.sprite = sprite;
+        if(sprite != null) sprite.onAssignedTo(this);
         if(sprite != null) sprite.rebuild(dx, dy, angle, h);
     }
 
@@ -107,10 +99,6 @@ abstract class AbstractSceneObject {
             this.dy = dy;
             rebuild();
         }
-    }
-
-    public boolean hasParent() {
-        return parent != null;
     }
 
     void onGraphicsFrame(float graphicsFPS) {
@@ -179,5 +167,9 @@ abstract class AbstractSceneObject {
 
     public boolean isRemoveWhenAnimDone() {
         return removeWhenAnimDone;
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 }

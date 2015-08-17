@@ -20,6 +20,7 @@ final class MyGLSurfaceView extends GLSurfaceView {
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(mRenderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
     private int id = 0;
 

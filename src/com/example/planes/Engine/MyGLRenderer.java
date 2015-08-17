@@ -3,7 +3,9 @@ package com.example.planes.Engine;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.Sprite;
+import com.example.planes.Game.Models.Cloud;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -40,23 +42,30 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
         engine.listener.onSurfaceCreated();
     }
 
-    private long now, dt = 0;
     private long last = 0;
     private long physStepTime;
     private long graphStepTime;
-    public void run(){
+    private int maxGraphBunch = 0;
+    private int maxPhysBunch = 0;
+    public void run1(){
+        if(true) throw new RuntimeException();
         //debug
         if(isRunning) throw new RuntimeException("already running");
 
-        now = 0;
-        dt = 0;
-        last = System.nanoTime();
-        isRunning = true;
+
+
+
+
         fpsLastSpam = System.currentTimeMillis();
         gfpsCount = 0;
         pfpsCount = 0;
         gfpsSum = 0;
         pfpsSum = 0;
+        graphDt = 0;
+        physDt = 0;
+        endTime = 0;
+        last = System.nanoTime();
+        isRunning = true;
     }
     private int c = 0;
     private boolean drawCalled = false; //debug
@@ -65,58 +74,32 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
     private float pfpsSum = 0;
     private long fpsSpamRate = 2000;
     private long fpsLastSpam = 0;
+    private long graphDt = 0;
+    private long physDt = 0;
+    private long endTime = 0;
     private int gfpsCount = 0;
     private int pfpsCount = 0;
 
+    float maxdtt = 0;
+    float lastpos = 0;
+    boolean skipped = false;
+    boolean even = false;
+    public static GameLoop.FpsMeter gfpsMeter = new GameLoop.FpsMeter();
 
-    public void onDrawFrame(GL10 gl) {
-        //debug
-        if(!drawCalled) {
-            Log.d("hey", "onDrawFrame first called");
-            drawCalled = true;
-        }
+    public void onDrawFrame(GL10 gl) { // todo queue future?
+        //if(Scene.sample != null) Scene.sample.onGraphicsFrame(60f);
 
+        gfpsMeter.before();
+        engine.onGraphicsGrame(60);
+        gfpsMeter.after();
 
-        if (isRunning) {
-            now = System.nanoTime();
-            dt += Math.min(NANO_IN_SECOND, (now - last));
-//            try {
-//                Thread.sleep((long) ((float)graphStepTime/NANO_IN_SECOND*1000));
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-            if (dt > graphStepTime) {
-                while (dt > physStepTime) {
-                    dt -= physStepTime;
-                    long b = System.nanoTime();
-                    engine.onPhysicsFrame(60f);
-                    pfpsSum += ((float)NANO_IN_SECOND / (System.nanoTime() - b));
-                    pfpsCount++;
-                }
-                long b = System.nanoTime();
-                engine.onGraphicsGrame(60f);
-                gfpsSum += ((float)NANO_IN_SECOND / (System.nanoTime() - b));
-                gfpsCount++;
-                if((System.currentTimeMillis() - fpsLastSpam > fpsSpamRate)) {
-                    Log.d("PERF", "Pfps : "+String.valueOf(pfpsSum / pfpsCount)+" Gfps : "+String.valueOf(gfpsSum /
-                            gfpsCount));
-                    pfpsSum = 0;
-                    gfpsSum = 0;
-                    gfpsCount = 0;
-                    pfpsCount = 0;
-                    fpsLastSpam = System.currentTimeMillis();
-                }
-            }
-            last = now;
-        }
+        GameLoop.lock = true;
+    }
+    public void onDrawFrame1(GL10 gl) {
+
     }
 
-    public void pause(){
-        //debug
-        if(!isRunning) throw new RuntimeException("was not running");
 
-        isRunning = false;
-    }
 
 
 

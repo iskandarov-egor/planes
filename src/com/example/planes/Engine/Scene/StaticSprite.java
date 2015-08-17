@@ -9,6 +9,7 @@ import android.util.Log;
 import com.example.planes.Engine.MyGLRenderer;
 import com.example.planes.Engine.TextureManager;
 import com.example.planes.MyApplication;
+import com.example.planes.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -111,6 +112,7 @@ public class StaticSprite extends Sprite {
 
         textureSurfaceVersion = MyGLRenderer.surfaceVersion;
     }
+
 
     @Override
     void draw(float x, float y, float[] m) {

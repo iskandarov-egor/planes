@@ -18,7 +18,10 @@ public class Cloud extends SceneObject implements Prop {
         this.vx = vx;
         this.vy = vy;
         setSprite(new StaticSprite(R.drawable.cloud));
+        sample = this;
     }
+
+    public static Cloud sample = null;
 
     public void onPhysicsFrame(float fps) {
         setXY(getX() + vx / fps, getY() + vy / fps);

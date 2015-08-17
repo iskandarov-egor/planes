@@ -30,6 +30,7 @@ public class MyActivity extends Activity {
         game = Game.getInstance();
 
         setContentView(game.createView(this));
+        game.getEngine().run();
     }
 
     @Override

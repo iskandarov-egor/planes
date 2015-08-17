@@ -24,7 +24,7 @@ public class FollowingCamera extends Camera{
 
     @Override
     public void onFrame(float fps) {
-
+        if(true) return;
         if(plane == null) return;
         float period = plane.getScene().getWorldWidth();
         float px = plane.getX();

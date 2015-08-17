@@ -18,11 +18,12 @@ public final class Engine {
     private MyGLRenderer gLRenderer;
     private final EngineTimerManager timerManager = new EngineTimerManager();
 
-    public Engine() {
+    public Engine(float graphFps, float physFps) {
         Log.d("hey", "Engine()");
 
         scene = new Scene(this);
         gLRenderer = new MyGLRenderer(this);
+        gameLoop = new GameLoop(this, graphFps, physFps);
     }
 
     public View createView(Context context) {
@@ -32,28 +33,19 @@ public final class Engine {
     }
 
     private boolean running = false;
+    private boolean started = false;
 
     public void run() {
         //if (view == null) throw new RuntimeException("run called before view assignment");
         if(running) throw new RuntimeException("engine already running");
         running = true;
+        started = true;
         Log.d("hey", "Engine.run called");
-        gLRenderer.run();
+
+        gameLoop.start();
     }
 
-    public void setGraphicsFPS(float graphicsFPS) {
-        if (graphicsFPS <= 0) throw new IllegalArgumentException("fps");
-        Log.d("hey", "GFPS set");
 
-        gLRenderer.setGraphicsFPS(graphicsFPS);
-    }
-
-    public void setPhysicsFPS(float physicsFPS) {
-        Log.d("hey", "PFPS set");
-        if (physicsFPS <= 0) throw new IllegalArgumentException("fps");
-
-        gLRenderer.setPhysicsFPS(physicsFPS);
-    }
 
     public void addTimer(Runnable runnable, float time) {
         timerManager.addTask(runnable, time);
@@ -101,11 +93,12 @@ public final class Engine {
 
     public void onResume() {
         view.onResume();
-        if(running && !gLRenderer.isRunning()) gLRenderer.run();
+        if(running && !gameLoop.isRunning()) gameLoop.start();
     }
 
+    GameLoop gameLoop;
     public void onPause() {
-        gLRenderer.pause();
+        gameLoop.pause();
         view.onPause();
     }
 

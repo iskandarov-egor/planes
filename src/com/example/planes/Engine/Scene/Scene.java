@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import com.example.planes.Engine.Engine;
 import com.example.planes.Engine.SceneButtonListener;
 import com.example.planes.Engine.Utils;
+import com.example.planes.Game.Models.Cloud;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -27,10 +28,11 @@ public final class Scene {
     private float numberOfScreens = 0;
     private float[] backgroundColor = {0, 0, 0};
     private final Engine engine;
-
+    public static Scene sample = null;
     public Scene(Engine engine) {
         Log.d("hey", "Scene() called");
         this.engine = engine;
+        sample = this;
     }
 
     public void setBackgroundColor(float R, float G, float B) {
@@ -62,14 +64,19 @@ public final class Scene {
         buttonManager.setListener(listner);
     }
 
+    float xx = -1.6f;
+    float vv = 0.01f;
     public void onGraphicsFrame(float graphicsFPS){
 
-        // очистка экрана
         GLES20.glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         //zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
-
+        if(Cloud.sample != null) {
+            xx += vv;
+            ((SceneObject)Cloud.sample).draw(xx, 0, viewport.ratioAndZoomMatrix);
+        }
+        //if(true) return;
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
         for(SceneObject object : objects) {

@@ -16,27 +16,34 @@ public class AnimatedSprite extends StaticSprite {
             1.0f, 1.0f,
             1.0f, 0.0f
     };
-    private final AbstractSceneObject so;
+    private AbstractSceneObject so;
 
-    private AnimatedSprite(int numFrames, float frameTime, AbstractSceneObject so, float aspectRatio) {
+    @Override
+    void onAssignedTo(AbstractSceneObject so) {
+        super.onAssignedTo(so);
+        if(this.so != null) throw new RuntimeException("only once");
+
+        this.so = so;
+    }
+
+    private AnimatedSprite(int numFrames, float frameTime, float aspectRatio) {
         super(aspectRatio);
 
         this.numFrames = numFrames;
         this.frameTime = frameTime;
-        this.so = so;
         initUvs();
         uvBuffer.put(uvs);
         uvBuffer.position(0);
     }
 
-    public AnimatedSprite(AbstractSceneObject so, Bitmap bmp, int numFrames, float frameTime) {
-        this(numFrames, frameTime, so, getAspectRatioBy(bmp));
+    public AnimatedSprite(Bitmap bmp, int numFrames, float frameTime) {
+        this(numFrames, frameTime, getAspectRatioBy(bmp));
         if(bmp == null) throw new NullPointerException();
         bitmap = bmp;
     }
 
-    public AnimatedSprite(AbstractSceneObject so, int fileId, int numFrames, float frameTime) {
-        this(numFrames, frameTime, so, getAspectRatioBy(fileId));
+    public AnimatedSprite(int fileId, int numFrames, float frameTime) {
+        this(numFrames, frameTime, getAspectRatioBy(fileId));
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
     }

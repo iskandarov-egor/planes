@@ -14,7 +14,7 @@ public class Explosion extends SceneObject {
     public Explosion(float x, float y, Scene scene, float height) {
         super(x, y, scene, height);
         setRemoveWhenAnimDone(true);
-        setSprite(new AnimatedSprite(this, R.drawable.explosion, 3, 1));
+        setSprite(new AnimatedSprite(R.drawable.explosion, 3, 1));
     }
 
     public Explosion(Plane plane) {

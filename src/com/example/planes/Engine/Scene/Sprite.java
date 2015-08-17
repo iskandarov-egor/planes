@@ -18,7 +18,9 @@ public abstract class Sprite {
 
     }
 
+    void onAssignedTo(AbstractSceneObject so) {
 
+    }
 
     abstract void draw(float x, float y, float[] transform);
 

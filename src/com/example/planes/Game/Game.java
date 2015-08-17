@@ -23,13 +23,11 @@ public class Game {
 
     public Game(int playerId, ArrayList<RemoteAbonent> otherPlayers) {
 
-        this.engine = new Engine();
+        this.engine = new Engine(GameConfig.FPS, GameConfig.PHYSICS_FPS);
         this.playerId = playerId;
         this.otherPlayers = otherPlayers;
-        engine.setGraphicsFPS(GameConfig.FPS);
-        engine.setPhysicsFPS(GameConfig.PHYSICS_FPS);
         newRound();
-        engine.run();
+        //engine.run();
     }
 
     public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
