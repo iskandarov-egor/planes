@@ -1,7 +1,6 @@
 package com.example.planes.Game.Models;
 
 import android.util.Log;
-import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.Config;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Body.ComplexPolygon;
@@ -15,10 +14,13 @@ import com.example.planes.Utils.MathHelper;
  * Created by egor on 15.07.15.
  */
 public class Plane extends GameObject {
-    private float k = 0.002666f;
-    private float acc = 0.00006665f*60*60;
-    private float dirVel = 0.027f;
-    private float lift = 0.015f*60;
+
+//    private float acc = 0.00006665f*60*60;
+//    private float dirVel = 0.027f;
+//    private float lift = 0.015f*60;
+    private float acc = k*0.025f*60*60;
+    private float dirVel = 0.033f;
+    private float lift = 0.2f*60;
     private boolean engineOn = false;
     private boolean alive = true;
 
@@ -26,10 +28,10 @@ public class Plane extends GameObject {
     private static final Wheel backWheel;
 
     static {
-        float frontWheelDx = Config.planeHeight * (BmpConfig.frontWheelX);
-        float frontWheelDy = Config.planeHeight * (BmpConfig.frontWheelY);
-        float backWheelDx = Config.planeHeight * (BmpConfig.backWheelX);
-        float backWheelDy = Config.planeHeight * (BmpConfig.backWheelY);
+        float frontWheelDx = Config.planeHeight * (Config.frontWheelX);
+        float frontWheelDy = Config.planeHeight * (Config.frontWheelY);
+        float backWheelDx = Config.planeHeight * (Config.backWheelX);
+        float backWheelDy = Config.planeHeight * (Config.backWheelY);
         frontWheel = new Wheel(frontWheelDx, frontWheelDy);
         backWheel = new Wheel(backWheelDx, backWheelDy);
     }
@@ -41,14 +43,15 @@ public class Plane extends GameObject {
         super(scene, x, y, speed, angle, Config.planeHeight);
 
         tanDrag = 0.008f*60;
-        normDrag = 0.008f*60;
+        normDrag = 3*0.008f*60;
         setSprite(new StaticSprite(R.drawable.plane_stub));
 
-        ComplexPolygon poly = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
-        for(int i = 1; i < Config.planePolyX.length; i++) {
-            poly.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
-        }
-        setBody(poly);
+//        ComplexPolygon poly = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
+//        for(int i = 1; i < Config.planePolyX.length; i++) {
+//            poly.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
+//        }
+        //setBody(poly);
+        setBody(0.1f);
         setCustomGroundPhys(true);
     }
 
@@ -91,8 +94,7 @@ public class Plane extends GameObject {
     public Direction dir = Direction.STRAIGHT;
 
     public void onPhysicsFrame(float fps) {
-        float vx = getVx();
-        float vy = getVy();
+        applySpeed(fps);
         float angle = getAngle();
         float v = (float) (vx*Math.cos(angle)+vy*Math.sin(angle));
         if(dir == Direction.RIGHT && alive) {
@@ -111,31 +113,35 @@ public class Plane extends GameObject {
             vx += vx1;
             vy += vy1;
         }
-
+//        setVx(vx);
+//        setVy(vy);
+        applyGear(fps);
 ///////////////////LIFT
 
         float normV = (float) (vy*Math.cos(angle)-vx*Math.sin(angle));
         float tanV = (float) (vx*Math.cos(angle)+vy*Math.sin(angle));
+        float speed = (float) Math.hypot(vx, vy);
 
         float lift = this.lift*(Math.abs(tanV)) / fps;
 
         vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (tanV * Math.cos(angle)));
         vy = MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (tanV * Math.sin(angle)));
+//        setVx(vx);
+//        setVy(vy);
 
-        setVx(vx);
-        setVy(vy);
 
         applyDrag(fps);
 
 ////////////////////// GEAR vs GROUND
-        applyGear(fps);
+
         if(crashed) {
             if(getVy() < 0) {
-                setVy(0);
+                //setVy(0);
+                vy = 0;
             }
         }
 
-        applySpeed(fps);
+
     }
 
 
@@ -149,7 +155,7 @@ public class Plane extends GameObject {
             backWheel.correctPlane(this);
         }
         if(frontWheelTouching && backWheelTouching) {
-            setVy(0);
+            vy = 0;
         }
         if(!frontWheelTouching && !backWheelTouching) {
             applyGravity(fps);

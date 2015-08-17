@@ -79,20 +79,25 @@ public final class Engine {
         timerManager.onPhysicsFrame(physicsFPS);
     }
 
-    boolean viewportReady = false;
+   // boolean viewportReady = false;
+    int width = 0;
+    int height = 0;
     void onScreenChanged(int width, int height) {
-        // напоминание: если будет много сцен, то им тоже надо будет сообщить
+        Log.d("wwww", String.valueOf(height));
+        boolean viewReady = scene.getViewport().isReady();
+        this.width = width;
+        this.height = height;
         scene.onScreenChanged(width, height);
-        listener.onScreenChanged(width, height);
-        if(!viewportReady) {
-            viewportReady = true;
-            listener.onEngineReady();
+        if(listener != null) listener.onScreenChanged(width, height);
+        if(!viewReady) {
+            //viewportReady = true;
+            if(listener != null) listener.onEngineReady();
         }
     }
 
-    public boolean isViewportReady() {
-        return viewportReady;
-    }
+    //public boolean isViewportReady() {
+    //    return viewportReady;
+    //}
 
     public void onResume() {
         view.onResume();
@@ -115,6 +120,7 @@ public final class Engine {
     EngineEventsListener listener;
     public void setEventsListener(EngineEventsListener listener) {
         this.listener = listener;
+
     }
 
     BlockingQueue<Event> touchQueue = new ArrayBlockingQueue<Event>(1, true);
@@ -138,11 +144,9 @@ public final class Engine {
     }
 
     public Scene newScene() {
-        int w = scene.getViewport().getScreenWidth();
-        int h = scene.getViewport().getScreenHeight();
-        viewportReady = false;
+        boolean viewportReady = scene.getViewport().isReady();
         scene = new Scene(this);
-        onScreenChanged(w, h);
+        if(viewportReady) scene.onScreenChanged(width, height);
         return scene;
     }
 

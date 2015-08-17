@@ -1,6 +1,7 @@
 package com.example.planes.Game;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
@@ -21,6 +22,7 @@ public class Game {
 
 
     public Game(int playerId, ArrayList<RemoteAbonent> otherPlayers) {
+
         this.engine = new Engine();
         this.playerId = playerId;
         this.otherPlayers = otherPlayers;
@@ -31,7 +33,7 @@ public class Game {
     }
 
     public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
-
+        Log.d("hey", "static NewGame");
         instance = new Game(playerId, otherPlayers);
 
     }
@@ -41,6 +43,7 @@ public class Game {
     }
 
     private void newRound() {
+        Log.d("hey", "new round()");
         roundNumber++;
         currentRound = new Round(playerId, otherPlayers, roundNumber, this);
 

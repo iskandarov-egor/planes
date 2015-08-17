@@ -46,7 +46,8 @@ public class StaticSprite extends Sprite {
 
     }
 
-    protected StaticSprite() {
+    protected StaticSprite(float aspectRatio) {
+        this.aspectRatio = aspectRatio;
         coords = new float[8];
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -77,28 +78,27 @@ public class StaticSprite extends Sprite {
 
     float aspectRatio;
 
-    protected static float getWidthBy(float h, int fileId) {
+    protected static float getAspectRatioBy(int fileId) {
         Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
-        return h * ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
+        return  ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
     }
 
-    protected static float getWidthBy(float h, Bitmap bitmap) {
-        return h * ((float)bitmap.getWidth()) / bitmap.getHeight();
+    protected static float getAspectRatioBy(Bitmap bitmap) {
+        return ((float)bitmap.getWidth()) / bitmap.getHeight();
     }
 
     public StaticSprite(Bitmap bmp) {
-        this();
+        this(getAspectRatioBy(bmp));
         if(bmp == null) throw new NullPointerException();
         bitmap = bmp;
-        aspectRatio = ((float)bitmap.getWidth()) / bitmap.getHeight();
+
     }
 
     public StaticSprite(int fileId) {
-        this();
+        this(getAspectRatioBy(fileId));
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
-        Drawable d = MyApplication.getContext().getResources().getDrawable(fileId);
-        aspectRatio = ((float)d.getIntrinsicWidth())/d.getIntrinsicHeight();
+
     }
 
     @Override

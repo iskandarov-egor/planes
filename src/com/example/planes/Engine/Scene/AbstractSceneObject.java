@@ -20,6 +20,7 @@ abstract class AbstractSceneObject {
     protected Sprite sprite = null;
     protected Body body = null;
     private float h;
+    private boolean removeWhenAnimDone = false;
 
     AbstractSceneObject(float x, float y, Scene scene, float height) {
         this.x = x;
@@ -140,6 +141,9 @@ abstract class AbstractSceneObject {
         this.visible = visible;
     }
 
+    public void setRemoveWhenAnimDone(boolean removeWhenAnimDone) {
+        this.removeWhenAnimDone = removeWhenAnimDone;
+    }
 
     private boolean removed = false;
 
@@ -171,5 +175,9 @@ abstract class AbstractSceneObject {
 
     public float getDx() {
         return dx;
+    }
+
+    public boolean isRemoveWhenAnimDone() {
+        return removeWhenAnimDone;
     }
 }

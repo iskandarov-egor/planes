@@ -24,6 +24,7 @@ public class Controls implements SceneButtonListener{
     private SceneButton buttonFire;
     private SceneButton buttonResurrect;
     private StaticSprite stopSprite, goSprite;
+    private boolean locked = false;
 
     public Controls(Round round) {
         this.game = round;
@@ -39,7 +40,9 @@ public class Controls implements SceneButtonListener{
         stopSprite = new StaticSprite(R.drawable.btn_stop);
         goSprite = new StaticSprite(R.drawable.btn_go);
         buttonStopGo = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, -Config.btnMargin, goSprite, 2 * Config.btnRadius);
-        buttonResurrect = scene.createButton(0, .8f, new AnimatedSprite(R.drawable.propeller, 0.3f, 8, 1f), 2 * Config.btnRadius);
+
+        buttonResurrect = scene.createButton(0, .8f, goSprite, 0.1f);
+
     }
     private boolean leftDown = false;
     private boolean rightDown = false;
@@ -47,6 +50,7 @@ public class Controls implements SceneButtonListener{
 
     @Override
     public void onButtonDown(SceneButton btn) {
+        if(locked) return;
         if(btn == buttonUp) {
             Log.d("multitouch madness", ".. it is a goLeft");
             leftDown = true;
@@ -123,5 +127,13 @@ public class Controls implements SceneButtonListener{
         buttonDown.setVisible(visible);
         buttonFire.setVisible(visible);
         buttonStopGo.setVisible(visible);
+    }
+
+    public void lock() {
+        locked = true;
+    }
+
+    public void unlock() {
+        locked = false;
     }
 }

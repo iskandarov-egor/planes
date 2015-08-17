@@ -22,4 +22,15 @@ public abstract class Config {
     public static final float[][] planePolyY = {{0.162f, -0.131f, -0.177f, 0.269f}, {0.208f, 0.346f, 0.208f},
                                     {0.208f, 0.5f, 0.162f}};
 
+    public static final float groundLevel = 0.48f;
+    public static final float frontWheelY = 0.861538461538f - 0.5f;
+    public static final float frontWheelX = (0.805970149254f - 0.5f)*2.06153846154f;
+    public static final float backWheelY = 0.538461538462f - 0.5f;
+    public static final float backWheelX = (0.044776119403f - 0.5f)*2.06153846154f;
+
+
+    public static final float explolsionHeight = 0.3f;
+
+
+
 }

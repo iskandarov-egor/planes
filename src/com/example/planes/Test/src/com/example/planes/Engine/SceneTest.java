@@ -1,5 +1,6 @@
 package com.example.planes.Engine;
 
+import com.example.planes.Engine.Scene.AnimatedSprite;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.Viewport;
@@ -25,6 +26,7 @@ public class SceneTest extends junit.framework.TestCase {
         assertTrue(scene.contains(car));
         assertTrue(scene.contains(bike));
         assertTrue(scene.contains(tank));
+        assertFalse(scene.contains(apple));
     }
 
     private void assertFloat(float x, float y, float eps) {
@@ -42,5 +44,10 @@ public class SceneTest extends junit.framework.TestCase {
         assertFloat(p.x, 2, eps);
         assertFloat(p.y, -1, eps);
 
+    }
+
+    public void testAnim() {
+        SceneObject so = scene.createObject(0, 0, 1);
+        AnimatedSprite sprite = new AnimatedSprite(so, com.example.planes.R.drawable.propeller, 10, 1);
     }
 }

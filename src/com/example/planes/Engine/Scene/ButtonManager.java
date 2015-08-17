@@ -42,6 +42,7 @@ class ButtonManager {
 
     public boolean onTouch(int action, float x, float y, int pointerId, int vid) {
         if(listener == null) return false;
+        if(!scene.getViewport().isReady()) return false;
 
         canRemove = false;
 

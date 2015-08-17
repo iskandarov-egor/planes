@@ -30,6 +30,8 @@ public abstract class Sprite {
 
     public abstract void load();
 
+
+
 //    public float getH() {
 //        return h;
 //    }

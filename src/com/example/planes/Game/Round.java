@@ -1,12 +1,10 @@
 package com.example.planes.Game;
 
-import android.content.Context;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import com.example.planes.Communication.RemoteAbonent;
-import com.example.planes.Config.BmpConfig;
+import com.example.planes.Config.Config;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
 import com.example.planes.Engine.Scene.*;
@@ -42,7 +40,7 @@ public class Round implements EngineEventsListener {
     static {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
         float h = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
-        groundLevel = -1 + h*(1 - BmpConfig.groundLevel);
+        groundLevel = -1 + h*(1 - Config.groundLevel);
     }
 
     private int numPlayers;
@@ -69,7 +67,7 @@ public class Round implements EngineEventsListener {
             abonent.setListener(messageListener);
         }
 
-        if(GameConfig.type == GameConfig.TYPE_NO_BT) numPlayers = 2;
+        if(GameConfig.type == GameConfig.TYPE_NO_BT) numPlayers = GameConfig.numPlayersTypeNoBt;
 
         Engine engine = game.getEngine();
         final Scene scene = engine.newScene();
@@ -117,12 +115,34 @@ public class Round implements EngineEventsListener {
 
         //init controls
         controls = new Controls(this);
+        controls.lock();
         scene.setButtonEventListner(controls);
 
         engine.setEventsListener(this);
 
+        engine.addTimer(new Runnable() {
+            @Override
+            public void run() {
+                setCountdownTimer(3);
+            }
+        }, 3);
 
 
+    }
+
+    private void setCountdownTimer(final int seconds) {
+        msgScore.setText(String.valueOf(seconds));
+        game.getEngine().addTimer(new Runnable() {
+            @Override
+            public void run() {
+                if (seconds == 1) {
+                    controls.unlock();
+                    msgScore.setVisible(false);
+                } else {
+                    setCountdownTimer(seconds - 1);
+                }
+            }
+        }, 1);
     }
 
     private void createOnCollisionStartListener(ObjectGroup group1, ObjectGroup group2, CollisionProcessor processor) {
@@ -234,6 +254,9 @@ public class Round implements EngineEventsListener {
                 }
             }
         }
+        getScene().addObject(new Explosion(plane));
+        plane.remove();
+
     }
 
     private void finalizeRound() {

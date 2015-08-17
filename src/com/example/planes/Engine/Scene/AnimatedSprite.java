@@ -2,17 +2,6 @@ package com.example.planes.Engine.Scene;
 
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.opengl.GLES20;
-import android.util.Log;
-import com.example.planes.Engine.MyGLRenderer;
-import com.example.planes.Engine.TextureManager;
-import com.example.planes.MyApplication;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 /**
  * Created by egor on 01.07.15.
@@ -27,27 +16,27 @@ public class AnimatedSprite extends StaticSprite {
             1.0f, 1.0f,
             1.0f, 0.0f
     };
+    private final AbstractSceneObject so;
 
-    private AnimatedSprite(float height, float width, int numFrames, float frameTime) {
-        super();
+    private AnimatedSprite(int numFrames, float frameTime, AbstractSceneObject so, float aspectRatio) {
+        super(aspectRatio);
+
         this.numFrames = numFrames;
         this.frameTime = frameTime;
-
+        this.so = so;
         initUvs();
         uvBuffer.put(uvs);
         uvBuffer.position(0);
     }
 
-
-
-    public AnimatedSprite(Bitmap bmp, float height, int numFrames, float frameTime) {
-        this(height, getWidthBy(height, bmp), numFrames, frameTime);
+    public AnimatedSprite(AbstractSceneObject so, Bitmap bmp, int numFrames, float frameTime) {
+        this(numFrames, frameTime, so, getAspectRatioBy(bmp));
         if(bmp == null) throw new NullPointerException();
         bitmap = bmp;
     }
 
-    public AnimatedSprite(int fileId, float height, int numFrames, float frameTime) {
-        this(height, getWidthBy(height, fileId), numFrames, frameTime);
+    public AnimatedSprite(AbstractSceneObject so, int fileId, int numFrames, float frameTime) {
+        this(numFrames, frameTime, so, getAspectRatioBy(fileId));
         if(fileId == 0) throw new IllegalArgumentException("0 id");
         this.fileId = fileId;
     }
@@ -76,7 +65,12 @@ public class AnimatedSprite extends StaticSprite {
             timeSinceLastFrame -= frameTime;
 
             if (uvs[0] + atlasStep >= 1) {
-                resetUvs();
+                if(so.isRemoveWhenAnimDone()) {
+                    so.remove();
+                    return;
+                } else {
+                    resetUvs();
+                }
             } else {
                 for (int i = 0; i < 8; i += 2) {
                     uvs[i] += atlasStep;

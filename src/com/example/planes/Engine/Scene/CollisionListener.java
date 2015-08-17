@@ -108,12 +108,14 @@ public final class CollisionListener {
 
     }
     private List<Pair> colliding = new LinkedList<>(); // array maybe?
+    Pair pair = new Pair(null, null);
     public boolean areColliding(SceneObject object, SceneObject other) {
         //debug
         if(object == null) throw new NullPointerException("object");
         if(other == null) throw new NullPointerException("other");
 
-        Pair pair = new Pair(object, other);
+        pair.other = other;
+        pair.object = object;
         return colliding.contains(pair);
     }
 

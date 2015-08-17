@@ -222,9 +222,13 @@ public final class Scene {
 
     public SceneButton createButton(float x, float y, Sprite sprite, float height) {
         SceneButton btn = new SceneButton(x, y, this, sprite, height);
-        buttonManager.addButton(btn);
-        stickers.add(btn);
+        addButton(btn);
         return btn;
+    }
+
+    public void addButton(SceneButton btn) {
+        buttonManager.addButton(btn);
+        addSticker(btn);
     }
 
     public Sticker createSticker(float x, float y, float height) {

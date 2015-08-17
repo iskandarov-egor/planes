@@ -23,5 +23,8 @@ public class Sticker extends AbstractSceneObject{
         super.draw(x, y, transformM);
     }
 
-
+    @Override
+    public void remove() {
+        getScene().removeSticker(this);
+    }
 }

@@ -27,8 +27,9 @@ public final class Viewport {
     float cameraX = 0;
     float cameraY = 0;
 
+    float[] screenM = new float[16];
     private void updateScreenMatrix() {
-        float[] screenM = new float[16];
+
         float halfWidth = getHalfWidth();
         float halfHeight = getHalfHeight();
         Matrix.frustumM(screenM, 0, -halfWidth, halfWidth, -halfHeight, halfHeight, 1, 2);
@@ -103,5 +104,9 @@ public final class Viewport {
 
     public int getScreenHeight() {
         return screenHeight;
+    }
+
+    public boolean isReady() {
+        return screenHeight != 0;
     }
 }
