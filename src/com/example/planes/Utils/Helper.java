@@ -8,7 +8,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
-import com.example.planes.Activities.MyApplication;
+import com.example.planes.Interface.MyApplication;
 
 /**
  * Created by egor on 02.07.15.
@@ -47,10 +47,29 @@ public class Helper {
         return new Point(d.getIntrinsicWidth(), d.getIntrinsicHeight());
     }
 
+    public static float getDrawableRatio(int id) {
+        Point p = getDrawableWH(id);
+        return (float)p.x / p.y;
+    }
+
     public static void setY(View view, int height) {
         RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         param.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         param.topMargin = height;
         view.setLayoutParams(param);
+    }
+
+    public static int _getScreenWidth() {
+        WindowManager wm = (WindowManager) MyApplication.getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics m = new DisplayMetrics();
+        display.getMetrics(m);// todo
+        return (m.heightPixels > m.widthPixels)?m.heightPixels:m.widthPixels;
+    }
+
+    static private int screenWidth = -1;
+    public static int getScreenWidth() {
+        if(screenWidth == -1) screenWidth = _getScreenWidth();
+        return screenWidth;
     }
 }

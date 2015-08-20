@@ -1,4 +1,4 @@
-package com.example.planes.Activities;
+package com.example.planes.Interface;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

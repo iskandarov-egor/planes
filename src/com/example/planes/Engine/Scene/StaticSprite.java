@@ -7,7 +7,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import com.example.planes.Engine.MyGLRenderer;
 import com.example.planes.Engine.TextureManager;
-import com.example.planes.Activities.MyApplication;
+import com.example.planes.Interface.MyApplication;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -8,12 +8,12 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher"
-                 android:name=".Activities.MyApplication">
-        <activity android:name=".Activities.MyActivity"
+                 android:name=".Interface.MyApplication">
+        <activity android:name=".Interface.MyActivity"
                   android:screenOrientation="landscape"></activity>
-        <activity android:name=".Activities.TestBTMenuActivity"
+        <activity android:name=".Interface.TestBTMenuActivity"
                   android:screenOrientation="landscape"></activity>
-        <activity android:name=".Activities.MenuActivity"
+        <activity android:name=".Interface.MenuActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="landscape">
             <intent-filter>

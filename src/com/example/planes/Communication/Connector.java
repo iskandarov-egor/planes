@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.*;
 import android.util.Log;
-import com.example.planes.Activities.MyApplication;
+import com.example.planes.Interface.MyApplication;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,13 +6,7 @@
         android:layout_height="fill_parent"
         >
 
-    <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/planesImageView" android:layout_gravity="center" android:src="@drawable/menu_planes"
-            android:layout_alignParentRight="true" android:layout_alignWithParentIfMissing="false"
-            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" android:scaleType="fitCenter"/>
+
     <!--TextView
             android:id="@+id/playText"
             android:layout_width="wrap_content"

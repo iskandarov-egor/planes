@@ -1,9 +1,7 @@
-package com.example.planes.Activities;
+package com.example.planes.Interface;
 
 import android.content.Context;
 import android.util.TypedValue;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.example.planes.Config.MenuConfig;
 import com.example.planes.Utils.Helper;
