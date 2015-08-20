@@ -1,9 +1,8 @@
 package com.example.planes.Game.Models;
 
 import android.util.Log;
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
-import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Round;
@@ -26,10 +25,10 @@ public class Plane extends GameObject {
     private static final Wheel backWheel;
 
     static {
-        float frontWheelDx = Config.planeHeight * (Config.frontWheelX);
-        float frontWheelDy = Config.planeHeight * (Config.frontWheelY);
-        float backWheelDx = Config.planeHeight * (Config.backWheelX);
-        float backWheelDy = Config.planeHeight * (Config.backWheelY);
+        float frontWheelDx = BmpConfig.planeHeight * (BmpConfig.frontWheelX);
+        float frontWheelDy = BmpConfig.planeHeight * (BmpConfig.frontWheelY);
+        float backWheelDx = BmpConfig.planeHeight * (BmpConfig.backWheelX);
+        float backWheelDy = BmpConfig.planeHeight * (BmpConfig.backWheelY);
         frontWheel = new Wheel(frontWheelDx, frontWheelDy);
         backWheel = new Wheel(backWheelDx, backWheelDy);
     }
@@ -39,7 +38,7 @@ public class Plane extends GameObject {
     private float health = GameConfig.planeHealth;
 
     public Plane(Scene scene, float x, float y, float speed, float angle) {
-        super(scene, x, y, speed, angle, Config.planeHeight);
+        super(scene, x, y, speed, angle, BmpConfig.planeHeight);
 
         tanDrag = 2*0.008f*60;
         normDrag = 4*0.008f*60;
@@ -248,7 +247,7 @@ public class Plane extends GameObject {
         public Wheel(float dx, float dy) {
             this.dx = dx;
             this.dy = dy;
-            z = MathHelper.modpi2((float) Math.atan2(Config.planeDy - dy, Config.planeDx + dx));
+            z = MathHelper.modpi2((float) Math.atan2(BmpConfig.planeDy - dy, BmpConfig.planeDx + dx));
             d = (float) Math.hypot(dx, dy);
         }
 

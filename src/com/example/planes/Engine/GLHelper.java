@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import com.example.planes.MyApplication;
+import com.example.planes.Activities.MyApplication;
 
 /**
  * Created by egor on 18.07.15.

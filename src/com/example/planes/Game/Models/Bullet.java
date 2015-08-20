@@ -1,10 +1,9 @@
 package com.example.planes.Game.Models;
 
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Body.Point;
 import com.example.planes.Engine.Scene.Scene;
-import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
 import com.example.planes.R;
 
@@ -13,7 +12,7 @@ import com.example.planes.R;
  */
 public class Bullet extends GameObject {
     public Bullet(Scene scene, float x, float y, float speed, float angle) {
-        super(scene, x, y, speed, angle, Config.bulletHeight);
+        super(scene, x, y, speed, angle, BmpConfig.bulletHeight);
         setSprite(new StaticSprite(R.drawable.but));
         setBody(new Point());
         normDrag = 0.004f*60;

@@ -1,11 +1,10 @@
 package com.example.planes.Game.Models;
 
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
-import com.example.planes.R;
 
 /**
  * Created by egor on 19.07.15.
@@ -15,7 +14,7 @@ public class Cloud extends SceneObject implements Prop {
     protected float vy = 0;
 
     public Cloud(Scene scene, int sprite) {
-        super(0, 0, scene, Config.cloudHeight);
+        super(0, 0, scene, BmpConfig.cloudHeight);
         if(sprite <= 0) throw new IllegalArgumentException();
         place();
         setSprite(new StaticSprite(sprite));

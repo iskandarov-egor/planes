@@ -4,7 +4,7 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 import com.example.planes.Communication.RemoteAbonent;
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
 import com.example.planes.Engine.Scene.*;
@@ -40,7 +40,7 @@ public class Round implements EngineEventsListener {
     static {
         Point groundWH = Helper.getDrawableWH(R.drawable.ground);
         float h = 2 * GameConfig.worldPeriod / groundWH.x * groundWH.y;
-        groundLevel = -1 + h*(1 - Config.groundLevel);
+        groundLevel = -1 + h*(1 - BmpConfig.groundLevel);
     }
 
     private int numPlayers;

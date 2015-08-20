@@ -5,8 +5,10 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
-import com.example.planes.MyApplication;
+import android.widget.RelativeLayout;
+import com.example.planes.Activities.MyApplication;
 
 /**
  * Created by egor on 02.07.15.
@@ -43,5 +45,12 @@ public class Helper {
     public static Point getDrawableWH(int id) {
         Drawable d = MyApplication.getContext().getResources().getDrawable(id);
         return new Point(d.getIntrinsicWidth(), d.getIntrinsicHeight());
+    }
+
+    public static void setY(View view, int height) {
+        RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        param.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        param.topMargin = height;
+        view.setLayoutParams(param);
     }
 }

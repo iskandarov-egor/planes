@@ -2,8 +2,7 @@ package com.example.planes.Game;
 
 import android.util.Log;
 import com.example.planes.Communication.Message.TurnMessage;
-import com.example.planes.Config.Config;
-import com.example.planes.Engine.Scene.AnimatedSprite;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneButton;
 import com.example.planes.Engine.Scene.StaticSprite;
@@ -30,16 +29,16 @@ public class Controls implements SceneButtonListener{
         this.game = round;
         Scene scene = round.getScene();
         float r = -Helper.getScreenRatio();
-        buttonDown = scene.createButton(r + Config.btnMargin, -Config.btnMargin,
-                new StaticSprite(R.drawable.btn_up), 2 * Config.btnRadius);
+        buttonDown = scene.createButton(r + BmpConfig.btnMargin, -BmpConfig.btnMargin,
+                new StaticSprite(R.drawable.btn_up), 2 * BmpConfig.btnRadius);
         buttonDown.setAngle(MathHelper.PI);
-        buttonUp = scene.createButton(-Helper.getScreenRatio() + Config.btnMargin, Config.btnMargin,
-                new StaticSprite(R.drawable.btn_up), 2 * Config.btnRadius);
-        buttonFire = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, Config.btnMargin,
-                new StaticSprite(R.drawable.btn_fire), 2 * Config.btnRadius);
+        buttonUp = scene.createButton(-Helper.getScreenRatio() + BmpConfig.btnMargin, BmpConfig.btnMargin,
+                new StaticSprite(R.drawable.btn_up), 2 * BmpConfig.btnRadius);
+        buttonFire = scene.createButton(Helper.getScreenRatio() - BmpConfig.btnMargin, BmpConfig.btnMargin,
+                new StaticSprite(R.drawable.btn_fire), 2 * BmpConfig.btnRadius);
         stopSprite = new StaticSprite(R.drawable.btn_stop);
         goSprite = new StaticSprite(R.drawable.btn_go);
-        buttonStopGo = scene.createButton(Helper.getScreenRatio() - Config.btnMargin, -Config.btnMargin, goSprite, 2 * Config.btnRadius);
+        buttonStopGo = scene.createButton(Helper.getScreenRatio() - BmpConfig.btnMargin, -BmpConfig.btnMargin, goSprite, 2 * BmpConfig.btnRadius);
 
         buttonResurrect = scene.createButton(0, .8f, goSprite, 0.1f);
 

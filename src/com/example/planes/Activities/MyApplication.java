@@ -1,4 +1,4 @@
-package com.example.planes;
+package com.example.planes.Activities;
 
 import android.app.Application;
 import android.content.Context;

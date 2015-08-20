@@ -4,12 +4,10 @@ package com.example.planes.Engine.Scene;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
-import android.os.Parcelable;
 import android.util.Log;
 import com.example.planes.Engine.MyGLRenderer;
 import com.example.planes.Engine.TextureManager;
-import com.example.planes.MyApplication;
-import com.example.planes.R;
+import com.example.planes.Activities.MyApplication;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

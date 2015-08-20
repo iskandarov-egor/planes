@@ -1,6 +1,6 @@
 package com.example.planes.Engine;
 
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Engine.Body.Point;
 import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Body.SimplePolygon;
@@ -172,9 +172,9 @@ public class PolygonTest extends  junit.framework.TestCase{
     }
 
     public void testPlanePoint() {
-        ComplexPolygon plane = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
-        for(int i = 1; i < Config.planePolyX.length; i++) {
-            plane.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
+        ComplexPolygon plane = new ComplexPolygon(BmpConfig.planePolyX[0], BmpConfig.planePolyY[0]);
+        for(int i = 1; i < BmpConfig.planePolyX.length; i++) {
+            plane.addSimplePolygon(BmpConfig.planePolyX[i], BmpConfig.planePolyY[i]);
         }
         Point bullet = new Point();
         assertTrue(plane.isPointInside(0.2f, 0.1f));

@@ -1,6 +1,6 @@
 package com.example.planes.Game.Models;
 
-import com.example.planes.Config.Config;
+import com.example.planes.Config.BmpConfig;
 import com.example.planes.Engine.Scene.AnimatedSprite;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
@@ -18,7 +18,7 @@ public class Explosion extends SceneObject {
     }
 
     public Explosion(Plane plane) {
-        this(plane.getX(), plane.getY(), plane.getScene(), Config.explolsionHeight);
+        this(plane.getX(), plane.getY(), plane.getScene(), BmpConfig.explolsionHeight);
 
     }
 

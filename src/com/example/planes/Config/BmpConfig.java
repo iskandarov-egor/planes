@@ -5,7 +5,7 @@ import com.example.planes.Game.Models.Plane;
 /**
  * Created by egor on 02.07.15.
  */
-public abstract class Config {
+public abstract class BmpConfig {
     public static final float btnMargin = 0.2f;
     public static final float btnRadius = 0.15f;
     public static final float planeHeight = 0.15f;

@@ -1,4 +1,4 @@
-package com.example.planes;
+package com.example.planes.Activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -16,8 +16,8 @@ import com.example.planes.Communication.Message.StartGameMessage;
 import com.example.planes.Communication.Message.StupidMessage;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Game.Game;
-import com.example.planes.Game.Round;
 import com.example.planes.Communication.MessageListener;
+import com.example.planes.R;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
