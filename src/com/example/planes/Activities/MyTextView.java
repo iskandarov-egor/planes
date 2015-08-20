@@ -17,7 +17,7 @@ public class MyTextView extends TextView {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, h);
         setTypeface(MenuConfig.MAIN_FONT);
         setTextColor(MenuConfig.DARK_BROWN);
-        setText("Play");
+        setText(text);
         Helper.setY(this, (int) y);
     }
 

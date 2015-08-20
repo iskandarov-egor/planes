@@ -11,6 +11,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.example.planes.Config.MenuConfig;
 import com.example.planes.R;
 
 /**
@@ -19,6 +20,8 @@ import com.example.planes.R;
 public class MenuActivity extends Activity {
     Activity that = this;
     TextView tvPlay;
+    TextView tvBeClient;
+    TextView tvBeServer;
     TextView tvChangeName;
     RelativeLayout layout;
 
@@ -54,51 +57,39 @@ public class MenuActivity extends Activity {
         int h = layout.getBottom(); // get height
         float scale = h / 720f;
 
-        int brown = Color.parseColor("#423e2c");
 
-
+        layout.setBackgroundColor(MenuConfig.SKY_COLOR);
         tvPlay = new MyTextView(this, (142f*scale), (0.49f*h), "Play");
+        tvChangeName = new MyTextView(this, scale * 46, 0.78f * h, "Change name");
+        tvBeServer = new MyTextView(this, scale * 97, 0.49f * h, "Create");
+        tvBeClient = new MyTextView(this, scale * 97, 0.68f * h, "Connect");
 
-
+        tvPlay.setOnClickListener(makePlayClickListener());
     }
 
-    //private TextView
+    private View.OnClickListener makePlayClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                leaveMain();
+                goToPlayMode();
+            }
+        };
+    }
 
-    private void setY(View view, int height) {
-        RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        param.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        param.topMargin = height;
-        view.setLayoutParams(param);
+    private void goToPlayMode() {
+        layout.addView(tvBeClient);
+        layout.addView(tvBeServer);
     }
 
     private void goToMain() {
         layout.addView(tvPlay);
-
+        layout.addView(tvChangeName);
     }
 
-    private int getStatusBarH() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
+    private void leaveMain() {
+        layout.removeView(tvPlay);
+        layout.removeView(tvChangeName);
     }
 
-    private void stuff() {
-
-
-
-
-
-
-
-
-
-
-
-        //param.topMargin = (int) (240);
-
-
-    }
 }
