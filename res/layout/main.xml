@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/relativelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#ffabd5fb">
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/planesImageView" android:layout_gravity="center" android:src="@drawable/menu_planes"
+            android:layout_alignParentRight="true" android:layout_alignWithParentIfMissing="false"
+            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" android:scaleType="fitCenter"/>
+    <!--TextView
+            android:id="@+id/playText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_margin="1dp"
+
+            android:text="Hello"
+            android:textColor="#000000" /-->
+
+</RelativeLayout>

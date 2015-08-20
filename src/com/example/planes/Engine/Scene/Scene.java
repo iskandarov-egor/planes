@@ -2,16 +2,11 @@ package com.example.planes.Engine.Scene;
 
 import android.opengl.GLES20;
 import android.util.Log;
-import android.view.MotionEvent;
 import com.example.planes.Engine.Engine;
 import com.example.planes.Engine.SceneButtonListener;
 import com.example.planes.Engine.Utils;
-import com.example.planes.Game.Models.Cloud;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Created by egor on 09.07.15.
@@ -72,10 +67,7 @@ public final class Scene {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         //zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
-        if(Cloud.sample != null) {
-            xx += vv;
-            ((SceneObject)Cloud.sample).draw(xx, 0, viewport.ratioAndZoomMatrix);
-        }
+
         //if(true) return;
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
@@ -136,7 +128,13 @@ public final class Scene {
 
     public void addSticker(Sticker sticker) {
         if(stickers.contains(sticker)) throw new RuntimeException("sticker already present");
+
         stickers.add(sticker);
+        Collections.sort(stickers, AbstractSceneObject.ZindexComparator.getInstance());
+    }
+
+    void onZindexChanged(SceneObject so) {
+        if(objects.contains(so)) Collections.sort(objects, AbstractSceneObject.ZindexComparator.getInstance());
     }
 
     boolean canModifyObjects = true;
@@ -195,6 +193,7 @@ public final class Scene {
     public SceneObject addObject(SceneObject object) {
         if(objects.contains(object)) throw new RuntimeException();
         objects.add(object);
+        onZindexChanged(object);
         return object;
     }
 

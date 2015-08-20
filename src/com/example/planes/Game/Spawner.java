@@ -2,6 +2,7 @@ package com.example.planes.Game;
 
 import android.graphics.Point;
 import com.example.planes.Config.Config;
+import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
@@ -42,12 +43,6 @@ public class Spawner {
         return new Plane(scene, x, y, 0f, 0);
     }
 
-    public Cloud createCloud(int i) {
-        float x = ((i*171717 + 6487)%1111)/500f-1;
-        float y = ((i * 191991 + 1358) % 1111) / 1000f;
-        Cloud cloud = new Cloud(scene, x, y, 0.1f, 0);
-        scene.addObject(cloud);
-        return cloud;
-    }
+
 
 }

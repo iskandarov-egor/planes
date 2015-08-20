@@ -9,15 +9,14 @@ import com.example.planes.Utils.MathHelper;
  * Created by egor on 29.07.15.
  */
 public abstract class GameObject extends SceneObject{
-
     protected static float planesInUnit = 3.23383084577f;
     protected static float planesInPixel = 1f/44f;
     protected static float k = planesInPixel/planesInUnit;//0.002666f;
-    private static final float g = k*0.015f *60*60;
+    private static final float g = k*0.02f *60*60;
     protected float vx;
     protected float vy;
     protected float tanDrag = 0.008f*60;
-    protected float normDrag = 0.008f*60;
+    protected float normDrag = 2*0.008f*60;
     private float angle = 0;
     private boolean customGroundPhys = false;
 

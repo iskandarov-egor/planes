@@ -22,7 +22,6 @@ public class Bullet extends GameObject {
 
     private float distTravelled = 0;
 
-
     @Override
     public void onPhysicsFrame(float physicsFPS) {
         super.onPhysicsFrame(physicsFPS);

@@ -4,6 +4,8 @@ import com.example.planes.Engine.Body.Body;
 import com.example.planes.Engine.Body.Circle;
 import com.example.planes.Engine.Utils;
 
+import java.util.Comparator;
+
 /**
  * Created by egor on 18.07.15.
  */
@@ -13,6 +15,7 @@ abstract class AbstractSceneObject {
     protected float angle = 0;
     protected float dx = 0;
     protected float dy = 0;
+    private int zindex = 0;
 
     protected boolean visible = true;
     private final Scene scene;
@@ -171,5 +174,31 @@ abstract class AbstractSceneObject {
 
     public boolean isRemoved() {
         return removed;
+    }
+
+    public int getZindex() {
+        return zindex;
+    }
+
+    public void setZindex(int zindex) {
+        this.zindex = zindex;
+    }
+
+    public static class ZindexComparator implements Comparator<AbstractSceneObject> {
+
+        private static Comparator<AbstractSceneObject> instance;
+
+        public static Comparator<AbstractSceneObject> getInstance() {
+            if(instance == null) instance = new ZindexComparator();
+            return instance;
+        }
+
+        @Override
+        public int compare(AbstractSceneObject t1, AbstractSceneObject t2) {
+            return t1.zindex - t2.zindex;
+        }
+
+
+
     }
 }

@@ -13,13 +13,15 @@ public class GameConfig {
 
     public static final float bulletDamage = 1;
     public static final float smallPlaneHealth = 3;
+    public static final float cloudSpeedMin = 0.05f;
+    public static final float cloudSpeedMax = 0.2f;
     public static final int TYPE_BT = 463675;
 
 
-    public static float worldCeiling = 1;
+    public static float worldCeiling = 1.5f;
     public static float worldPeriod = 2f;
-    public static int cloudsMin = 5;
-    public static int cloudsMax = 10;
+    public static int cloudsMin = 14;
+    public static int cloudsMax = 16;
 
     public static final int TYPE_NO_BT = 607;
     public static final int TYPE_BT_SERVER = 87364;
@@ -34,6 +36,7 @@ public class GameConfig {
     public static final float landingGearAngleRight = 5f;
     public static final float bulletSpeed = 3f;
     public static final float bulletPath = worldPeriod;
+    public static final float planeHealth = 3;
     public static final boolean immortality = false;
 
 }

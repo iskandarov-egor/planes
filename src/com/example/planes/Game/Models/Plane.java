@@ -15,12 +15,10 @@ import com.example.planes.Utils.MathHelper;
  */
 public class Plane extends GameObject {
 
-//    private float acc = 0.00006665f*60*60;
-//    private float dirVel = 0.027f;
-//    private float lift = 0.015f*60;
-    private float acc = k*0.025f*60*60;
+    private float acc = k*0.050f*60*60;
     private float dirVel = 0.033f * 60;
-    private float lift = 0.2f*60;
+    private float lift = 0.015f*60;
+    private float velolim = 5f*60;
     private boolean engineOn = false;
     private boolean alive = true;
 
@@ -38,12 +36,13 @@ public class Plane extends GameObject {
 
     private boolean crashed = false;
     private Player player;
+    private float health = GameConfig.planeHealth;
 
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle, Config.planeHeight);
 
-        tanDrag = 0.008f*60;
-        normDrag = 3*0.008f*60;
+        tanDrag = 2*0.008f*60;
+        normDrag = 4*0.008f*60;
         setSprite(new StaticSprite(R.drawable.plane_stub));
 
 //        ComplexPolygon poly = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
@@ -53,7 +52,7 @@ public class Plane extends GameObject {
         //setBody(poly);
         setBody(0.1f);
         setCustomGroundPhys(true);
-        SceneObject propeller = new SceneObject(0.3f, 0, scene, 0.1f);
+        SceneObject propeller = new SceneObject(0.25f, 0, scene, 0.1f);
         propeller.setParent(this);
         propeller.setSprite(new AnimatedSprite(R.drawable.propeller, 8, 0.05f));
         scene.addObject(propeller);
@@ -91,6 +90,14 @@ public class Plane extends GameObject {
         return player;
     }
 
+    public void onHit(Bullet bullet) {
+        health -= 1;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
     private enum Direction {
         LEFT, RIGHT, STRAIGHT
     }
@@ -110,12 +117,14 @@ public class Plane extends GameObject {
             setAngle(angle);
         }
 
+        float vx1 = 0;
+        float vy1 = 0;
         if(alive && engineOn && getY() < GameConfig.worldCeiling) {
-            float vx1 = (float) (acc *  Math.cos(angle)) / fps;
-            float vy1 = (float) (acc * Math.sin(angle)) / fps;
+            float k = 1 - v / velolim;
+            vx1 = (float) (k*acc *  Math.cos(angle)) / fps;
+            vy1 = (float) (k*acc * Math.sin(angle)) / fps;
 
-            vx += vx1;
-            vy += vy1;
+
         }
 //        setVx(vx);
 //        setVy(vy);
@@ -128,13 +137,15 @@ public class Plane extends GameObject {
 
         float lift = this.lift*(Math.abs(tanV)) / fps;
 
-        vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (tanV * Math.cos(angle)));
-        vy = MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (tanV * Math.sin(angle)));
+        vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (speed * Math.cos(angle)));
+        vy = MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (speed * Math.sin(angle)));
 //        setVx(vx);
 //        setVy(vy);
 
 
         applyDrag(fps);
+        vx += vx1;
+        vy += vy1;
 
 ////////////////////// GEAR vs GROUND
 
@@ -170,8 +181,14 @@ public class Plane extends GameObject {
     private static int shots = 0;
 
     private float angleVelFunc(float v, float fps) {
-        float resist = 0.5f;
-        float maxV2 = 0.5f * acc / tanDrag;
+        float resist = 0.3f;
+        float maxV = 1 / (1 / this.velolim + this.tanDrag / this.acc);
+        return dirVel*(1-Math.min(resist, resist*(Math.abs(v)/maxV))) / fps;
+    }
+
+    private float angleVelFunc2(float v, float fps) {
+        float resist = 0.3f;
+        float maxV2 = 0.5f / (1 / this.velolim + this.tanDrag / this.acc);
         if(v < maxV2) {
             return dirVel*(Math.min(1, (Math.abs(v)/maxV2))) / fps;
         } else {

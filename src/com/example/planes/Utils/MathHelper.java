@@ -1,5 +1,7 @@
 package com.example.planes.Utils;
 
+import java.util.Random;
+
 /**
  * Created by egor on 02.07.15.
  */
@@ -49,5 +51,14 @@ public class MathHelper {
 
     public static boolean isBetween(float x, float lim1, float lim2) {
         return x > lim1 != x >= lim2;
+    }
+
+    static Random rand = new Random();
+
+    public static int randInt(int min, int max) {
+
+        int randomNum = rand.nextInt((max - min) + 1) + min;
+
+        return randomNum;
     }
 }

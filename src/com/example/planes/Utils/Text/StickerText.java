@@ -54,6 +54,8 @@ public class StickerText {
         if(scene.getViewport().isReady()) write(text);
     }
 
+
+
     private void write(String text) {
         for(Sticker sticker : stickers) {
             scene.removeSticker(sticker);

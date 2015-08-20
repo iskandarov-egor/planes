@@ -7,7 +7,6 @@ import android.util.Log;
  */
 class GameLoop extends Thread {
     boolean isRunning = false;
-    private float gfps, pfps;
     public GameLoop(Engine engine, float gfps, float pfps) {
         this.engine = engine;
         setGraphicsFPS(gfps);

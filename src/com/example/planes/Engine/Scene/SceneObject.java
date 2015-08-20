@@ -1,8 +1,5 @@
 package com.example.planes.Engine.Scene;
 
-import com.example.planes.Engine.Body.Body;
-import com.example.planes.Engine.Body.Circle;
-import com.example.planes.Engine.Utils;
 import com.example.planes.Utils.Vector;
 
 import java.util.ArrayList;
@@ -108,5 +105,11 @@ public class SceneObject extends AbstractSceneObject{
             so.relativePos.set(so.x, so.y);
             so.relativePos.rotate(angle);
         }
+    }
+
+    @Override
+    public void setZindex(int zindex) {
+        super.setZindex(zindex);
+        getScene().onZindexChanged(this);
     }
 }

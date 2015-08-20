@@ -84,7 +84,14 @@ public class Round implements EngineEventsListener {
         cross.setSprite(new StaticSprite(R.drawable.cross));
 
         //create clouds
-        for (int i = 0; i < GameConfig.cloudsMin; i++) spawner.createCloud(i);
+        for (int i = 0; i < GameConfig.cloudsMin; i++) {
+            int sprite = (i % 2 == 0)?R.drawable.cloud:R.drawable.fore_cloud;
+            Cloud cloud = new Cloud(scene, sprite);
+            scene.addObject(cloud);
+            if(i % 2 == 1) {
+                cloud.setZindex(2);
+            }
+        }
 
         //create planes
         planesGroup = new ObjectGroup(scene);
@@ -172,15 +179,11 @@ public class Round implements EngineEventsListener {
 
     @Override
     public void onScreenChanged(int width, int height) {
-
-
        msgScore.onScreenChanged();
-
     }
 
     @Override
     public void onEngineReady() {
-
     }
 
     @Override
@@ -193,9 +196,6 @@ public class Round implements EngineEventsListener {
     public void onPhysicsFrame(float fps) {
 
     }
-
-
-
 
     public CollisionProcessor getPlanesVsPlanes() {
         return new CollisionProcessor() {
@@ -211,8 +211,12 @@ public class Round implements EngineEventsListener {
         return new CollisionProcessor() {
             @Override
             public void process(SceneObject object, SceneObject other) {
-                killPlaneIfAlive((Plane) (object));
+                Plane plane = (Plane) object;
                 Bullet bullet  = (Bullet) (other);
+                plane.onHit(bullet);
+
+                if(plane.getHealth() <= 0) killPlaneIfAlive((Plane) (object));
+
                 bullet.onHit();
             }
         };
@@ -223,12 +227,10 @@ public class Round implements EngineEventsListener {
             @Override
             public void process(SceneObject object, SceneObject other) {
                 Plane plane = (Plane) object;
-
                 plane.onTouchingGround();
                 if(plane.isCrashed()) {
                     killPlaneIfAlive(plane);
                 }
-
             }
         };
     }
