@@ -17,4 +17,13 @@
             android:text="Hello"
             android:textColor="#000000" /-->
 
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/cloud"
+            android:adjustViewBounds="false" android:minWidth="200dp"
+            android:minHeight="100dp"
+            android:scaleType="matrix" android:layout_centerVertical="true" android:layout_alignParentRight="true"
+            android:layout_marginRight="49dp"/>
 </RelativeLayout>

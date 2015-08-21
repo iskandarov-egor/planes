@@ -15,6 +15,8 @@ import com.example.planes.Config.MenuConfig;
 import com.example.planes.R;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by egor on 19.08.15.
@@ -51,11 +53,53 @@ public class MenuActivity extends Activity {
                 }
 
                 setupViews();
+                makeClouds();
                 setupScreens();
                 goToScreen(mainScreen);
+                //startCloudLoop();
             }
 
         });
+    }
+
+
+    Timer cloudTimer = new Timer("null", true);
+    boolean clstopped = true;
+    private void startCloudLoop() {
+        if(!clstopped) throw new RuntimeException();
+        clstopped = false;
+        cloudTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                for (final Cloud cloud : clouds) {
+                    cloud.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            cloud.move();
+                        }
+                    });
+                }
+            }
+        }, 50, 50);
+
+    }
+
+    private void stopCloudLoop() {
+        if(clstopped) throw new RuntimeException();
+        cloudTimer.cancel();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCloudLoop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startCloudLoop();
     }
 
     private void setupViews() {
@@ -83,8 +127,11 @@ public class MenuActivity extends Activity {
         gameScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait);
     }
 
+    ArrayList<Cloud> clouds = new ArrayList<>(6);
     private void makeClouds() {
-
+        Cloud cloud = new Cloud(this, 0, 200, 1, 50);
+        clouds.add(cloud);
+        layout.addView(cloud);
     }
 
     private View.OnClickListener makeServerClickListener() {
@@ -118,6 +165,7 @@ public class MenuActivity extends Activity {
     @Override
     public void onBackPressed() {
         Log.d("CDA", "onBackPressed Called");
+        super.onBackPressed();
     }
 
     private class Screen {
