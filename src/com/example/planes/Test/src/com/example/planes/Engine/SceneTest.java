@@ -48,6 +48,6 @@ public class SceneTest extends junit.framework.TestCase {
 
     public void testAnim() {
         SceneObject so = scene.createObject(0, 0, 1);
-        AnimatedSprite sprite = new AnimatedSprite(so, com.example.planes.R.drawable.propeller, 10, 1);
+        AnimatedSprite sprite = new AnimatedSprite(com.example.planes.R.drawable.propeller, 10, 1);
     }
 }

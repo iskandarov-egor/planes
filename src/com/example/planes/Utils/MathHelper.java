@@ -61,4 +61,8 @@ public class MathHelper {
 
         return randomNum;
     }
+
+    public static float rand(float min, float max) {
+        return (float) (min + Math.random()*(max - min));
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.planes.Utils;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
@@ -72,4 +73,15 @@ public class Helper {
         if(screenWidth == -1) screenWidth = _getScreenWidth();
         return screenWidth;
     }
+
+    public static String cutString(String str, int max) {
+        int len = str.length();
+
+        if(len > max) {
+            String newstr = str.substring(0, max - 3) + "...";
+            return newstr;
+        }
+        return str;
+    }
+
 }

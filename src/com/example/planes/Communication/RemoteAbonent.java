@@ -1,5 +1,6 @@
 package com.example.planes.Communication;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.Message.ReceivedMessage;
@@ -13,6 +14,7 @@ public class RemoteAbonent {
     private BluetoothSocket socket;
     private ConnectedThread thread;
     private MessageListener listener;
+
 
     public RemoteAbonent(BluetoothSocket socket) {
         this.socket = socket;
@@ -44,4 +46,7 @@ public class RemoteAbonent {
         thread = null;
     }
 
+    public BluetoothDevice getDevice() {
+        return socket.getRemoteDevice();
+    }
 }

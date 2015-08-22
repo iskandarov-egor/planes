@@ -89,10 +89,11 @@ class GameLoop extends Thread {
 
     @Override
     public synchronized void start() {
+        isRunning = true;
         graphDt = 0;
         physDt = 0;
         last = System.nanoTime();
-        isRunning = true;
+
         super.start();
     }
 

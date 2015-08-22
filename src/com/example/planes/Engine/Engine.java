@@ -93,7 +93,7 @@ public final class Engine {
 
     public void onResume() {
         view.onResume();
-        if(running && !gameLoop.isRunning()) gameLoop.start();
+        if(running && !gameLoop.isAlive()) gameLoop.start();
     }
 
     GameLoop gameLoop;

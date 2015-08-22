@@ -28,7 +28,7 @@ import java.util.Queue;
  */
 public class TestBTMenuActivity extends Activity implements ConnectorListener, MessageListener {
     TestBTMenuActivity that = this;
-    final Connector connector = new Connector(this);
+
     Button noBtBtn;
     Button beServBtn;
     Button connBtn;
@@ -50,31 +50,14 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
         @Override
         public void onClick(View view) {
             Log.d("hey", "conn button clicked");
-            doWithBT(new Runnable() {
-                @Override
-                public void run() {
-                    connector.startSearching();
-                }
-            }, new Runnable() {
-                @Override
-                public void run() {
-                    connBtn.setText("fuck you too");
-                }
-            });
+
         }
     };
 
     final View.OnClickListener noBtListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            GameConfig.type = GameConfig.TYPE_NO_BT;
-            Log.d("hey", "testBT button clicked");
-            ArrayList<RemoteAbonent> list = new ArrayList<RemoteAbonent>(0);
-            Game.NewGame(list, 0);
-            Intent intent = new Intent(that, MyActivity.class);
-            Log.d("hey", "testBT button - intent");
-            startActivity(intent);
-            Log.d("hey", "testBT button - start");
+
         }
     };
 
@@ -83,56 +66,17 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
         public void onClick(View view) {
             Log.d("hey", "beServ clicked");
 
-            doWithBT(new Runnable() {
-                         @Override
-                         public void run() {
-                             connector.startAccepting();
-                             beServBtn.setText("serving");
-                         }
-                     },new Runnable() {
-                        @Override
-                        public void run() {
-                            beServBtn.setText("oh come on man!");
-                        }
-                    });
+
         }
     };
 
-    private Queue<Runnable> btRunnables = new ArrayDeque<>(4);
-    private static final int REQUEST_ENABLE_BT = 2147048222;
-    private void doWithBT(Runnable r, Runnable ifCancelled) {
-        if(!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-            btRunnables.add(r);
-            btRunnables.add(ifCancelled);
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            r.run();
-        }
-    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_ENABLE_BT) {
-            if(resultCode == RESULT_OK) {
-                Runnable r = btRunnables.poll();
-                while (r != null) {
-                    r.run();
-                    if(btRunnables.poll() == null) throw new RuntimeException("must contain even number of elem");
-                    r = btRunnables.poll();
-                }
-            } else {
-                btRunnables.poll();
-                Runnable r = btRunnables.poll();
-                while (r != null) {
-                    r.run();
-                    Runnable t = btRunnables.poll();
-                    r = btRunnables.poll();
-                    if(r == null && t != null) throw new RuntimeException("must contain even number of elem");
-                }
-            }
-        }
+
     }
 
     @Override
@@ -181,72 +125,32 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
     protected void onDestroy() {
         super.onDestroy();
         Log.d("hey", "testBTactivity ondestroy");
-        connector.destruct();
+        //connector.destruct();
     }
+
 
     @Override
     public void onAccepted(RemoteAbonent abonent) {
-        Log.d("hey", "onaccepted");
-        connector.stopAcceptingSafe();
-        abonent.sendMessage(new StartGameMessage(1));
-        startGame(abonent, 0);
-    }
 
-    @Override
-    public void onMessage(final ReceivedMessage rmsg) {
-        final Message msg = rmsg.getMessage();
-        RemoteAbonent abonent = rmsg.getSender();
-        if(msg.getType() == Message.STUPID_MESSAGE) {
-            beServBtn.post(new Runnable() {
-                @Override
-                public void run() {
-                    beServBtn.setText(((StupidMessage)msg).getString());
-                }
-            });
-            if(((StupidMessage)msg).getString().equals("you are a nigger")) {
-                abonent.sendMessage(new StupidMessage("no, you are"));
-            }
-        }
-        if(msg.getType() == Message.START_GAME_MESSAGE) {
-            startGame(abonent, ((StartGameMessage) msg).getYourId());
-        }
-    }
-
-
-    private void startGame(RemoteAbonent abonent, int myId) {
-        GameConfig.type = GameConfig.TYPE_BT;
-
-
-        ArrayList<RemoteAbonent> them = new ArrayList<>(1);
-        them.add(abonent);
-        Game.NewGame(them, myId);
-
-        Intent intent = new Intent(that, MyActivity.class);
-
-        startActivity(intent);
     }
 
     @Override
     public void onFound(BluetoothDevice device) {
-        Log.d("hey", "onFound bt device");
-        String name = device.getName();
-            if(name.equals( "planesbt")) {
-                Log.d("hey", "onFound bt device name matched");
-                connector.connectTo(device);
-            }
+
     }
 
     @Override
     public void onConnected(RemoteAbonent abonent) {
-        Log.d("hey", "on connected");
-        abonent.setListener(this);
-        abonent.sendMessage(new StupidMessage("you are a nigger"));
+
     }
 
     @Override
     public void onConnectFailed() {
-        Log.d("hey", "on conn failed");
+
     }
 
+    @Override
+    public void onMessage(ReceivedMessage receivedMessage) {
 
+    }
 }
