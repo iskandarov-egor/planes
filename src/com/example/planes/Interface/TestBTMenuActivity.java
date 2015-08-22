@@ -44,6 +44,8 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
         beServBtn.setOnClickListener(beServListener);
         connBtn = (Button) findViewById(R.id.conn_btn);
         connBtn.setOnClickListener(connListener);
+
+
     }
 
     final View.OnClickListener connListener = new View.OnClickListener() {
@@ -147,6 +149,11 @@ public class TestBTMenuActivity extends Activity implements ConnectorListener, M
     @Override
     public void onConnectFailed() {
 
+    }
+
+    @Override
+    public void onFinishedDiscovery() {
+        throw new RuntimeException("not implemented");
     }
 
     @Override

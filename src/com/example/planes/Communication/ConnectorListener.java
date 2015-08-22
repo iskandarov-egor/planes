@@ -12,4 +12,6 @@ public interface ConnectorListener {
     void onConnected(RemoteAbonent abonent);
 
     void onConnectFailed();
+
+    void onFinishedDiscovery();
 }

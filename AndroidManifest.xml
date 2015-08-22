@@ -9,6 +9,8 @@
 
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher"
                  android:name=".Interface.MyApplication">
+        <activity android:name=".Interface.SelectOpponentActivity"
+                  android:screenOrientation="landscape"></activity>
         <activity android:name=".Interface.MyActivity"
                   android:screenOrientation="landscape"></activity>
         <activity android:name=".Interface.TestBTMenuActivity"

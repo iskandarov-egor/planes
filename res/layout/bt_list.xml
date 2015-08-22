@@ -4,13 +4,30 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
+    <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/textView" android:layout_gravity="center_horizontal"/>
+            android:layout_height="wrap_content" android:layout_gravity="center_horizontal">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView"
+                  android:layout_gravity="center_horizontal" android:text="Discovery finished"
+                  android:layout_alignParentTop="false" android:layout_centerVertical="true"/>
+        <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repeat"
+                android:id="@+id/search_repeat" android:layout_alignParentTop="false"
+                android:layout_toRightOf="@+id/textView" android:layout_alignParentRight="false"
+                android:visibility="visible" android:layout_marginLeft="0dp" android:layout_marginRight="0dp"
+                android:layout_marginTop="0dp" android:layout_centerVertical="true"/>
+    </RelativeLayout>
     <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/listView" android:layout_gravity="center_horizontal"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No devices found."
+            android:id="@+id/tv_not_found" android:layout_gravity="center_horizontal"/>
 </LinearLayout>

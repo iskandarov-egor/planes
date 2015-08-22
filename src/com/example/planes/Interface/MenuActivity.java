@@ -87,15 +87,15 @@ public class MenuActivity extends Activity {
         cloudTask = new TimerTask() {
             @Override
             public void run() {
-                for (final Cloud cloud : clouds) {
-                    cloud.post(new Runnable() {
-                        @Override
-                        public void run() {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Cloud cloud : clouds) {
                             cloud.move();
                         }
-                    });
-                }
+                    }
+                });
+
             }
         };
         cloudTimer.scheduleAtFixedRate(cloudTask, 50, 33);
@@ -165,7 +165,7 @@ public class MenuActivity extends Activity {
             @Override
             public void onClick(View view) {
                 gameStarter.connectAsClient();
-                goToScreen(gameScreen);
+                //goToScreen(gameScreen);
             }
         };
     }
@@ -268,6 +268,12 @@ public class MenuActivity extends Activity {
         Log.d("hey", "menu onstop");
     }
 
+    public void onConnected(RemoteAbonent abonent) {
+        goToScreen(gameScreen);
+        tvPlayReady.setText("Not ready"); // todo check if has open game
+
+    }
+
     private class Screen {
         private final ArrayList<View> views = new ArrayList<>(4);
 
@@ -282,10 +288,18 @@ public class MenuActivity extends Activity {
             }
         }
 
-        public void leave() {
-            for(View view : views) {
-                layout.removeView(view);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                for(View view : views) {
+                    layout.removeView(view);
+                }
             }
+        };
+
+        public void leave() {
+            runOnUiThread(runnable);
+
         }
     }
 }

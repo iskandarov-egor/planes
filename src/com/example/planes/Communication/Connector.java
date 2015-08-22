@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.*;
 import android.util.Log;
 import com.example.planes.Interface.MyApplication;
+import com.example.planes.Interface.SelectOpponentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Connector {
     ConnectorListener listener;
     BluetoothAdapter adapter;
     ContextWrapper app;
-    private BroadcastReceiver foundReceiver = null;
+    private BroadcastReceiver foundReceiver = getFoundReceiver();
 
     private List<RemoteAbonent> remotes = new ArrayList<>(1);
 
@@ -46,7 +47,6 @@ public class Connector {
         getAcceptThread().start();
     }
 
-    private static final int REQUEST_ENABLE_BT = 83638;
     private void assertBT() {
         if(!BluetoothAdapter.getDefaultAdapter().isEnabled()) throw new RuntimeException("bt not enabled");
     }
@@ -78,11 +78,13 @@ public class Connector {
         assertBT();
 
 
-        BroadcastReceiver mReceiver = getFoundReceiver();
+
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        app.registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        app.registerReceiver(foundReceiver, filter); // Don't forget to unregister during onDestroy
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
     }
+
 
     private BroadcastReceiver getFoundReceiver() {
         if(foundReceiver == null) {
@@ -95,6 +97,10 @@ public class Connector {
                         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                         // Add the name and address to an array adapter to show in a ListView
                         listener.onFound(device);
+                    }
+                    if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+
+                        listener.onFinishedDiscovery();
                     }
                 }
             };
@@ -153,5 +159,10 @@ public class Connector {
     public void destruct() {
         stopAcceptingSafe();
         stopSearchingSafe();
+        app.unregisterReceiver(foundReceiver);
+    }
+
+    public void setListener(ConnectorListener listener) {
+        this.listener = listener;
     }
 }
