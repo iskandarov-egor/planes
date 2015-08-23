@@ -11,4 +11,6 @@ public interface MessageListener {
 
 
     void onMessage(ReceivedMessage receivedMessage);
+
+    void onDisconnected();
 }

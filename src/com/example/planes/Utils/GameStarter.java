@@ -8,12 +8,12 @@ import android.util.Log;
 import com.example.planes.Communication.Connector;
 import com.example.planes.Communication.ConnectorListener;
 import com.example.planes.Communication.Message.Message;
+import com.example.planes.Communication.Message.ReadyMessage;
 import com.example.planes.Communication.Message.ReceivedMessage;
 import com.example.planes.Communication.Message.StartGameMessage;
 import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
-import com.example.planes.Game.Game;
 import com.example.planes.Interface.MenuActivity;
 import com.example.planes.Interface.MyActivity;
 import com.example.planes.Interface.ListBTActivity;
@@ -91,7 +91,7 @@ public class GameStarter implements ConnectorListener, MessageListener {
         GameConfig.type = GameConfig.TYPE_NO_BT;
         Log.d("hey", "testBT button clicked");
         ArrayList<RemoteAbonent> list = new ArrayList<RemoteAbonent>(0);
-        Game.NewGame(list, 0);
+        MyActivity.NewGame(list, 0);
         Intent intent = new Intent(activity, MyActivity.class);
         Log.d("hey", "testBT button - intent");
         activity.startActivity(intent);
@@ -147,6 +147,7 @@ public class GameStarter implements ConnectorListener, MessageListener {
         Log.d("hey", "onaccepted");
         connector.stopAcceptingSafe();
         activity.onAccepted(abonent);
+        abonent.setListener(this);
         //abonent.sendMessage(new StartGameMessage(1));
         //startGame(abonent, 0);
     }
@@ -155,20 +156,32 @@ public class GameStarter implements ConnectorListener, MessageListener {
     public void onMessage(final ReceivedMessage rmsg) {
         final Message msg = rmsg.getMessage();
         RemoteAbonent abonent = rmsg.getSender();
-
-        if(msg.getType() == Message.START_GAME_MESSAGE) {
-            startGame(abonent, ((StartGameMessage) msg).getYourId());
+        switch (msg.getType()) {
+            case Message.READY_MESSAGE:
+                activity.onReadyMessage(((ReadyMessage) msg).getReady());
+                break;
+            case Message.START_GAME_MESSAGE:
+                startGame(abonent, ((StartGameMessage) msg).getYourId());
+                break;
         }
     }
 
+    @Override
+    public void onDisconnected() {
+        activity.onDisconnected();
+    }
+
+    public void startAsServer(RemoteAbonent abonent) {
+        abonent.sendMessage(new StartGameMessage(1));
+        startGame(abonent, 0);
+    }
 
     private void startGame(RemoteAbonent abonent, int myId) {
         GameConfig.type = GameConfig.TYPE_BT;
 
-
         ArrayList<RemoteAbonent> them = new ArrayList<>(1);
         them.add(abonent);
-        Game.NewGame(them, myId);
+        MyActivity.NewGame(them, myId);
 
         Intent intent = new Intent(activity, MyActivity.class);
 
@@ -196,9 +209,7 @@ public class GameStarter implements ConnectorListener, MessageListener {
 
     @Override
     public void onConnected(RemoteAbonent abonent) {
-        Log.d("hey", "on connected");
-        abonent.setListener(this);
-        activity.onConnected(abonent);
+
     }
 
     @Override
@@ -224,5 +235,6 @@ public class GameStarter implements ConnectorListener, MessageListener {
 
     public void onConnectedFromBTList(RemoteAbonent abonent) {
         activity.onConnectedFromBTList(abonent);
+        abonent.setListener(this);
     }
 }

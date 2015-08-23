@@ -13,6 +13,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.example.planes.Communication.Message.Message;
+import com.example.planes.Communication.Message.ReadyMessage;
+import com.example.planes.Communication.Message.ReceivedMessage;
+import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.MenuConfig;
 import com.example.planes.R;
@@ -28,7 +32,6 @@ public class MenuActivity extends ActivityWithScreens {
     Activity that = this;
     final GameStarter gameStarter = new GameStarter(this);
 
-    ArrayList<Screen> screens = new ArrayList<>(5);
     Screen mainScreen = new Screen();
     Screen modeScreen = new Screen();
     Screen serverScreen = new Screen();
@@ -38,6 +41,31 @@ public class MenuActivity extends ActivityWithScreens {
     TextView tvPlayServer;
     TextView tvReady;
     RemoteAbonent them = null;
+
+    public void onReadyMessage(final boolean ready) {
+        if(state != State.SERVER_NOT_READY && state != State.SERVER_READY) throw new RuntimeException();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(ready) {
+                    state = State.SERVER_READY;
+                    tvPlayServer.setVisibility(View.VISIBLE);
+                    tvWait.setVisibility(View.GONE);
+                } else {
+                    state = State.SERVER_NOT_READY;
+                    tvPlayServer.setVisibility(View.GONE);
+                    tvWait.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    public void onDisconnected() {
+        if(state == State.NONE) throw new RuntimeException();
+        state = State.NONE;
+        DialogHelper.showOKDialog(this, "", "Connection was lost");
+        goToScreen(mainScreen);
+    }
 
     private enum State {
         CLIENT_CONNECTING, CLIENT_NOT_READY, CLIENT_READY, SERVER_WAITING, SERVER_READY, SERVER_NOT_READY, NONE
@@ -72,7 +100,6 @@ public class MenuActivity extends ActivityWithScreens {
                 }
 
                 setupViews();
-                setupScreens();
                 makeClouds();
 
                 goToScreen(mainScreen);
@@ -101,20 +128,21 @@ public class MenuActivity extends ActivityWithScreens {
         TextView selectMap = new MyTextView(this, scale * MenuConfig.FONT_SIZE_MID, 0.49f * h, "Select map");
         tvWait = new MyTextView(this, scale * MenuConfig.FONT_SIZE_SMALL, 0.728f * h, "Waiting for " +
                 "another\nplayer to connect");
-        tvPlayServer = new MyTextView(this, 142*scale, 0.728f*h, "Play");
+        tvPlayServer = new MyTextView(this, 94*scale, 0.728f*h, "Play");
         tvPlayServer.setVisibility(View.GONE);
-        tvReady = new MyTextView(this, 142*scale, 0.728f*h, "");
+        tvReady = new MyTextView(this, 94*scale, 0.728f*h, "");
 
         NEWGAME.setTextColor(Color.WHITE);
         mainScreen.add(ivMain).add(tvPlay).add(tvChangeName);
         modeScreen.add(ivMain).add(tvBeClient).add(tvBeServer);
         serverScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait).add(tvPlayServer);
-        clientScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait).add(tvReady);
+        clientScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvReady);
 
 
         tvBeServer.setOnClickListener(makeBeServerListener());
         tvBeClient.setOnClickListener(makeBeClientListener());
         tvReady.setOnClickListener(makeReadyListener());
+        tvPlayServer.setOnClickListener(makePlayServerListener());
 
         Button playBT = (Button) findViewById(R.id.noBtBtn);
         playBT.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +151,16 @@ public class MenuActivity extends ActivityWithScreens {
                 gameStarter.startWithNoBT();
             }
         });
+    }
 
+    private View.OnClickListener makePlayServerListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(state != State.SERVER_READY) throw new RuntimeException();
+                gameStarter.startAsServer(them);
+            }
+        };
     }
 
     private View.OnClickListener makeReadyListener() {
@@ -134,10 +171,12 @@ public class MenuActivity extends ActivityWithScreens {
                     case CLIENT_NOT_READY:
                         state = State.CLIENT_READY;
                         tvReady.setText("Ready");
+                        them.sendMessage(new ReadyMessage(true));
                         break;
                     case CLIENT_READY:
                         state = State.CLIENT_NOT_READY;
                         tvReady.setText("Not ready");
+                        them.sendMessage(new ReadyMessage(false));
                         break;
                     default: throw new RuntimeException("wrong state");
                 }
@@ -174,10 +213,6 @@ public class MenuActivity extends ActivityWithScreens {
         };
     }
 
-    private void setupScreens() {
-
-    }
-
     private View.OnClickListener makePlayClickListener() {
         return new View.OnClickListener() {
             @Override
@@ -204,6 +239,7 @@ public class MenuActivity extends ActivityWithScreens {
                 tvWait.setText(Helper.cutString(name.getDevice().getName(), 7) + "\nis not ready");
             }
         });
+        them = name;
     }
 
     @Override
@@ -212,14 +248,12 @@ public class MenuActivity extends ActivityWithScreens {
         gameStarter.destruct();
     }
 
-    public void onConnected(RemoteAbonent abonent) {
-        throw new RuntimeException();
-    }
 
-    public void onConnectedFromBTList(RemoteAbonent abonent) {
+    public void onConnectedFromBTList(final RemoteAbonent abonent) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                them = abonent;
                 goToScreen(clientScreen);
                 if(state != State.CLIENT_CONNECTING) throw new RuntimeException();
                 state = State.CLIENT_NOT_READY;

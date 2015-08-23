@@ -11,6 +11,7 @@ import com.example.planes.Engine.Scene.*;
 import com.example.planes.Game.Camera.Camera;
 import com.example.planes.Game.Camera.FollowingCamera;
 import com.example.planes.Game.Models.*;
+import com.example.planes.Interface.MyActivity;
 import com.example.planes.R;
 import com.example.planes.Utils.Helper;
 import com.example.planes.Utils.Text.StickerText;
@@ -34,7 +35,7 @@ public class Round implements EngineEventsListener {
     ObjectGroup planesGroup;
     private List<Player> players;
     private BTMessageListener messageListener = null;
-    private final Game game;
+    private final MyActivity activity;
 
 
     static {
@@ -56,9 +57,9 @@ public class Round implements EngineEventsListener {
     }
 
 
-    public Round(int playerId, ArrayList<RemoteAbonent> otherPlayers, int roundNumber, Game game) {
+    public Round(int playerId, ArrayList<RemoteAbonent> otherPlayers, int roundNumber, MyActivity activity) {
         Log.d("hey", "Game()");
-        this.game = game;
+        this.activity = activity;
         numPlayers = otherPlayers.size() + 1;
         players = new ArrayList<>(numPlayers);
         myId = playerId;
@@ -69,7 +70,7 @@ public class Round implements EngineEventsListener {
 
         if(GameConfig.type == GameConfig.TYPE_NO_BT) numPlayers = GameConfig.numPlayersTypeNoBt;
 
-        Engine engine = game.getEngine();
+        Engine engine = activity.getEngine();
         final Scene scene = engine.newScene();
         scene.setPeriod(GameConfig.worldPeriod);
         scene.setBackgroundColor(0, 0, 1);
@@ -139,7 +140,7 @@ public class Round implements EngineEventsListener {
 
     private void setCountdownTimer(final int seconds) {
         msgScore.setText(String.valueOf(seconds));
-        game.getEngine().addTimer(new Runnable() {
+        activity.getEngine().addTimer(new Runnable() {
             @Override
             public void run() {
                 if (seconds == 1) {
@@ -165,7 +166,7 @@ public class Round implements EngineEventsListener {
     }
 
     public Scene getScene() {
-        return game.getEngine().getScene();
+        return activity.getEngine().getScene();
     }
 
     public boolean onTouchEvent(MotionEvent e) {
@@ -272,10 +273,10 @@ public class Round implements EngineEventsListener {
                 }
             }
             msgScore.setText(makeScoreString());
-            game.getEngine().addTimer(new Runnable() {
+            activity.getEngine().addTimer(new Runnable() {
                 @Override
                 public void run() {
-                    game.onRoundOver();
+                    activity.onRoundOver();
                 }
             }, 3);
             msgScore.setVisible(true);
@@ -329,4 +330,7 @@ public class Round implements EngineEventsListener {
         return myId == 0;
     }
 
+    public void onDisconnected() {
+        MyActivity.onDisconnected();
+    }
 }

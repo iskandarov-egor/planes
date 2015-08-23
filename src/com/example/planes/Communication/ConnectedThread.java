@@ -48,6 +48,7 @@ class ConnectedThread extends Thread {
                     //        .sendToTarget();
                 } catch (IOException e) {
                     Log.e("error", "disconnected", e);
+                    abonent.onDisconnect();
                     //connectionLost();
                     // Start the service over to restart listening mode
 

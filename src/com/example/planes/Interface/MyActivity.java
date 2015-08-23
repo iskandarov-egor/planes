@@ -6,80 +6,91 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import com.example.planes.Game.Game;
+import com.example.planes.Communication.RemoteAbonent;
+import com.example.planes.Config.GameConfig;
+import com.example.planes.Engine.Engine;
+import com.example.planes.Game.Round;
 
-public class MyActivity extends Activity {
+import java.util.ArrayList;
+
+public class MyActivity extends LoggedActivity {
+    public static boolean disconnectedBeforeCreation;
     /**
      * Called when the activity is first created.
      */
 
-    Game game;
+    private Engine engine;
+    private int roundNumber = 0;
+    private Round currentRound = null;
+    private static int playerId;
+    private static ArrayList<RemoteAbonent> otherPlayers;
+    private static MyActivity activity = null;
+
+    public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
+        Log.d("hey", "static NewGame");
+//        instance = new Game(playerId, otherPlayers);
+        disconnectedBeforeCreation = false;
+        MyActivity.playerId = playerId;
+        MyActivity.otherPlayers = otherPlayers;
+
+    }
+
+    public MyActivity() {
+        super("MyActivity");
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d("hey", "activity oncreate");
-        Log.d("hey", "saved state " + String.valueOf(savedInstanceState));
-
+        activity = this;
+        if(disconnectedBeforeCreation) onDisconnected();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        game = Game.getInstance();
+        this.engine = new Engine(GameConfig.FPS, GameConfig.PHYSICS_FPS);
 
-        setContentView(game.createView(this));
-        game.getEngine().run();
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.d("hey", "activity onconfigchanged");
+        setContentView(engine.createView(this));
+        engine.run();
+        newRound();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("hey", "activity onresume");
-        game.getEngine().onResume();
+        engine.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("hey", "activity onpause");
-        game.getEngine().onPause();
+        engine.onPause();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("hey", "activity onstart");
+    private void newRound() {
+        Log.d("hey", "new round()");
+        roundNumber++;
+        currentRound = new Round(playerId, otherPlayers, roundNumber, this);
+
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.d("hey", "activity onrestorestate");
+    public void onRoundOver() {
+        newRound();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("hey", "activity onrestart");
+    public Engine getEngine() {
+        return engine;
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("hey", "activity onstop");
+    public static void onDisconnected() {
+        if(activity == null) {
+            MyActivity.disconnectedBeforeCreation = true;
+        } else {
+            activity.finish();
+            DialogHelper.showOKDialog(activity, "", "Connection was lost");
+        }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("hey", "activity ondestroy");
-    }
-
 }

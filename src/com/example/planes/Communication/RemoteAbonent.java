@@ -49,4 +49,8 @@ public class RemoteAbonent {
     public BluetoothDevice getDevice() {
         return socket.getRemoteDevice();
     }
+
+    public void onDisconnect() {
+        listener.onDisconnected();
+    }
 }

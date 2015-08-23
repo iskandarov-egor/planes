@@ -32,6 +32,11 @@ public class BTMessageListener implements MessageListener {
         queue.add(msg);
     }
 
+    @Override
+    public void onDisconnected() {
+        game.onDisconnected(); // todo debug this
+    }
+
     public void processMessages() {
         ReceivedMessage msg = queue.poll();
         while (msg != null) {

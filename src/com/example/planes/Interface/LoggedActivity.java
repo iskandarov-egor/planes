@@ -1,6 +1,7 @@
 package com.example.planes.Interface;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,7 +18,7 @@ public class LoggedActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("hey", name + " onCreate");
+        Log.d("hey", name + " onCreate, saved state " + String.valueOf(savedInstanceState));
     }
 
     @Override
@@ -55,5 +56,17 @@ public class LoggedActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("hey", name + " ondestroy");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("hey", "activity onrestorestate");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("hey", "activity onconfigchanged");
     }
 }
