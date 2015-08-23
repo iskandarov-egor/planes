@@ -1,11 +1,12 @@
 package com.example.planes.Interface;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import com.example.planes.Communication.Connector;
 import com.example.planes.Communication.ConnectorListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.R;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by egor on 22.08.15.
  */
-public class SelectOpponentActivity extends Activity implements ConnectorListener{
+public class ListBTActivity extends LoggedActivity implements ConnectorListener{
     TextView tv;
     ArrayAdapter<Device> adapter;
     ArrayList<Device> list = new ArrayList<>();
@@ -26,9 +27,14 @@ public class SelectOpponentActivity extends Activity implements ConnectorListene
     public static OnCreateListener onCreateListener;
     public static GameStarter starter = null;
 
+    public ListBTActivity() {
+        super("ListBT");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 //        if(instance != null) throw new RuntimeException();
 //        instance = this;
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
@@ -54,25 +60,40 @@ public class SelectOpponentActivity extends Activity implements ConnectorListene
         if(starter == null) throw new RuntimeException("set starter in oncreate!");
     }
 
+    private ListBTActivity that = this;
+    ProgressDialog progressDialog = null;
     private AdapterView.OnItemClickListener makeListItemListener() {
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                starter.getConnector().setListener(starter);
+                //starter.getConnector().setListener(starter);
+                starter.getConnector().stopSearchingSafe();
                 starter.getConnector().connectTo(adapter.getItem(i).device);
+                chosenName = adapter.getItem(i).name;
+                progressDialog = DialogHelper.showProgressDialog(that, "", "Connecting, please wait...",
+                        new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                startDiscovery();
+                            }
+                        });
             }
         };
+    }
+
+    private void startDiscovery() {
+        bRepeat.setVisibility(View.GONE);
+        adapter.clear();
+        starter.getConnector().startSearching();
+        tv.setText("Discovering devices...");
+        notFound.setVisibility(View.GONE);
     }
 
     private View.OnClickListener makeRepeatListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bRepeat.setVisibility(View.GONE);
-                adapter.clear();
-                starter.getConnector().startSearching();
-                tv.setText("Discovering devices...");
-                notFound.setVisibility(View.GONE);
+                startDiscovery();
             }
         };
     }
@@ -88,14 +109,19 @@ public class SelectOpponentActivity extends Activity implements ConnectorListene
 
     @Override
     public void onConnected(RemoteAbonent abonent) {
-        throw new RuntimeException();
+        progressDialog.dismiss();
+        finish();
+        starter.onConnectedFromBTList(abonent);
     }
+
+    String chosenName = null; //debug
 
     @Override
     public void onConnectFailed() {
-        throw new RuntimeException();
+        progressDialog.dismiss();
+        DialogHelper.showOKDialog(this, "Connection failed", "Could not connect to " + chosenName);
+        startDiscovery();
     }
-
 
     TextView notFound;
     public void onFinishedDiscovery() {
@@ -108,7 +134,7 @@ public class SelectOpponentActivity extends Activity implements ConnectorListene
     }
 
     public static interface OnCreateListener {
-        void onCreate(SelectOpponentActivity act);
+        void onCreate(ListBTActivity act);
     }
 
     private static class Device {

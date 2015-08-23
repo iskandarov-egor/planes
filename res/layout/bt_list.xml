@@ -19,7 +19,7 @@
                 android:id="@+id/search_repeat" android:layout_alignParentTop="false"
                 android:layout_toRightOf="@+id/textView" android:layout_alignParentRight="false"
                 android:visibility="visible" android:layout_marginLeft="0dp" android:layout_marginRight="0dp"
-                android:layout_marginTop="0dp" android:layout_centerVertical="true"/>
+                android:layout_marginTop="0dp" android:layout_centerVertical="true" android:layout_margin="10dp"/>
     </RelativeLayout>
     <ListView
             android:layout_width="match_parent"

@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.*;
 import android.util.Log;
 import com.example.planes.Interface.MyApplication;
-import com.example.planes.Interface.SelectOpponentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +51,12 @@ public class Connector {
     }
 
     public void connectTo (BluetoothDevice device) {
-        if(isAccepting()) {
-            stopAccepting();
-        }
-        if(isSearching()) {
-            stopSearching();
-        }
+//        if(isAccepting()) {
+//            stopAccepting();
+//        }
+//        if(isSearching()) {
+//            stopSearching();
+//        }
 
         assertBT();
         ConnectThread connThread = new ConnectThread(device, this);
@@ -99,7 +98,7 @@ public class Connector {
                         listener.onFound(device);
                     }
                     if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-
+                        Log.d("hey", "finished discovery");
                         listener.onFinishedDiscovery();
                     }
                 }
@@ -157,9 +156,9 @@ public class Connector {
     }
 
     public void destruct() {
+        Log.d("hey", "connector destroyed");
         stopAcceptingSafe();
         stopSearchingSafe();
-        app.unregisterReceiver(foundReceiver);
     }
 
     public void setListener(ConnectorListener listener) {

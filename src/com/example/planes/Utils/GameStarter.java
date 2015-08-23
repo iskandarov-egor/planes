@@ -16,7 +16,7 @@ import com.example.planes.Config.GameConfig;
 import com.example.planes.Game.Game;
 import com.example.planes.Interface.MenuActivity;
 import com.example.planes.Interface.MyActivity;
-import com.example.planes.Interface.SelectOpponentActivity;
+import com.example.planes.Interface.ListBTActivity;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -49,35 +49,33 @@ public class GameStarter implements ConnectorListener, MessageListener {
 
     final Connector connector;
     final int REQUEST_OPPONENT = 4354665;
-    SelectOpponentActivity selectOpponentActivity = null;
+    ListBTActivity listBTActivity = null;
     GameStarter that = this;
     public void connectAsClient() {
         doWithBT(new Runnable() {
             @Override
             public void run() {
-
-
-                if(selectOpponentActivity != null) throw new RuntimeException();
-                selectOpponentActivity = null;
+                //if(listBTActivity != null) throw new RuntimeException();
+                listBTActivity = null;
                 onFinishedDiscovery = false;
                 foundDevices.clear();
-                SelectOpponentActivity.onCreateListener = new SelectOpponentActivity.OnCreateListener() {
+                ListBTActivity.onCreateListener = new ListBTActivity.OnCreateListener() {
                     @Override
-                    public void onCreate(SelectOpponentActivity act) {
-                        selectOpponentActivity = act;
+                    public void onCreate(ListBTActivity act) {
+                        listBTActivity = act;
                         connector.setListener(act);
-                        SelectOpponentActivity.starter = that;
+                        ListBTActivity.starter = that;
                         if(!foundDevices.isEmpty()) {
                             for(BluetoothDevice device : foundDevices) {
-                                selectOpponentActivity.onFound(device);
+                                listBTActivity.onFound(device);
                             }
                         }
                         if(onFinishedDiscovery) {
-                            selectOpponentActivity.onFinishedDiscovery();
+                            listBTActivity.onFinishedDiscovery();
                         }
                     }
                 };
-                Intent i = new Intent(activity, SelectOpponentActivity.class);
+                Intent i = new Intent(activity, ListBTActivity.class);
                 activity.startActivityForResult(i, REQUEST_OPPONENT);
                 connector.startSearching();
             }
@@ -151,7 +149,6 @@ public class GameStarter implements ConnectorListener, MessageListener {
         activity.onAccepted(abonent);
         //abonent.sendMessage(new StartGameMessage(1));
         //startGame(abonent, 0);
-
     }
 
     @Override
@@ -183,11 +180,11 @@ public class GameStarter implements ConnectorListener, MessageListener {
     @Override
     public void onFound(BluetoothDevice device) {
         Log.d("hey", "onFound bt device");
-        if(selectOpponentActivity == null) {
+        if(listBTActivity == null) {
             Log.d("debug", "sel opp act was null");
             foundDevices.add(device);
         } else {
-            //selectOpponentActivity.onFound(device);
+            //listBTActivity.onFound(device);
             throw new RuntimeException();
         }
 //        String name = device.getName();
@@ -215,13 +212,17 @@ public class GameStarter implements ConnectorListener, MessageListener {
     public void onFinishedDiscovery() {
         if(onFinishedDiscovery) throw new RuntimeException();
         onFinishedDiscovery = true;
-        if(selectOpponentActivity != null) {
-            //selectOpponentActivity.onFinishedDiscovery();
+        if(listBTActivity != null) {
+            //listBTActivity.onFinishedDiscovery();
             throw new RuntimeException();
         }
     }
 
     public Connector getConnector() {
         return connector;
+    }
+
+    public void onConnectedFromBTList(RemoteAbonent abonent) {
+        activity.onConnectedFromBTList(abonent);
     }
 }

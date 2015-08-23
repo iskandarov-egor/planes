@@ -29,7 +29,7 @@ class ConnectThread extends Thread {
  
     public void run() {
         // Cancel discovery because it will slow down the connection
-        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+        BluetoothAdapter.getDefaultAdapter().cancelDiscovery(); // todo bt list
  
         try {
             // Connect the device through the socket. This will block

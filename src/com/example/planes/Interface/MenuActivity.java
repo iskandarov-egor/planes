@@ -20,34 +20,39 @@ import com.example.planes.Utils.GameStarter;
 import com.example.planes.Utils.Helper;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by egor on 19.08.15.
  */
-public class MenuActivity extends Activity {
+public class MenuActivity extends ActivityWithScreens {
     Activity that = this;
     final GameStarter gameStarter = new GameStarter(this);
-    RelativeLayout layout;
-    Screen currentScreen;
+
     ArrayList<Screen> screens = new ArrayList<>(5);
     Screen mainScreen = new Screen();
     Screen modeScreen = new Screen();
-    Screen gameScreen = new Screen();
+    Screen serverScreen = new Screen();
+    Screen clientScreen = new Screen();
 
     TextView tvWait;
-    TextView tvPlayReady;
+    TextView tvPlayServer;
+    TextView tvReady;
+    RemoteAbonent them = null;
+
+    private enum State {
+        CLIENT_CONNECTING, CLIENT_NOT_READY, CLIENT_READY, SERVER_WAITING, SERVER_READY, SERVER_NOT_READY, NONE
+    }
+
+    private State state = State.NONE;
 
     public MenuActivity() {
-        super();
+        super("Menu");
         Log.d("hey", "menu constructor");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("hey", "menu oncreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
 
@@ -77,50 +82,6 @@ public class MenuActivity extends Activity {
         });
     }
 
-
-    Timer cloudTimer = new Timer("null", true);
-    boolean clstopped = true;
-    TimerTask cloudTask = null;
-    private void startCloudLoop() {
-        if(!clstopped) throw new RuntimeException();
-        clstopped = false;
-        cloudTask = new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Cloud cloud : clouds) {
-                            cloud.move();
-                        }
-                    }
-                });
-
-            }
-        };
-        cloudTimer.scheduleAtFixedRate(cloudTask, 50, 33);
-    }
-
-    private void stopCloudLoop() {
-        if(clstopped) throw new RuntimeException();
-        clstopped = true;
-        cloudTask.cancel();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("hey", "menu onpause");
-        stopCloudLoop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("hey", "menu onresume");
-        startCloudLoop();
-    }
-
     private void setupViews() {
         int h = layout.getHeight(); // get height
         float scale = h / 720f;
@@ -140,14 +101,21 @@ public class MenuActivity extends Activity {
         TextView selectMap = new MyTextView(this, scale * MenuConfig.FONT_SIZE_MID, 0.49f * h, "Select map");
         tvWait = new MyTextView(this, scale * MenuConfig.FONT_SIZE_SMALL, 0.728f * h, "Waiting for " +
                 "another\nplayer to connect");
+        tvPlayServer = new MyTextView(this, 142*scale, 0.728f*h, "Play");
+        tvPlayServer.setVisibility(View.GONE);
+        tvReady = new MyTextView(this, 142*scale, 0.728f*h, "");
+
         NEWGAME.setTextColor(Color.WHITE);
         mainScreen.add(ivMain).add(tvPlay).add(tvChangeName);
         modeScreen.add(ivMain).add(tvBeClient).add(tvBeServer);
-        gameScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait);
-        tvPlayReady = new MyTextView(this, 142*scale, 0.728f*h, "Not ready");
+        serverScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait).add(tvPlayServer);
+        clientScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait).add(tvReady);
+
 
         tvBeServer.setOnClickListener(makeBeServerListener());
         tvBeClient.setOnClickListener(makeBeClientListener());
+        tvReady.setOnClickListener(makeReadyListener());
+
         Button playBT = (Button) findViewById(R.id.noBtBtn);
         playBT.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,14 +126,32 @@ public class MenuActivity extends Activity {
 
     }
 
-
+    private View.OnClickListener makeReadyListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch(state) {
+                    case CLIENT_NOT_READY:
+                        state = State.CLIENT_READY;
+                        tvReady.setText("Ready");
+                        break;
+                    case CLIENT_READY:
+                        state = State.CLIENT_NOT_READY;
+                        tvReady.setText("Not ready");
+                        break;
+                    default: throw new RuntimeException("wrong state");
+                }
+            }
+        };
+    }
 
     private View.OnClickListener makeBeClientListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(state != State.NONE) throw new RuntimeException();
+                state = State.CLIENT_CONNECTING;
                 gameStarter.connectAsClient();
-                //goToScreen(gameScreen);
             }
         };
     }
@@ -174,33 +160,15 @@ public class MenuActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         gameStarter.onActivityResult(requestCode, resultCode, data);
-
-    }
-
-    ArrayList<Cloud> clouds = new ArrayList<>(6);
-    private void addCloud(Cloud cloud) {
-        clouds.add(cloud);
-        layout.addView(cloud);
-    }
-
-    private void makeClouds() {
-        int h = Helper.getScreenHeight();
-        int w = Helper.getScreenWidth();
-        float ch = h * 0.1f;
-        for(int i = 0; i < 7; i++) addCloud(new Cloud(this, w, h));
-//        addCloud(new Cloud(this, 0, h * 0.5f, 1.1f, ch));
-//        addCloud(new Cloud(this, 0.2f * w, h * 0.5f, 1.15f, ch));
-//        addCloud(new Cloud(this, 0.4f * w, h * 0.3f, 0.95f, ch*1.15f));
-//        addCloud(new Cloud(this, 0.7f * w, h * 0.1f, 1.33f, ch*1.4f));
-//        addCloud(new Cloud(this, 0.1f * w, h * 0.25f, 1.3f, ch*1.3f));
-//        addCloud(new Cloud(this, 0.89f * w, h * 0.77f, 0.8f, ch*0.8f));
     }
 
     private View.OnClickListener makeBeServerListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToScreen(gameScreen);
+                if(state != State.NONE) throw new RuntimeException();
+                state = State.SERVER_WAITING;
+                goToScreen(serverScreen);
                 gameStarter.startServer();
             }
         };
@@ -208,12 +176,6 @@ public class MenuActivity extends Activity {
 
     private void setupScreens() {
 
-    }
-
-    private void goToScreen(Screen screen) {
-        if(currentScreen != null) currentScreen.leave();
-        screen.open();
-        currentScreen = screen;
     }
 
     private View.OnClickListener makePlayClickListener() {
@@ -233,6 +195,8 @@ public class MenuActivity extends Activity {
 
     public void onAccepted(final RemoteAbonent name) {
         Log.d("hey", "menu onAccepted");
+        if(state != State.SERVER_WAITING) throw new RuntimeException();
+        state = State.SERVER_NOT_READY;
         float h = layout.getHeight();
         tvWait.post(new Runnable() {
             @Override
@@ -240,66 +204,27 @@ public class MenuActivity extends Activity {
                 tvWait.setText(Helper.cutString(name.getDevice().getName(), 7) + "\nis not ready");
             }
         });
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("hey", "menu ondestroy");
         gameStarter.destruct();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("hey", "menu onrestart");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("hey", "menu onstart");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("hey", "menu onstop");
-    }
-
     public void onConnected(RemoteAbonent abonent) {
-        goToScreen(gameScreen);
-        tvPlayReady.setText("Not ready"); // todo check if has open game
-
+        throw new RuntimeException();
     }
 
-    private class Screen {
-        private final ArrayList<View> views = new ArrayList<>(4);
-
-        public Screen add(View view) {
-            views.add(view);
-            return this;
-        }
-
-        public void open() {
-            for(View view : views) {
-                layout.addView(view);
-            }
-        }
-
-        Runnable runnable = new Runnable() {
+    public void onConnectedFromBTList(RemoteAbonent abonent) {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for(View view : views) {
-                    layout.removeView(view);
-                }
+                goToScreen(clientScreen);
+                if(state != State.CLIENT_CONNECTING) throw new RuntimeException();
+                state = State.CLIENT_NOT_READY;
+                tvReady.setText("Not ready");
             }
-        };
-
-        public void leave() {
-            runOnUiThread(runnable);
-
-        }
+        });
     }
 }
