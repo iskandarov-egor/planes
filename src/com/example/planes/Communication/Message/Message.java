@@ -11,6 +11,7 @@ public abstract class Message {
     public static final int TURN_MESSAGE = 1;
     public static final int START_GAME_MESSAGE = 2;
     public static final int READY_MESSAGE = 3;
+    public static final int LOADED_MESSAGE = 4;
     protected final int type;
     protected ByteBuffer contents;
 
@@ -34,6 +35,7 @@ public abstract class Message {
             case TURN_MESSAGE: return new TurnMessage(bb);
             case START_GAME_MESSAGE: return new StartGameMessage(bb);
             case READY_MESSAGE: return new ReadyMessage(bb);
+            case LOADED_MESSAGE: return new LoadedMessage();
         }
         throw new RuntimeException("bad msg type");
     }

@@ -1,6 +1,7 @@
 package com.example.planes.Interface;
 
 import android.widget.RelativeLayout;
+import com.example.planes.Utils.GameStarter;
 import com.example.planes.Utils.Helper;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.TimerTask;
 /**
  * Created by egor on 23.08.15.
  */
-public abstract class ActivityWithClouds extends LoggedActivity {
+public abstract class ActivityWithClouds extends GameStarter {
     Timer cloudTimer = new Timer("null", true);
     boolean clstopped = true;
     TimerTask cloudTask = null;

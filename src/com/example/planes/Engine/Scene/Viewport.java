@@ -109,4 +109,8 @@ public final class Viewport {
     public boolean isReady() {
         return screenHeight != 0;
     }
+
+    public float getZoom() {
+        return currentZoom;
+    }
 }

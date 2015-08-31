@@ -125,10 +125,10 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
 
     TextView notFound;
     public void onFinishedDiscovery() {
-        tv.setText("Discovery finished.");
-
         if(adapter.isEmpty()) {
-            notFound.setVisibility(View.VISIBLE);
+            tv.setText("No devices found.");
+        } else {
+            tv.setText("Choose an opponent.");
         }
         bRepeat.setVisibility(View.VISIBLE);
     }

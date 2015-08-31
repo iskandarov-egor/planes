@@ -2,6 +2,7 @@ package com.example.planes.Interface;
 
 import android.content.Context;
 import android.graphics.Matrix;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -47,7 +48,14 @@ public class Cloud extends ImageView {
 
     }
 
+    static long lastSpam = System.currentTimeMillis();
+    static long spamRate = 2000;
+
     public void move() {
+        if(System.currentTimeMillis() - lastSpam > spamRate) {
+            lastSpam = System.currentTimeMillis();
+            Log.d("hey", "clouds moving...");
+        }
         x += vx;
         int screenWidth = Helper.getScreenWidth();
         if(x - w2 > screenWidth) x = -w2;

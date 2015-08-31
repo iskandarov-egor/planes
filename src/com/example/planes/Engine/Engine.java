@@ -15,15 +15,14 @@ import java.util.concurrent.BlockingQueue;
 public final class Engine {
     private Scene scene;
     private MyGLSurfaceView view;
-    private MyGLRenderer gLRenderer;
+    MyGLRenderer gLRenderer;
     private final EngineTimerManager timerManager = new EngineTimerManager();
 
     public Engine(float graphFps, float physFps) {
         Log.d("hey", "Engine()");
 
         scene = new Scene(this);
-        gLRenderer = new MyGLRenderer(this);
-        gameLoop = new GameLoop(this, graphFps, physFps);
+        gLRenderer = new MyGLRenderer(this, physFps);
     }
 
     public View createView(Context context) {
@@ -42,10 +41,8 @@ public final class Engine {
         started = true;
         Log.d("hey", "Engine.run called");
 
-        gameLoop.start();
+        gLRenderer.run();
     }
-
-
 
     public void addTimer(Runnable runnable, float time) {
         timerManager.addTask(runnable, time);
@@ -67,15 +64,14 @@ public final class Engine {
 
     public void onPhysicsFrame(float physicsFPS) {
         scene.onPhysicsFrame(physicsFPS);
+
         if(listener != null) listener.onPhysicsFrame(physicsFPS);
         timerManager.onPhysicsFrame(physicsFPS);
     }
 
-   // boolean viewportReady = false;
     int width = 0;
     int height = 0;
     void onScreenChanged(int width, int height) {
-        Log.d("wwww", String.valueOf(height));
         boolean viewReady = scene.getViewport().isReady();
         this.width = width;
         this.height = height;
@@ -87,18 +83,15 @@ public final class Engine {
         }
     }
 
-    //public boolean isViewportReady() {
-    //    return viewportReady;
-    //}
+
 
     public void onResume() {
         view.onResume();
-        if(running && !gameLoop.isAlive()) gameLoop.start();
+        if(running) gLRenderer.runIfNotRunning();
     }
 
-    GameLoop gameLoop;
     public void onPause() {
-        gameLoop.pause();
+        gLRenderer.pause();
         view.onPause();
     }
 

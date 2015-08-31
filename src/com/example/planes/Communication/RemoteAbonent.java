@@ -23,6 +23,12 @@ public class RemoteAbonent {
         thread.start();
     }
 
+    public RemoteAbonent(RemoteAbonent abonent) {
+        socket = abonent.socket;
+        thread = abonent.thread;
+        listener = abonent.listener;
+    }
+
     public void sendMessage(Message msg) {
         thread.write(msg.getBytes());
     }
@@ -53,4 +59,5 @@ public class RemoteAbonent {
     public void onDisconnect() {
         listener.onDisconnected();
     }
+
 }

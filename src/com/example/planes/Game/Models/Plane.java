@@ -17,7 +17,7 @@ public class Plane extends GameObject {
     private float acc = k*0.050f*60*60;
     private float dirVel = 0.033f * 60;
     private float lift = 0.015f*60;
-    private float velolim = 5f*60;
+    public static float velolim = 5f*60;
     private boolean engineOn = false;
     private boolean alive = true;
 
@@ -40,7 +40,7 @@ public class Plane extends GameObject {
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle, BmpConfig.planeHeight);
 
-        tanDrag = 2*0.008f*60;
+        tanDrag = 2*0.009f*60;
         normDrag = 4*0.008f*60;
         setSprite(new StaticSprite(R.drawable.plane_stub));
 
@@ -119,11 +119,9 @@ public class Plane extends GameObject {
         float vx1 = 0;
         float vy1 = 0;
         if(alive && engineOn && getY() < GameConfig.worldCeiling) {
-            float k = 1 - v / velolim;
+            float k = Math.max(0, 1 - v / velolim);
             vx1 = (float) (k*acc *  Math.cos(angle)) / fps;
             vy1 = (float) (k*acc * Math.sin(angle)) / fps;
-
-
         }
 //        setVx(vx);
 //        setVy(vy);

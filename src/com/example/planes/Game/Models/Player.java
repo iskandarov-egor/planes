@@ -1,5 +1,7 @@
 package com.example.planes.Game.Models;
 
+import com.example.planes.Communication.RemoteAbonent;
+
 /**
  * Created by egor on 14.08.15.
  */
@@ -8,9 +10,11 @@ public class Player {
     private String name = "player" + String.valueOf(count);
     private int wins = 0;
     private Plane plane;
+    RemoteAbonent abonent;
 
-    public Player() {
+    public Player(RemoteAbonent abonent) {
         count++;
+        this.abonent = abonent;
     }
 
     public void onWin() {
@@ -27,5 +31,9 @@ public class Player {
 
     public Plane getPlane() {
         return plane;
+    }
+
+    public RemoteAbonent getAbonent() {
+        return abonent;
     }
 }

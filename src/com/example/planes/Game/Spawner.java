@@ -2,9 +2,12 @@ package com.example.planes.Game;
 
 import android.graphics.Point;
 import com.example.planes.Config.BmpConfig;
+import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;
 import com.example.planes.Engine.Scene.StaticSprite;
+import com.example.planes.Game.Models.BackCloud;
+import com.example.planes.Game.Models.Cloud;
 import com.example.planes.Game.Models.Plane;
 import com.example.planes.R;
 import com.example.planes.Utils.Helper;
@@ -13,12 +16,13 @@ import com.example.planes.Utils.Helper;
  * Created by egor on 19.07.15.
  */
 public class Spawner {
-    private final Round game;
+    private final Round round
+            ;
     private final Scene scene;
 
-    public Spawner(Round game) {
-        scene = game.getScene();
-        this.game = game;
+    public Spawner(Round round) {
+        scene = round.getScene();
+        this.round = round;
         if(scene == null) throw new NullPointerException("scene");
     }
 
@@ -40,6 +44,18 @@ public class Spawner {
         return new Plane(scene, x, y, 0f, 0);
     }
 
+    public void createClouds(float koef, int n) {
+        for (int i = 0; i < n; i++) {
+            Cloud cloud = new Cloud(scene, koef);
+            scene.addObject(cloud);
+        }
+    }
+
+    public void createClouds() {
+        createClouds(0.2f, 4);
+        createClouds(0.6f, 4);
+        createClouds(1, 4);
 
 
+    }
 }

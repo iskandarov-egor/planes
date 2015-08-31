@@ -12,7 +12,7 @@ public abstract class BmpConfig {
     public static final float bulletHeight = 0.05f;
     public static final float planeDx = 0;
     public static final float planeDy = 0;
-    public static final float cloudHeight = 0.2f;
+    public static final float cloudHeight = 0.4f;
 
 //    public static final float[][] planePolyX = {0.346f, 1.531f, 1.531f, 1.115f, 0.577f, 0.515f, 0.008f, -0.315f};
 //    public static final float[] planePolyY = {-0.131f, -0.177f, 0.269f, 0.208f, 0.346f, 0.208f, 0.208f, 0.5f};
@@ -31,6 +31,6 @@ public abstract class BmpConfig {
 
     public static final float explolsionHeight = 0.3f;
 
-
+    public static final float backCloudDistKoef = 0.2f;
 
 }

@@ -12,7 +12,7 @@ import com.example.planes.R;
  * Created by egor on 23.08.15.
  */
 public class DialogHelper {
-    public static void showOKDialog(Activity ctx, String title, String msg) {
+    public static void showOKDialog(final Activity ctx, String title, String msg) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 
         builder.setMessage(msg).setTitle(title);
@@ -25,15 +25,15 @@ public class DialogHelper {
         ctx.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                builder.create().show();
+                if(!ctx.isFinishing()) {
+                    builder.create().show();
+                }
             }
         });
     }
 
-    public static ProgressDialog showProgressDialog(Activity act, String title, String msg, DialogInterface.OnCancelListener listener){
-        final ProgressDialog.Builder builder = new ProgressDialog.Builder(act);
-        final ProgressDialog dlg = ProgressDialog.show(act, title,
-                msg, true);
+    public static ProgressDialog showProgressDialog(final Activity act, String title, String msg, DialogInterface.OnCancelListener listener){
+        final ProgressDialog dlg = ProgressDialog.show(act, title, msg, true);
         if(listener != null) {
             dlg.setCancelable(false);
 
@@ -42,7 +42,9 @@ public class DialogHelper {
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                dlg.show();
+                if(!act.isFinishing()) {
+                    dlg.show();
+                }
             }
         });
 

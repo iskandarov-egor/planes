@@ -9,6 +9,8 @@ import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Game.Models.Bullet;
 import com.example.planes.Game.Models.Plane;
+import com.example.planes.Game.Models.Player;
+import com.example.planes.Interface.MyActivity;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -18,11 +20,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class BTMessageListener implements MessageListener {
     private final Round game;
-    private ArrayList<RemoteAbonent> abonents = new ArrayList<>();
+    private ArrayList<Player> players = null;
 
-    public BTMessageListener(Round game, ArrayList<RemoteAbonent> otherPlayers) {
+    public BTMessageListener(Round game, ArrayList<Player> players) {
         this.game = game;
-        configure(otherPlayers, game.getMyId());
+        this.players = players;
     }
 
     ConcurrentLinkedQueue<ReceivedMessage> queue = new ConcurrentLinkedQueue<>();
@@ -67,6 +69,9 @@ public class BTMessageListener implements MessageListener {
                     case FIRE: fire(plane); break;
                 }
                 break;
+            case Message.LOADED_MESSAGE:
+                game.onLoadedMessage();
+                break;
         }
     }
 
@@ -92,28 +97,25 @@ public class BTMessageListener implements MessageListener {
     }
 
     private int indexOf(RemoteAbonent sender) {
-        int index = abonents.indexOf(sender);
-        if(index == -1) throw new RuntimeException("abonent not found");
-        return index;
+        for(Player player : players) {
+            if(player.getAbonent() == sender) return players.indexOf(player);
+        }
+        throw new RuntimeException("abonent not found");
     }
 
-    public void configure(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
-        abonents.clear();
-        abonents.addAll(otherPlayers);
-        abonents.add(playerId, null);
-    }
+
 
     public void broadcastMessage(Message msg) {
-        if(GameConfig.type == GameConfig.TYPE_NO_BT) return;
-        for(RemoteAbonent abonent : abonents) {
-            if(abonent != null) abonent.sendMessage(msg);
+        if(MyActivity.type == MyActivity.Type.NO_BT) return;
+        for(Player player : players) {
+            if(player.getAbonent() != null) player.getAbonent().sendMessage(msg);
         }
     }
 
     public void broadcastMessageExcept(Message msg, RemoteAbonent exception) {
-        if(GameConfig.type == GameConfig.TYPE_NO_BT) return;
-        for(RemoteAbonent abonent : abonents) {
-            if(abonent != exception && abonent != null) abonent.sendMessage(msg);
+        if(MyActivity.type == MyActivity.Type.NO_BT) return;
+        for(Player player : players) {
+            if(player.getAbonent() != exception && player.getAbonent() != null) player.getAbonent().sendMessage(msg);
         }
     }
 }

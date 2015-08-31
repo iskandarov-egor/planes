@@ -3,7 +3,7 @@ package com.example.planes.Game;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
-import com.example.planes.Communication.RemoteAbonent;
+import com.example.planes.Communication.Message.LoadedMessage;
 import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.*;
@@ -46,8 +46,6 @@ public class Round implements EngineEventsListener {
 
     private int numPlayers;
 
-
-
     public BTMessageListener getMessageListener() {
         return messageListener;
     }
@@ -56,19 +54,30 @@ public class Round implements EngineEventsListener {
         return myId;
     }
 
-
-    public Round(int playerId, ArrayList<RemoteAbonent> otherPlayers, int roundNumber, MyActivity activity) {
+    private final int roundNumber;
+    private int opponentsLoaded = 0;
+    public Round(int playerId, ArrayList<Player> players, int roundNumber, MyActivity activity, boolean theyLoaded) {
         Log.d("hey", "Game()");
+
         this.activity = activity;
-        numPlayers = otherPlayers.size() + 1;
-        players = new ArrayList<>(numPlayers);
+        this.roundNumber = roundNumber;
+        numPlayers = players.size();
+        if(theyLoaded) {
+            opponentsLoaded = players.size() - 1;
+        }
+        this.players = players;
         myId = playerId;
-        messageListener = new BTMessageListener(this, otherPlayers);
-        for(RemoteAbonent abonent : otherPlayers) {
-            abonent.setListener(messageListener);
+        messageListener = new BTMessageListener(this, players);
+        for(Player player : players) {
+            if(player.getAbonent() != null) player.getAbonent().setListener(messageListener);
         }
 
-        if(GameConfig.type == GameConfig.TYPE_NO_BT) numPlayers = GameConfig.numPlayersTypeNoBt;
+        if(MyActivity.type == MyActivity.Type.NO_BT) {
+            numPlayers = GameConfig.numPlayersTypeNoBt;
+            for(int i = 1; i < numPlayers; i++) {
+                players.add(new Player(null));
+            }
+        }
 
         Engine engine = activity.getEngine();
         final Scene scene = engine.newScene();
@@ -85,20 +94,12 @@ public class Round implements EngineEventsListener {
         cross.setSprite(new StaticSprite(R.drawable.cross));
 
         //create clouds
-        for (int i = 0; i < GameConfig.cloudsMin; i++) {
-            int sprite = (i % 2 == 0)?R.drawable.cloud:R.drawable.fore_cloud;
-            Cloud cloud = new Cloud(scene, sprite);
-            scene.addObject(cloud);
-            if(i % 2 == 1) {
-                cloud.setZindex(2);
-            }
-        }
+        spawner.createClouds();
 
         //create planes
         planesGroup = new ObjectGroup(scene);
         bulletsGroup = new ObjectGroup(scene);
         for (int i = 0; i < numPlayers; i++) {
-            players.add(new Player());
             Plane plane = new Plane(scene, 0, 0, 0, 0);
             planes.add(plane);
             scene.addObject(plane);
@@ -106,20 +107,18 @@ public class Round implements EngineEventsListener {
             plane.setPlayer(players.get(i));
         }
         myPlane = planes.get(myId);
-        msgScore.setText("Round " + String.valueOf(roundNumber) + "/" + String.valueOf(GameConfig.ROUND_COUNT));
+
         msgScore.setVisible(true);
 
         placePlanes();
 
-        createOnCollisionStartListener(planesGroup, planesGroup, getPlanesVsPlanes());
+        //createOnCollisionStartListener(planesGroup, planesGroup, getPlanesVsPlanes());
 
         ObjectGroup groundGroup = new ObjectGroup(scene);
         groundGroup.add(ground);
         createOnCollisionStartListener(planesGroup, bulletsGroup, getPlanesVsBullets());
         createOnCollisionListener(planesGroup, groundGroup, getPlanesVsGround());
         camera = new FollowingCamera(myPlane);
-
-
 
         //init controls
         controls = new Controls(this);
@@ -128,14 +127,31 @@ public class Round implements EngineEventsListener {
 
         engine.setEventsListener(this);
 
-        engine.addTimer(new Runnable() {
+        if(theyLoaded || MyActivity.type == MyActivity.Type.NO_BT) {
+            startGameWithCountdown();
+        } else {
+
+            msgScore.setText("Waiting...");
+
+        }
+        messageListener.broadcastMessage(new LoadedMessage());
+    }
+
+    public void onLoadedMessage() {
+        opponentsLoaded++;
+        if(opponentsLoaded == getNumPlayers() - 1) {
+            startGameWithCountdown();
+        }
+    }
+
+    public void startGameWithCountdown() {
+        msgScore.setText("Round " + String.valueOf(roundNumber) + "/" + String.valueOf(GameConfig.ROUND_COUNT));
+        activity.getEngine().addTimer(new Runnable() {
             @Override
             public void run() {
                 setCountdownTimer(3);
             }
         }, 3);
-
-
     }
 
     private void setCountdownTimer(final int seconds) {
@@ -272,6 +288,7 @@ public class Round implements EngineEventsListener {
                     winner.onWin();
                 }
             }
+
             msgScore.setText(makeScoreString());
             activity.getEngine().addTimer(new Runnable() {
                 @Override
@@ -286,8 +303,6 @@ public class Round implements EngineEventsListener {
     private void setButtonsVisible(boolean visible) {
         controls.setButtonsVisible(visible);
     }
-
-
 
     private void placePlanes() {
         float w = getScene().getWorldWidth();

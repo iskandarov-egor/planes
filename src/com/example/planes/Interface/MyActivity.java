@@ -1,7 +1,6 @@
 package com.example.planes.Interface;
 
-import android.app.Activity;
-import android.content.res.Configuration;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
@@ -9,30 +8,40 @@ import android.view.WindowManager;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Engine;
+import com.example.planes.Game.Models.Player;
 import com.example.planes.Game.Round;
 
 import java.util.ArrayList;
 
 public class MyActivity extends LoggedActivity {
     public static boolean disconnectedBeforeCreation;
-    /**
-     * Called when the activity is first created.
-     */
+    public static boolean opponentLoadedEarlier;
 
     private Engine engine;
     private int roundNumber = 0;
     private Round currentRound = null;
     private static int playerId;
-    private static ArrayList<RemoteAbonent> otherPlayers;
+    private static ArrayList<Player> players = new ArrayList<>();
     private static MyActivity activity = null;
+    public enum Type {
+        NO_BT, CLIENT, SERVER, NOT_SET
+    }
 
-    public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId) {
+    public static Type type = Type.NOT_SET;
+
+
+    public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId, Type type) {
         Log.d("hey", "static NewGame");
-//        instance = new Game(playerId, otherPlayers);
+        MyActivity.type = type;
         disconnectedBeforeCreation = false;
+        opponentLoadedEarlier = false;
         MyActivity.playerId = playerId;
-        MyActivity.otherPlayers = otherPlayers;
-
+        players.clear();
+        for(RemoteAbonent abonent : otherPlayers) {
+            Player player = new Player(abonent);
+            players.add(player);
+        }
+        players.add(playerId, new Player(null));
     }
 
     public MyActivity() {
@@ -51,11 +60,9 @@ public class MyActivity extends LoggedActivity {
 
         this.engine = new Engine(GameConfig.FPS, GameConfig.PHYSICS_FPS);
 
-
         setContentView(engine.createView(this));
         engine.run();
         newRound();
-
     }
 
     @Override
@@ -73,12 +80,27 @@ public class MyActivity extends LoggedActivity {
     private void newRound() {
         Log.d("hey", "new round()");
         roundNumber++;
-        currentRound = new Round(playerId, otherPlayers, roundNumber, this);
-
+        boolean opponentReady = true;
+        if(roundNumber == 1)  {
+            opponentReady = opponentLoadedEarlier;
+            Log.d("hey", "this is first round and opp loaded earlier");
+        }
+        currentRound = new Round(playerId, players, roundNumber, this, opponentReady);
     }
 
     public void onRoundOver() {
-        newRound();
+        if(roundNumber < GameConfig.ROUND_COUNT) {
+            newRound();
+        } else {
+            Intent intent = new Intent();
+            for(int i = 0; i < players.size(); i++) {
+                Player player = players.get(i);
+                intent.putExtra(String.valueOf(i), player.getWins());
+            }
+
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
     public Engine getEngine() {

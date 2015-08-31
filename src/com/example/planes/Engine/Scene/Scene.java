@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.planes.Engine.Engine;
 import com.example.planes.Engine.SceneButtonListener;
 import com.example.planes.Engine.Utils;
+import com.example.planes.Game.Models.Cloud;
 
 import java.util.*;
 
@@ -13,7 +14,6 @@ import java.util.*;
  */
 
 public final class Scene {
-
     private final List<SceneObject> objects = new ArrayList<>();
     private final List<Sticker> stickers = new ArrayList<>();
     private final CollisionManager collisionManager = new CollisionManager(this);
@@ -59,41 +59,42 @@ public final class Scene {
         buttonManager.setListener(listner);
     }
 
-    float xx = -1.6f;
-    float vv = 0.01f;
+
     public void onGraphicsFrame(float graphicsFPS){
 
         GLES20.glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        //zigzag.draw(-viewport.cameraX, -viewport.cameraY, viewport.ratioAndZoomMatrix);
+        //Cloud.sample.getSprite().draw(x, 0, viewport.ratioAndZoomMatrix);
 
-        //if(true) return;
+
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
         for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
             if(!object.getVisible()) continue;
-            float horizPeriod = getWorldWidth();
+            float horizPeriod = getWorldWidth() * viewport.getZoom();
             if(horizPeriod < 0) throw new RuntimeException("period"); //debug
 
-            float x = (object.getAbsoluteX() - viewport.cameraX);
-            float y = (object.getAbsoluteY() - viewport.cameraY);
+            float screenX = (object.getAbsoluteX() * viewport.getZoom() - viewport.cameraX) * object.getDistanceKoef();
+            float screenY = (object.getAbsoluteY() * viewport.getZoom() - viewport.cameraY) * object.getDistanceKoef();
+            float x = (object.getAbsoluteX() - viewport.cameraX) * object.getDistanceKoef();
+            float y = (object.getAbsoluteY() - viewport.cameraY) * object.getDistanceKoef();
 
             if(horizPeriod != 0) {
                 float r = (object.getRadius());
-                if (y + r > -halfHeight && y - r < halfHeight) {
+                if (screenY + r > -halfHeight && screenY - r < halfHeight) {
                     //тащим х влево экрана
-                    while (x + r > horizPeriod - halfWidth) x -= horizPeriod;
-                    while (x + r < -halfWidth) x += horizPeriod;
+                    while (screenX + r > horizPeriod - halfWidth) screenX -= horizPeriod;
+                    while (screenX + r < -halfWidth) screenX += horizPeriod;
                     //цикл рисования объекта и его горизонтальных образов если они помещаются
-                    while (x - r < halfWidth) {
-                        object.draw(x, y, viewport.ratioAndZoomMatrix);
-                        x += horizPeriod;
+                    while (screenX - r < halfWidth) {
+                        object.draw(screenX, screenY, viewport.ratioAndZoomMatrix);
+                        screenX += horizPeriod;
                     }
                 }
             } else {
-                object.draw(x, y, viewport.ratioAndZoomMatrix);
+                object.draw(screenX, screenY, viewport.ratioAndZoomMatrix);
             }
         }
 
@@ -103,11 +104,13 @@ public final class Scene {
         }
     }
 
+//    float x = -1.6f;
+//    float vx = 0.01f * 60;
     public void onPhysicsFrame(float physicsFPS) {
         setCanModifyObjects(false);
         for(SceneObject object : objects) {
             if(!object.hasParent()) {
-                if (false && numberOfScreens != 0) {
+                if (false && numberOfScreens != 0) { // todo hfзобраться с этой фигнй
                     float horizPeriod = getWorldWidth();
                     float x = object.getX();
                     while (x > horizPeriod / 2) x -= horizPeriod;
@@ -140,6 +143,7 @@ public final class Scene {
     boolean canModifyObjects = true;
 
     private Queue<SceneObject> removeQueue = new ArrayDeque<>();
+    private Queue<SceneObject> addQueue = new ArrayDeque<>();
 
     private void removeObjectNow(SceneObject object) {
         objects.remove(object);
@@ -179,6 +183,13 @@ public final class Scene {
                 object = removeQueue.poll();
             }
         }
+        if(!addQueue.isEmpty() && canModifyObjects) {
+            SceneObject object = addQueue.poll();
+            while(object != null) {
+                addObjectNow(object);
+                object = addQueue.poll();
+            }
+        }
         if(canModifyObjects) {
             collisionManager.onCanModify();
         }
@@ -192,9 +203,20 @@ public final class Scene {
 
     public SceneObject addObject(SceneObject object) {
         if(objects.contains(object)) throw new RuntimeException();
+        if(addQueue.contains(object)) throw new RuntimeException("already queued for adding");
+
+        if(canModifyObjects) {
+            addObjectNow(object);
+        } else {
+            addQueue.add(object);
+        }
+
+        return object;
+    }
+
+    public void addObjectNow(SceneObject object) {
         objects.add(object);
         onZindexChanged(object);
-        return object;
     }
 
     public Viewport getViewport() {
@@ -203,12 +225,7 @@ public final class Scene {
 
     public void onScreenChanged(int width, int height) {
         viewport.onScreenChanged(width, height);
-      //  if(numberOfScreens != 0) zigzag.setWH(getWorldWidth(), 2);
     }
-
-//    public void addToGroup(ObjectGroup group, SceneObject object) {
-//        collisionManager.addToGroup(group, object);
-//    }
 
     public void addCollisionListener(CollisionListener listener) {
         collisionManager.addCollisionListener(listener);

@@ -12,10 +12,12 @@ public class SceneObject extends AbstractSceneObject{
     protected SceneObject parent = null;
     private List<ObjectGroup> groups = new ArrayList<>(1);
     private List<SceneObject> children = new ArrayList<>(0);
+    float distanceKoef = 1;
 
     public SceneObject(float x, float y, Scene scene, float height) {
         super(x, y, scene, height);
     }
+
 
 
     public void onPhysicsFrame(float fps) {
@@ -53,10 +55,12 @@ public class SceneObject extends AbstractSceneObject{
 
     @Override
     public void setX(float x) {
-        float horizPeriod = getScene().getWorldWidth();
-        if(horizPeriod != 0) {
-            while (x > horizPeriod / 2) x -= horizPeriod;
-            while (x < -horizPeriod / 2) x += horizPeriod;
+        if(distanceKoef != 0) {
+            float horizPeriod = getScene().getWorldWidth() / distanceKoef;
+            if (horizPeriod != 0) {
+//                while (x > horizPeriod / 2) x -= horizPeriod;
+//                while (x < -horizPeriod / 2) x += horizPeriod;
+            }
         }
         this.x = x;
     }
@@ -111,5 +115,13 @@ public class SceneObject extends AbstractSceneObject{
     public void setZindex(int zindex) {
         super.setZindex(zindex);
         getScene().onZindexChanged(this);
+    }
+
+    public float getDistanceKoef() {
+        return distanceKoef;
+    }
+
+    public void setDistanceKoef(float distanceKoef) {
+        this.distanceKoef = distanceKoef;
     }
 }

@@ -16,30 +16,30 @@ import android.widget.TextView;
 import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.Message.ReadyMessage;
 import com.example.planes.Communication.Message.ReceivedMessage;
-import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.MenuConfig;
 import com.example.planes.R;
-import com.example.planes.Utils.GameStarter;
 import com.example.planes.Utils.Helper;
-
-import java.util.ArrayList;
 
 /**
  * Created by egor on 19.08.15.
  */
 public class MenuActivity extends ActivityWithScreens {
     Activity that = this;
-    final GameStarter gameStarter = new GameStarter(this);
+    //final GameStarter gameStarter = new GameStarter(this);
 
     Screen mainScreen = new Screen();
     Screen modeScreen = new Screen();
     Screen serverScreen = new Screen();
     Screen clientScreen = new Screen();
+    Screen resultScreen = new Screen();
 
     TextView tvWait;
     TextView tvPlayServer;
     TextView tvReady;
+    TextView tvResultTitle;
+    TextView tvResultScore;
+    TextView tvResultPlayAgain;
     RemoteAbonent them = null;
 
     public void onReadyMessage(final boolean ready) {
@@ -131,12 +131,19 @@ public class MenuActivity extends ActivityWithScreens {
         tvPlayServer = new MyTextView(this, 94*scale, 0.728f*h, "Play");
         tvPlayServer.setVisibility(View.GONE);
         tvReady = new MyTextView(this, 94*scale, 0.728f*h, "");
+        tvResultTitle = new MyTextView(this, scale * 94, 0.046f * h, "");
+        tvResultPlayAgain = new MyTextView(this, 94*scale, 0.728f*h, "Play");
+        tvResultScore = new MyTextView(this, scale * MenuConfig.FONT_SIZE_MID, 0.32f * h, "");
+
 
         NEWGAME.setTextColor(Color.WHITE);
+        tvResultTitle.setTextColor(Color.WHITE);
+
         mainScreen.add(ivMain).add(tvPlay).add(tvChangeName);
         modeScreen.add(ivMain).add(tvBeClient).add(tvBeServer);
         serverScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvWait).add(tvPlayServer);
         clientScreen.add(ivGame).add(NEWGAME).add(selectPlane).add(selectMap).add(tvReady);
+        resultScreen.add(ivGame).add(tvResultTitle).add(tvResultScore).add(tvResultPlayAgain);
 
 
         tvBeServer.setOnClickListener(makeBeServerListener());
@@ -148,7 +155,8 @@ public class MenuActivity extends ActivityWithScreens {
         playBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gameStarter.startWithNoBT();
+                startWithNoBT();
+                finish();
             }
         });
     }
@@ -158,7 +166,7 @@ public class MenuActivity extends ActivityWithScreens {
             @Override
             public void onClick(View view) {
                 if(state != State.SERVER_READY) throw new RuntimeException();
-                gameStarter.startAsServer(them);
+                startAsServer(them);
             }
         };
     }
@@ -190,15 +198,59 @@ public class MenuActivity extends ActivityWithScreens {
             public void onClick(View view) {
                 if(state != State.NONE) throw new RuntimeException();
                 state = State.CLIENT_CONNECTING;
-                gameStarter.connectAsClient();
+                connectAsClient();
             }
         };
     }
 
     @Override
+    public void onMessage(ReceivedMessage rmsg) {
+        super.onMessage(rmsg);
+        if(rmsg.getMessage().getType() == Message.READY_MESSAGE) {
+            ReadyMessage msg = (ReadyMessage) rmsg.getMessage();
+            onReadyMessage(msg.getReady());
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        gameStarter.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDefeat(final String scoreString) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvResultTitle.setText("DEFEAT");
+                tvResultScore.setText(scoreString);
+                goToScreen(resultScreen);
+            }
+        });
+    }
+
+    @Override
+    protected void onVictory(final String scoreString) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvResultTitle.setText("VICTORY");
+                tvResultScore.setText(scoreString);
+                goToScreen(resultScreen);
+            }
+        });
+    }
+
+    @Override
+    protected void onTie(final String scoreString) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvResultTitle.setText("TIE");
+                tvResultScore.setText(scoreString);
+                goToScreen(resultScreen);
+            }
+        });
     }
 
     private View.OnClickListener makeBeServerListener() {
@@ -208,7 +260,7 @@ public class MenuActivity extends ActivityWithScreens {
                 if(state != State.NONE) throw new RuntimeException();
                 state = State.SERVER_WAITING;
                 goToScreen(serverScreen);
-                gameStarter.startServer();
+                startServer();
             }
         };
     }
@@ -228,7 +280,9 @@ public class MenuActivity extends ActivityWithScreens {
         super.onBackPressed();
     }
 
+    @Override
     public void onAccepted(final RemoteAbonent name) {
+        super.onAccepted(name);
         Log.d("hey", "menu onAccepted");
         if(state != State.SERVER_WAITING) throw new RuntimeException();
         state = State.SERVER_NOT_READY;
@@ -245,17 +299,19 @@ public class MenuActivity extends ActivityWithScreens {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        gameStarter.destruct();
+        destruct();
     }
 
 
+    @Override
     public void onConnectedFromBTList(final RemoteAbonent abonent) {
+        super.onConnectedFromBTList(abonent);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 them = abonent;
                 goToScreen(clientScreen);
-                if(state != State.CLIENT_CONNECTING) throw new RuntimeException();
+                if (state != State.CLIENT_CONNECTING) throw new RuntimeException();
                 state = State.CLIENT_NOT_READY;
                 tvReady.setText("Not ready");
             }

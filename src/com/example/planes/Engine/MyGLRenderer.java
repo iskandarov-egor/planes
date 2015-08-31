@@ -17,16 +17,17 @@ import javax.microedition.khronos.opengles.GL10;
 public final class MyGLRenderer implements GLSurfaceView.Renderer {
     private boolean isRunning = false;
     private final static int NANO_IN_SECOND = 1000000000;
-    private Engine engine;
+    private final Engine engine;
     public static int surfaceVersion = 0;
 
-    MyGLRenderer(Engine engine) {
+    MyGLRenderer(Engine engine, float pfps) {
         Log.d("hey", "MyGLRenderer called");
         this.engine = engine;
+        setPhysicsFPS(pfps);
     }
 
     public void setGraphicsFPS(float fps) {
-        graphStepTime = (long)(NANO_IN_SECOND / fps);
+
     }
 
     public void setPhysicsFPS(float fps) {
@@ -44,64 +45,57 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private long last = 0;
     private long physStepTime;
-    private long graphStepTime;
-    private int maxGraphBunch = 0;
-    private int maxPhysBunch = 0;
-    public void run1(){
-        if(true) throw new RuntimeException();
-        //debug
-        if(isRunning) throw new RuntimeException("already running");
 
-
-
-
-
-        fpsLastSpam = System.currentTimeMillis();
-        gfpsCount = 0;
-        pfpsCount = 0;
-        gfpsSum = 0;
-        pfpsSum = 0;
-        graphDt = 0;
-        physDt = 0;
-        endTime = 0;
+    public void runIfNotRunning(){
         last = System.nanoTime();
         isRunning = true;
     }
-    private int c = 0;
-    private boolean drawCalled = false; //debug
 
-    private float gfpsSum = 0;
-    private float pfpsSum = 0;
-    private long fpsSpamRate = 2000;
-    private long fpsLastSpam = 0;
-    private long graphDt = 0;
-    private long physDt = 0;
-    private long endTime = 0;
-    private int gfpsCount = 0;
-    private int pfpsCount = 0;
+    public static GameLoop1.FpsMeter gfpsMeter = new GameLoop1.FpsMeter();
+    public static GameLoop1.FpsMeter pfpsMeter = new GameLoop1.FpsMeter();
 
-    float maxdtt = 0;
-    float lastpos = 0;
-    boolean skipped = false;
-    boolean even = false;
-    public static GameLoop.FpsMeter gfpsMeter = new GameLoop.FpsMeter();
 
-    public void onDrawFrame(GL10 gl) { // todo queue future?
-        //if(Scene.sample != null) Scene.sample.onGraphicsFrame(60f);
+    public void onDrawFrame(GL10 gl) {
+        if(!isRunning) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            return;
+        }
+        long now = System.nanoTime();
+        final long dt = Math.min(NANO_IN_SECOND, (now - last));
+        last = now;
+        long physDt = dt;
+
+        int maxDiv = 3;
+        int count = 0;
+        while (physDt > physStepTime && count < maxDiv) {
+            physDt -= physStepTime;
+            pfpsMeter.before();
+            engine.onPhysicsFrame((float) NANO_IN_SECOND / physStepTime);
+            count++;
+        }
+        if (physDt != 0 && count < maxDiv) {
+            engine.onPhysicsFrame((float) NANO_IN_SECOND / physDt);
+            physDt = 0;
+        } else if (count == maxDiv) {
+            Log.d("PERF", "count == maxDiv!");
+            engine.onPhysicsFrame((float) NANO_IN_SECOND / physDt);
+            physDt = 0;
+        }
+
 
         gfpsMeter.before();
-        engine.onGraphicsGrame(60);
+        engine.onGraphicsGrame((float)NANO_IN_SECOND / dt);
         gfpsMeter.after();
 
-        GameLoop.lock = true;
+
+        if (GameLoop1.FpsMeter.ready()) {
+            float gr = gfpsMeter.result();
+
+            Log.d("PERF", "Pfps : " + String.valueOf(pfpsMeter.result()) + " Gfps : " + String.valueOf(gr));
+            Log.d("PERF", "MAX Pfps : " + String.valueOf(pfpsMeter.max()) + " MAX Gfps : " + String.valueOf(MyGLRenderer
+                    .gfpsMeter.max()));
+        }
     }
-    public void onDrawFrame1(GL10 gl) {
-
-    }
-
-
-
-
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         if(height <= 0 || width <= 0) return;
@@ -111,5 +105,14 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public boolean isRunning() {
         return isRunning;
+    }
+
+    public void run() {
+        if(isRunning()) throw new RuntimeException("already running");
+        runIfNotRunning();
+    }
+
+    public void pause() {
+        isRunning = false;
     }
 }

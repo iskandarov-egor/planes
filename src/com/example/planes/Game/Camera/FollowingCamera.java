@@ -11,7 +11,7 @@ import com.example.planes.Game.Models.Plane;
  */
 public class FollowingCamera extends Camera{
     private Plane plane = null;
-    private float distance = GameConfig.cameraDistance;
+    private float distance = GameConfig.maxCameraDistance;
     private float x, y;
     private float zoom = 1;
     private Viewport view;
@@ -31,16 +31,20 @@ public class FollowingCamera extends Camera{
         float vx = plane.getVx();
         float vy = plane.getVy();
         float v = (float) Math.hypot(vx, vy);
-        float dx = px + vx*distance/0.5f;
-        float dy = py + vy*distance/0.5f;
-        while(Math.abs(dx - x) > Math.abs(dx - x - period)) dx -= period;
-        while(Math.abs(dx - x) > Math.abs(dx - x + period)) dx += period;
+        float dx = px + vx*distance/Plane.velolim;
+        float dy = py + vy*distance/Plane.velolim; // todo make smooth
+
+//        while(Math.abs(dx - x) > Math.abs(dx - x - period)) dx -= period; clouds
+//        while(Math.abs(dx - x) > Math.abs(dx - x + period)) dx += period;
 
         x += (dx - x) * 2 / fps;
         y += (dy - y) * 2 / fps;
 
-        while(x > period/2) x -= period;
-        while(x < -period/2) x += period;
+        x = dx;
+        y = dy;
+
+//        while(x > period/2) x -= period; clouds
+//        while(x < -period/2) x += period;
 
 
         float bottom = (-1 + y)*zoom;

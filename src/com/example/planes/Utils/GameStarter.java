@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import com.example.planes.Communication.Connector;
 import com.example.planes.Communication.ConnectorListener;
@@ -14,9 +15,7 @@ import com.example.planes.Communication.Message.StartGameMessage;
 import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
-import com.example.planes.Interface.MenuActivity;
-import com.example.planes.Interface.MyActivity;
-import com.example.planes.Interface.ListBTActivity;
+import com.example.planes.Interface.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -25,14 +24,15 @@ import java.util.Queue;
 /**
  * Created by egor on 21.08.15.
  */
-public class GameStarter implements ConnectorListener, MessageListener {
-    private final MenuActivity activity;
+public abstract class GameStarter extends LoggedActivity implements ConnectorListener, MessageListener {
 
     private Queue<Runnable> btRunnables = new ArrayDeque<>(4);
     private static final int REQUEST_ENABLE_BT = 2147048222;
+    private int myId = -1;
 
-    public GameStarter(MenuActivity activity) {
-        this.activity = activity;
+    public GameStarter(String loggedName) {
+        super(loggedName);
+        //this.activity = activity;
         connector = new Connector(this);
     }
 
@@ -41,7 +41,7 @@ public class GameStarter implements ConnectorListener, MessageListener {
             btRunnables.add(r);
             btRunnables.add(ifCancelled);
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             r.run();
         }
@@ -75,8 +75,8 @@ public class GameStarter implements ConnectorListener, MessageListener {
                         }
                     }
                 };
-                Intent i = new Intent(activity, ListBTActivity.class);
-                activity.startActivityForResult(i, REQUEST_OPPONENT);
+                Intent i = new Intent(that, ListBTActivity.class);
+                startActivityForResult(i, REQUEST_OPPONENT);
                 connector.startSearching();
             }
         }, new Runnable() {
@@ -88,13 +88,12 @@ public class GameStarter implements ConnectorListener, MessageListener {
     }
 
     public void startWithNoBT() {
-        GameConfig.type = GameConfig.TYPE_NO_BT;
         Log.d("hey", "testBT button clicked");
         ArrayList<RemoteAbonent> list = new ArrayList<RemoteAbonent>(0);
-        MyActivity.NewGame(list, 0);
-        Intent intent = new Intent(activity, MyActivity.class);
+        MyActivity.NewGame(list, 0, MyActivity.Type.NO_BT);
+        Intent intent = new Intent(this, MyActivity.class);
         Log.d("hey", "testBT button - intent");
-        activity.startActivity(intent);
+        startActivity(intent);
         Log.d("hey", "testBT button - start");
     }
 
@@ -113,9 +112,20 @@ public class GameStarter implements ConnectorListener, MessageListener {
         });
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_OPPONENT) {
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_GAME) {
+            int firstWins = data.getIntExtra("0", -1);
+            int secondWins = data.getIntExtra("1", -1);
+            if(firstWins == -1 || secondWins == -1) throw new RuntimeException();
+            int winnerId = (firstWins > secondWins) ? 0 : 1;
+            String scoreString = String.valueOf(firstWins) + " / " + String.valueOf(secondWins);
+            if (firstWins == secondWins) {
+                onTie(scoreString);
+            } else {
+                if(myId == winnerId) onVictory(scoreString);
+                else onDefeat(scoreString);
+            }
         }
         if(requestCode == REQUEST_ENABLE_BT) {
             if(resultCode == Activity.RESULT_OK) {
@@ -138,6 +148,12 @@ public class GameStarter implements ConnectorListener, MessageListener {
         }
     }
 
+    protected abstract void onDefeat(String scoreString);
+
+    protected abstract void onVictory(String scoreString);
+
+    protected abstract void onTie(String scoreString);
+
     public void destruct() {
         connector.destruct();
     }
@@ -146,10 +162,7 @@ public class GameStarter implements ConnectorListener, MessageListener {
     public void onAccepted(RemoteAbonent abonent) {
         Log.d("hey", "onaccepted");
         connector.stopAcceptingSafe();
-        activity.onAccepted(abonent);
         abonent.setListener(this);
-        //abonent.sendMessage(new StartGameMessage(1));
-        //startGame(abonent, 0);
     }
 
     @Override
@@ -158,34 +171,40 @@ public class GameStarter implements ConnectorListener, MessageListener {
         RemoteAbonent abonent = rmsg.getSender();
         switch (msg.getType()) {
             case Message.READY_MESSAGE:
-                activity.onReadyMessage(((ReadyMessage) msg).getReady());
+
                 break;
             case Message.START_GAME_MESSAGE:
                 startGame(abonent, ((StartGameMessage) msg).getYourId());
                 break;
+            case Message.LOADED_MESSAGE:
+                Log.d("hey", "got loadedMessage in starter");
+                MyActivity.opponentLoadedEarlier = true;
         }
     }
 
     @Override
-    public void onDisconnected() {
-        activity.onDisconnected();
-    }
+    public  abstract  void onDisconnected();
 
     public void startAsServer(RemoteAbonent abonent) {
         abonent.sendMessage(new StartGameMessage(1));
         startGame(abonent, 0);
     }
 
+    public static int REQUEST_GAME = 8473;
+
     private void startGame(RemoteAbonent abonent, int myId) {
-        GameConfig.type = GameConfig.TYPE_BT;
+        this.myId = myId;
+
 
         ArrayList<RemoteAbonent> them = new ArrayList<>(1);
         them.add(abonent);
-        MyActivity.NewGame(them, myId);
 
-        Intent intent = new Intent(activity, MyActivity.class);
 
-        activity.startActivity(intent);
+        MyActivity.NewGame(them, myId, (myId == 0) ? MyActivity.Type.SERVER : MyActivity.Type.CLIENT);
+
+        Intent intent = new Intent(this, MyActivity.class);
+
+        startActivityForResult(intent, REQUEST_GAME);
     }
 
     ArrayList<BluetoothDevice> foundDevices = new ArrayList<>(0);
@@ -200,11 +219,6 @@ public class GameStarter implements ConnectorListener, MessageListener {
             //listBTActivity.onFound(device);
             throw new RuntimeException();
         }
-//        String name = device.getName();
-//        if(name.equals( "planesbt")) {
-//            Log.d("hey", "onFound bt device name matched");
-//            connector.connectTo(device);
-//        }
     }
 
     @Override
@@ -234,7 +248,6 @@ public class GameStarter implements ConnectorListener, MessageListener {
     }
 
     public void onConnectedFromBTList(RemoteAbonent abonent) {
-        activity.onConnectedFromBTList(abonent);
         abonent.setListener(this);
     }
 }
