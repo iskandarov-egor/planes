@@ -1,6 +1,5 @@
 package com.example.planes.Game.Models;
 
-import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Scene.Scene;
 import com.example.planes.Engine.Scene.SceneObject;

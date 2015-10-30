@@ -2,6 +2,7 @@ package com.example.planes.Communication;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 import com.example.planes.Communication.Message.Message;
 import com.example.planes.Communication.Message.ReceivedMessage;
 
@@ -14,6 +15,7 @@ public class RemoteAbonent {
     private BluetoothSocket socket;
     private ConnectedThread thread;
     private MessageListener listener;
+
 
 
     public RemoteAbonent(BluetoothSocket socket) {
@@ -46,7 +48,7 @@ public class RemoteAbonent {
 
     private final RemoteAbonent that = this;
 
-    public void onDestruct() {
+    public void onDestruct() { // todo
         if(thread == null) throw new RuntimeException("что то не так");
         thread.cancel();
         thread = null;
@@ -57,7 +59,11 @@ public class RemoteAbonent {
     }
 
     public void onDisconnect() {
+        Log.d("heyhey", "everyday");
         listener.onDisconnected();
     }
 
+    public void disconnect() {
+        thread.cancel();
+    }
 }

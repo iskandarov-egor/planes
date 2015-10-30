@@ -1,5 +1,6 @@
 package com.example.planes.Engine.Scene;
 
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.util.Log;
 import com.example.planes.Engine.Engine;
@@ -30,13 +31,10 @@ public final class Scene {
         sample = this;
     }
 
-    public void setBackgroundColor(float R, float G, float B) {
-        Utils.assertColor(R, G, B);
-
-        backgroundColor[0] = R;
-        backgroundColor[1] = G;
-        backgroundColor[2] = B;
-
+    public void setBackgroundColor(int color) {
+        backgroundColor[0] = Color.red(color) / 255f;
+        backgroundColor[1] = Color.green(color) / 255f;
+        backgroundColor[2] = Color.blue(color) / 255f;
     }
 
     public CollisionManager getCollisionManager() {
@@ -70,6 +68,7 @@ public final class Scene {
 
         float halfHeight = viewport.getHalfHeight();
         float halfWidth = viewport.getHalfWidth();
+        setCanModifyObjects(false);
         for(SceneObject object : objects) {
             object.onGraphicsFrame(graphicsFPS);
             if(!object.getVisible()) continue;
@@ -102,6 +101,7 @@ public final class Scene {
             sticker.onGraphicsFrame(graphicsFPS);
             if(sticker.getVisible()) sticker.draw(viewport.ratioMatrix);
         }
+        setCanModifyObjects(true);
     }
 
 //    float x = -1.6f;
@@ -197,7 +197,7 @@ public final class Scene {
 
     public SceneObject createObject(float x, float y, float height) {
         SceneObject object = new SceneObject(x, y, this, height);
-        objects.add(object);
+        addObject(object);
         return object;
     }
 

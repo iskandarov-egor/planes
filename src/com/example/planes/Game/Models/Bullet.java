@@ -15,8 +15,8 @@ public class Bullet extends GameObject {
         super(scene, x, y, speed, angle, BmpConfig.bulletHeight);
         setSprite(new StaticSprite(R.drawable.but));
         setBody(new Point());
-        normDrag = 0.004f*60;
-        tanDrag = 0.004f*60;
+        setNormDrag(0.004f*60);
+        setTanDrag(0.004f*60);
     }
 
     private float distTravelled = 0;

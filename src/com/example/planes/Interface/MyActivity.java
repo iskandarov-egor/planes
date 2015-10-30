@@ -10,13 +10,16 @@ import com.example.planes.Config.GameConfig;
 import com.example.planes.Engine.Engine;
 import com.example.planes.Game.Models.Player;
 import com.example.planes.Game.Round;
+import com.example.planes.R;
 
 import java.util.ArrayList;
 
 public class MyActivity extends LoggedActivity {
-    public static boolean disconnectedBeforeCreation;
-    public static boolean opponentLoadedEarlier;
 
+    public static boolean opponentLoadedEarlier;
+    public static final String GAME_END_STATUS = "status";
+    public static final int END_STATUS_DISCONNECTED = 2;
+    public static final int END_STATUS_LEFT = 3;
     private Engine engine;
     private int roundNumber = 0;
     private Round currentRound = null;
@@ -33,7 +36,6 @@ public class MyActivity extends LoggedActivity {
     public static void NewGame(ArrayList<RemoteAbonent> otherPlayers, int playerId, Type type) {
         Log.d("hey", "static NewGame");
         MyActivity.type = type;
-        disconnectedBeforeCreation = false;
         opponentLoadedEarlier = false;
         MyActivity.playerId = playerId;
         players.clear();
@@ -52,7 +54,6 @@ public class MyActivity extends LoggedActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
-        if(disconnectedBeforeCreation) onDisconnected();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -109,10 +110,21 @@ public class MyActivity extends LoggedActivity {
 
     public static void onDisconnected() {
         if(activity == null) {
-            MyActivity.disconnectedBeforeCreation = true;
+
         } else {
+            Intent intent = new Intent();
+            intent.putExtra(GAME_END_STATUS, END_STATUS_DISCONNECTED);
+            activity.setResult(RESULT_OK, intent);
             activity.finish();
-            DialogHelper.showOKDialog(activity, "", "Connection was lost");
+
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(GAME_END_STATUS, END_STATUS_LEFT);
+        activity.setResult(RESULT_OK, intent);
+        activity.finish();
     }
 }

@@ -16,6 +16,7 @@ import com.example.planes.Communication.MessageListener;
 import com.example.planes.Communication.RemoteAbonent;
 import com.example.planes.Config.GameConfig;
 import com.example.planes.Interface.*;
+import com.example.planes.R;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
     final int REQUEST_OPPONENT = 4354665;
     ListBTActivity listBTActivity = null;
     GameStarter that = this;
-    public void connectAsClient() {
+    public void startAsClient() {
         doWithBT(new Runnable() {
             @Override
             public void run() {
@@ -59,22 +60,24 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
                 listBTActivity = null;
                 onFinishedDiscovery = false;
                 foundDevices.clear();
-                ListBTActivity.onCreateListener = new ListBTActivity.OnCreateListener() {
-                    @Override
-                    public void onCreate(ListBTActivity act) {
-                        listBTActivity = act;
-                        connector.setListener(act);
-                        ListBTActivity.starter = that;
-                        if(!foundDevices.isEmpty()) {
-                            for(BluetoothDevice device : foundDevices) {
-                                listBTActivity.onFound(device);
-                            }
-                        }
-                        if(onFinishedDiscovery) {
-                            listBTActivity.onFinishedDiscovery();
-                        }
-                    }
-                };
+                ListBTActivity.starter = that;
+//                ListBTActivity.onCreateListener = new ListBTActivity.OnCreateListener() {
+//                    @Override
+//                    public void onCreate(ListBTActivity act) {
+//                        listBTActivity = act;
+//                        connector.setListener(act);
+//
+//                        if(!foundDevices.isEmpty()) {
+//                            for(BluetoothDevice device : foundDevices) {
+//                                listBTActivity.onFound(device);
+//                            }
+//                        }
+//                        if(onFinishedDiscovery) {
+//                            listBTActivity.onFinishedDiscovery();
+//                        }
+//                    }
+//                };
+                themChosen = false;
                 Intent i = new Intent(that, ListBTActivity.class);
                 startActivityForResult(i, REQUEST_OPPONENT);
                 connector.startSearching();
@@ -97,7 +100,7 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
         Log.d("hey", "testBT button - start");
     }
 
-    public void startServer() {
+    public void startAsServer() {
         doWithBT(new Runnable() {
             @Override
             public void run() {
@@ -114,17 +117,27 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_OPPONENT) {
+            connector.stopSearchingSafe();
+        }
         if(requestCode == REQUEST_GAME) {
-            int firstWins = data.getIntExtra("0", -1);
-            int secondWins = data.getIntExtra("1", -1);
-            if(firstWins == -1 || secondWins == -1) throw new RuntimeException();
-            int winnerId = (firstWins > secondWins) ? 0 : 1;
-            String scoreString = String.valueOf(firstWins) + " / " + String.valueOf(secondWins);
-            if (firstWins == secondWins) {
-                onTie(scoreString);
+            int status = data.getIntExtra(MyActivity.GAME_END_STATUS, -1);
+            if (status == MyActivity.END_STATUS_DISCONNECTED) {
+                onDisconnected();
+            } else if (status == MyActivity.END_STATUS_LEFT) {
+                onLeftGame();
             } else {
-                if(myId == winnerId) onVictory(scoreString);
-                else onDefeat(scoreString);
+                int firstWins = data.getIntExtra("0", -1);
+                int secondWins = data.getIntExtra("1", -1);
+                if (firstWins == -1 || secondWins == -1) throw new RuntimeException();
+                int winnerId = (firstWins > secondWins) ? 0 : 1;
+                String scoreString = String.valueOf(firstWins) + " / " + String.valueOf(secondWins);
+                if (firstWins == secondWins) {
+                    onTie(scoreString);
+                } else {
+                    if (myId == winnerId) onVictory(scoreString);
+                    else onDefeat(scoreString);
+                }
             }
         }
         if(requestCode == REQUEST_ENABLE_BT) {
@@ -153,6 +166,8 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
     protected abstract void onVictory(String scoreString);
 
     protected abstract void onTie(String scoreString);
+
+    protected abstract void onLeftGame();
 
     public void destruct() {
         connector.destruct();
@@ -185,7 +200,7 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
     @Override
     public  abstract  void onDisconnected();
 
-    public void startAsServer(RemoteAbonent abonent) {
+    public void startAsServerWith(RemoteAbonent abonent) {
         abonent.sendMessage(new StartGameMessage(1));
         startGame(abonent, 0);
     }
@@ -247,7 +262,11 @@ public abstract class GameStarter extends LoggedActivity implements ConnectorLis
         return connector;
     }
 
+    boolean themChosen = false;
     public void onConnectedFromBTList(RemoteAbonent abonent) {
+        themChosen = true;
         abonent.setListener(this);
     }
+
+
 }

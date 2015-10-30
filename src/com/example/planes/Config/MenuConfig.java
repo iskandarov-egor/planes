@@ -11,6 +11,8 @@ public class MenuConfig {
     public static final int SKY_COLOR = Color.parseColor("#ffabd5fb");
     public static final float FONT_SIZE_MID = 77;
     public static final float FONT_SIZE_SMALL = 45;
+    public static final float FONT_SIZE_HUGE = 142f;
+    public static final float FONT_SIZE_BIG = 94;
     public static int DARK_BROWN = Color.parseColor("#423e2c");
     public static Typeface MAIN_FONT = Typeface.createFromAsset(MyApplication.get().getAssets(), "fonts/expressway rg.ttf");
 }

@@ -13,6 +13,7 @@ class ConnectedThread extends Thread {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         private final RemoteAbonent abonent;
+        private volatile boolean cancelled = false;
 
         public ConnectedThread(BluetoothSocket socket, RemoteAbonent abon) {
             abonent = abon;
@@ -48,7 +49,7 @@ class ConnectedThread extends Thread {
                     //        .sendToTarget();
                 } catch (IOException e) {
                     Log.d("hey", "bt disconnected exc");
-                    abonent.onDisconnect();
+                    if(!cancelled) abonent.onDisconnect();
                     //connectionLost();
                     // Start the service over to restart listening mode
 
@@ -75,7 +76,9 @@ class ConnectedThread extends Thread {
         }
 
         public void cancel() {
+            if (cancelled) return;
             try {
+                cancelled = true;
                 mmSocket.close();
             } catch (IOException e) {
                 Log.e("error", "close() of connect socket failed", e);

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">planes</string>
+    <string name="GAME_END_STATUS">status</string>
+    <string name="END_STATUS_DISCONNECTED">disconnected</string>
 </resources>

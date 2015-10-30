@@ -3,6 +3,7 @@ package com.example.planes.Game.Models;
 import android.util.Log;
 import com.example.planes.Config.BmpConfig;
 import com.example.planes.Config.GameConfig;
+import com.example.planes.Engine.Body.ComplexPolygon;
 import com.example.planes.Engine.Scene.*;
 import com.example.planes.Engine.Utils;
 import com.example.planes.Game.Round;
@@ -14,10 +15,10 @@ import com.example.planes.Utils.MathHelper;
  */
 public class Plane extends GameObject {
 
-    private float acc = k*0.050f*60*60;
+    private static float acc = 1f / 60f;//k*0.050f*60*60;
     private float dirVel = 0.033f * 60;
-    private float lift = 0.015f*60;
-    public static float velolim = 5f*60;
+    private float lift = 0.005f*60;
+    public static float velolim = 1f;
     private boolean engineOn = false;
     private boolean alive = true;
 
@@ -37,19 +38,22 @@ public class Plane extends GameObject {
     private Player player;
     private float health = GameConfig.planeHealth;
 
+    static float tanDrag = 2*0.011f*5/60f;
+    static float normDrag = 5*0.011f*5/60f;
+
     public Plane(Scene scene, float x, float y, float speed, float angle) {
         super(scene, x, y, speed, angle, BmpConfig.planeHeight);
 
-        tanDrag = 2*0.009f*60;
-        normDrag = 4*0.008f*60;
+        setTanDrag(tanDrag);
+        setNormDrag(normDrag);
         setSprite(new StaticSprite(R.drawable.plane_stub));
 
-//        ComplexPolygon poly = new ComplexPolygon(Config.planePolyX[0], Config.planePolyY[0]);
-//        for(int i = 1; i < Config.planePolyX.length; i++) {
-//            poly.addSimplePolygon(Config.planePolyX[i], Config.planePolyY[i]);
-//        }
-        //setBody(poly);
-        setBody(0.1f);
+        ComplexPolygon poly = new ComplexPolygon(BmpConfig.planePolyX[0], BmpConfig.planePolyY[0]);
+        for(int i = 1; i < BmpConfig.planePolyX.length; i++) {
+            poly.addSimplePolygon(BmpConfig.planePolyX[i], BmpConfig.planePolyY[i]);
+        }
+        setBody(poly);
+        //setBody(0.1f);
         setCustomGroundPhys(true);
         SceneObject propeller = new SceneObject(0.25f, 0, scene, 0.1f);
         propeller.setParent(this);
@@ -118,10 +122,15 @@ public class Plane extends GameObject {
 
         float vx1 = 0;
         float vy1 = 0;
-        if(alive && engineOn && getY() < GameConfig.worldCeiling) {
+        if(alive && engineOn) {
             float k = Math.max(0, 1 - v / velolim);
-            vx1 = (float) (k*acc *  Math.cos(angle)) / fps;
-            vy1 = (float) (k*acc * Math.sin(angle)) / fps;
+            k = tanDrag - acc / velolim;
+            float reala = k*v + acc;
+            vx1 = (float) (reala * Math.cos(angle));
+            vy1 = (float) (reala * Math.sin(angle));
+        }
+        if(getY() > GameConfig.worldCeiling && vy1 > 0) {
+            vy1 = 0;
         }
 //        setVx(vx);
 //        setVy(vy);
@@ -134,8 +143,10 @@ public class Plane extends GameObject {
 
         float lift = this.lift*(Math.abs(tanV)) / fps;
 
-        vx = MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (speed * Math.cos(angle)));
-        vy = MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (speed * Math.sin(angle)));
+        vx1 += MathHelper.pullToX(vx, (float)Math.abs(Math.sin(angle) * lift), (float) (speed * Math.cos(angle))) -
+        vx;
+        vy1 += MathHelper.pullToX(vy, (float)Math.abs(Math.cos(angle) * lift), (float) (speed * Math.sin(angle))) -
+        vy;
 //        setVx(vx);
 //        setVy(vy);
 
@@ -179,8 +190,13 @@ public class Plane extends GameObject {
 
     private float angleVelFunc(float v, float fps) {
         float resist = 0.3f;
-        float maxV = 1 / (1 / this.velolim + this.tanDrag / this.acc);
+        float maxV = getMaxV();
         return dirVel*(1-Math.min(resist, resist*(Math.abs(v)/maxV))) / fps;
+    }
+
+    public static float getMaxV() {
+        //return 1 / (1 / velolim + tanDrag / acc);
+        return velolim;
     }
 
     private float angleVelFunc2(float v, float fps) {

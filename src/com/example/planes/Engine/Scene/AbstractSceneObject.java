@@ -201,4 +201,12 @@ abstract class AbstractSceneObject {
 
 
     }
+
+    public void setDx(float dx) {
+        this.dx = dx;
+    }
+
+    public void setDy(float dy) {
+        this.dy = dy;
+    }
 }

@@ -49,8 +49,9 @@ public final class Engine {
     }
 
     public void onGraphicsGrame(float graphicsFPS) {
-        scene.onGraphicsFrame(graphicsFPS);
         if(listener != null) listener.onGraphicsFrame(graphicsFPS);
+        scene.onGraphicsFrame(graphicsFPS);
+
 
         //process touch events
         Event e = touchQueue.poll();

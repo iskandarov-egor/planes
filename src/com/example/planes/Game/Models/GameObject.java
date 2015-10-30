@@ -8,15 +8,15 @@ import com.example.planes.Utils.MathHelper;
 /**
  * Created by egor on 29.07.15.
  */
-public abstract class GameObject extends SceneObject{
+public abstract class GameObject extends SceneObject {
     protected static float planesInUnit = 3.23383084577f;
     protected static float planesInPixel = 1f/44f;
     protected static float k = planesInPixel/planesInUnit;//0.002666f;
-    private static final float g = k*0.02f *60*60;
+    private static final float g = k*0.005f *60*60;
     protected float vx;
     protected float vy;
-    protected float tanDrag = 0.008f*60;
-    protected float normDrag = 2*0.008f*60;
+    private float tanDrag = 2*0.011f*5/60f;
+    private float normDrag = tanDrag;
     private float angle = 0;
     private boolean customGroundPhys = false;
 
@@ -31,6 +31,14 @@ public abstract class GameObject extends SceneObject{
 
     public float getVy() {
         return vy;
+    }
+
+    public void setNormDrag(float normDrag) {
+        this.normDrag = normDrag;
+    }
+
+    public void setTanDrag(float tanDrag) {
+        this.tanDrag = tanDrag;
     }
 
     public void setCustomGroundPhys(boolean customGroundPhys) {
@@ -48,8 +56,8 @@ public abstract class GameObject extends SceneObject{
     protected void applyDrag(float physicsFPS) {
         float vtan = (float) (vx*Math.cos(angle) + vy*Math.sin(angle));
         float vnorm = (float) (vy*Math.cos(angle)-vx*Math.sin(angle));
-        vtan = MathHelper.pullToX(vtan, Math.abs(tanDrag  * vtan/ physicsFPS), 0);
-        vnorm = MathHelper.pullToX(vnorm, Math.abs(normDrag  * vnorm/ physicsFPS), 0);
+        vtan = MathHelper.pullToX(vtan, Math.abs(tanDrag  * vtan), 0);
+        vnorm = MathHelper.pullToX(vnorm, Math.abs(normDrag  * vnorm), 0);
         vx = (float) (vtan*Math.cos(angle) - vnorm*Math.sin(angle));
         vy = (float) (vnorm*Math.cos(angle) + vtan*Math.sin(angle));
     }

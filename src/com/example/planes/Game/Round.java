@@ -23,7 +23,6 @@ import java.util.List;
  * Created by egor on 12.07.15.
  */
 public class Round implements EngineEventsListener {
-
     private Camera camera;
     private Plane myPlane;
     private List<Plane> planes = new ArrayList<>();
@@ -48,10 +47,6 @@ public class Round implements EngineEventsListener {
 
     public BTMessageListener getMessageListener() {
         return messageListener;
-    }
-
-    public int getMyId() {
-        return myId;
     }
 
     private final int roundNumber;
@@ -82,7 +77,7 @@ public class Round implements EngineEventsListener {
         Engine engine = activity.getEngine();
         final Scene scene = engine.newScene();
         scene.setPeriod(GameConfig.worldPeriod);
-        scene.setBackgroundColor(0, 0, 1);
+        scene.setBackgroundColor(GameConfig.skyColor);
         msgScore = new StickerText(engine.getScene(), 0, 0.5f, 0.1f);
 
 
@@ -162,6 +157,7 @@ public class Round implements EngineEventsListener {
                 if (seconds == 1) {
                     controls.unlock();
                     msgScore.setVisible(false);
+                    //killPlaneIfAlive(planes.get(0));
                 } else {
                     setCountdownTimer(seconds - 1);
                 }
@@ -257,6 +253,7 @@ public class Round implements EngineEventsListener {
     private void killPlaneIfAlive(Plane plane) {
         if(GameConfig.immortality) return;
         if(!plane.getAlive()) return;
+        Log.d("hey", "Plane " + String.valueOf(planes.indexOf(plane)) + " dead");
         plane.die();
         deadCount++;
         int numPlayers = getNumPlayers();
@@ -306,10 +303,14 @@ public class Round implements EngineEventsListener {
 
     private void placePlanes() {
         float w = getScene().getWorldWidth();
-        for (int i = 0; i < numPlayers; i++) {
-            float x = (numPlayers == 1)?0:-w / 2 + w * 0.1f + 0.8f * w * i / (numPlayers - 1);
-            Plane plane = planes.get(i);
-            plane.setXY(x, 0);// getGroundLevel()
+        float period = w / numPlayers;
+        Plane plane = planes.get(0);
+        plane.setXY(0, 1);
+        plane.stopEngine();
+        for (int i = 1; i < numPlayers; i++) {
+            plane = planes.get(i);
+            plane.setXY(i * period, 1);
+            // getGroundLevel()
             //+ plane.getH() * 0.5f - plane.getDy());
             plane.stopEngine();
         }

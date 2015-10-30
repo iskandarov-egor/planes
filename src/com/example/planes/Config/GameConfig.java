@@ -1,5 +1,7 @@
 package com.example.planes.Config;
 
+import android.graphics.Color;
+
 /**
  * Created by egor on 02.07.15.
  */
@@ -37,5 +39,6 @@ public class GameConfig {
     public static final float bulletPath = worldPeriod;
     public static final float planeHealth = 3;
     public static final boolean immortality = false;
-    public static final float maxCameraDistance = 1;
+    public static final float maxCameraDistance = 0.5f;
+    public static final int skyColor = Color.parseColor("#abd5fb");
 }

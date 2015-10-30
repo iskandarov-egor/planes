@@ -35,8 +35,8 @@ public class Connector {
 
     public void startAccepting() {
         if(isAccepting()) {
-            //stopAccepting();
-            throw new RuntimeException("already accepting");  //debug
+            stopAccepting();
+
         }
         if(isSearching()) {
             stopSearching();
@@ -108,7 +108,7 @@ public class Connector {
     }
 
     private AcceptThread getAcceptThread() {
-        if(acceptThread == null) {
+        if(acceptThread == null || acceptThread.getState() == Thread.State.TERMINATED) {
             acceptThread = new AcceptThread(this);
         }
         return acceptThread;

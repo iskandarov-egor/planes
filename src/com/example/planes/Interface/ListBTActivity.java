@@ -23,8 +23,7 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
     ArrayList<Device> list = new ArrayList<>();
     ListView lv;
     Button bRepeat;
-    //public static SelectOpponentActivity instance;
-    public static OnCreateListener onCreateListener;
+    //public static OnCreateListener onCreateListener;
     public static GameStarter starter = null;
 
     public ListBTActivity() {
@@ -35,8 +34,6 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        if(instance != null) throw new RuntimeException();
-//        instance = this;
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
 
         setContentView(R.layout.bt_list);
@@ -50,13 +47,14 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
         lv.setOnItemClickListener(makeListItemListener());
         notFound.setVisibility(View.GONE);
         bRepeat.setVisibility(View.GONE);
-        if(onCreateListener == null) throw new RuntimeException();
+//        if(onCreateListener == null) throw new RuntimeException();
 
 
         bRepeat.setOnClickListener(makeRepeatListener());
 
-        if(starter != null) throw new RuntimeException("case not implemented yet");
-        onCreateListener.onCreate(this);
+        //if(starter != null) throw new RuntimeException("case not implemented yet");
+//        onCreateListener.onCreate(this);
+        starter.getConnector().setListener(this);
         if(starter == null) throw new RuntimeException("set starter in oncreate!");
     }
 
@@ -82,11 +80,16 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
     }
 
     private void startDiscovery() {
-        bRepeat.setVisibility(View.GONE);
-        adapter.clear();
-        starter.getConnector().startSearching();
-        tv.setText("Discovering devices...");
-        notFound.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bRepeat.setVisibility(View.GONE);
+                adapter.clear();
+                starter.getConnector().startSearching();
+                tv.setText("Discovering devices...");
+                notFound.setVisibility(View.GONE);
+            }
+        });
     }
 
     private View.OnClickListener makeRepeatListener() {
@@ -110,8 +113,9 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
     @Override
     public void onConnected(RemoteAbonent abonent) {
         progressDialog.dismiss();
-        finish();
         starter.onConnectedFromBTList(abonent);
+        finish();
+
     }
 
     String chosenName = null; //debug
@@ -135,6 +139,11 @@ public class ListBTActivity extends LoggedActivity implements ConnectorListener{
 
     public static interface OnCreateListener {
         void onCreate(ListBTActivity act);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private static class Device {
