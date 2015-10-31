@@ -116,7 +116,7 @@ public class StickerText {
             int pw = (int)widths[idx];
             bitmap = Bitmap.createBitmap(pw, ph, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            bitmap.eraseColor(Color.YELLOW);
+            bitmap.eraseColor(Color.TRANSPARENT);
             canvas.drawText(String.valueOf(text.charAt(idx)), 0, -metrics.ascent, paint);
             map.put(pair, bitmap);
         }

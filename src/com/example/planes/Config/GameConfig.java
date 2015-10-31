@@ -6,7 +6,7 @@ import android.graphics.Color;
  * Created by egor on 02.07.15.
  */
 public class GameConfig {
-    public static final int ROUND_COUNT = 1;
+    public static final int ROUND_COUNT = 3;
     public static final int WORLD_WIDTH = 2222;
     public static final int WORLD_HEIGHT = 1111;
     public static final int FPS = 60;

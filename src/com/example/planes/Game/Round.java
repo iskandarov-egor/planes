@@ -78,7 +78,7 @@ public class Round implements EngineEventsListener {
         final Scene scene = engine.newScene();
         scene.setPeriod(GameConfig.worldPeriod);
         scene.setBackgroundColor(GameConfig.skyColor);
-        msgScore = new StickerText(engine.getScene(), 0, 0.5f, 0.1f);
+        msgScore = new StickerText(engine.getScene(), 0, 0.5f, 0.2f);
 
 
         Spawner spawner = new Spawner(this);
@@ -305,11 +305,11 @@ public class Round implements EngineEventsListener {
         float w = getScene().getWorldWidth();
         float period = w / numPlayers;
         Plane plane = planes.get(0);
-        plane.setXY(0, 1);
+        plane.setXY(0, getGroundLevel() + 0.2f);
         plane.stopEngine();
         for (int i = 1; i < numPlayers; i++) {
             plane = planes.get(i);
-            plane.setXY(i * period, 1);
+            plane.setXY(i * period, getGroundLevel() + 0.2f);
             // getGroundLevel()
             //+ plane.getH() * 0.5f - plane.getDy());
             plane.stopEngine();

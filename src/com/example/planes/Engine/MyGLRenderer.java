@@ -19,15 +19,16 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
     private final static int NANO_IN_SECOND = 1000000000;
     private final Engine engine;
     public static int surfaceVersion = 0;
+    private long graphStepTime;
 
     MyGLRenderer(Engine engine, float pfps) {
         Log.d("hey", "MyGLRenderer called");
         this.engine = engine;
-        setPhysicsFPS(pfps);
+        setPhysicsFPS(60);
     }
 
     public void setGraphicsFPS(float fps) {
-
+        graphStepTime = (long)(NANO_IN_SECOND / fps);
     }
 
     public void setPhysicsFPS(float fps) {
@@ -51,8 +52,8 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
         isRunning = true;
     }
 
-    public static GameLoop1.FpsMeter gfpsMeter = new GameLoop1.FpsMeter();
-    public static GameLoop1.FpsMeter pfpsMeter = new GameLoop1.FpsMeter();
+    public static FpsMeter gfpsMeter = new FpsMeter();
+    public static FpsMeter pfpsMeter = new FpsMeter();
 
 
     public void onDrawFrame(GL10 gl) {
@@ -63,32 +64,26 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
         long now = System.nanoTime();
         final long dt = Math.min(NANO_IN_SECOND, (now - last));
         last = now;
-        long physDt = dt;
 
-        int maxDiv = 3;
-        int count = 0;
-        while (physDt > physStepTime && count < maxDiv) {
-            physDt -= physStepTime;
-            pfpsMeter.before();
-            engine.onPhysicsFrame((float) NANO_IN_SECOND / physStepTime);
-            count++;
-        }
-        if (physDt != 0 && count < maxDiv) {
-            engine.onPhysicsFrame((float) NANO_IN_SECOND / physDt);
-            physDt = 0;
-        } else if (count == maxDiv) {
-            Log.d("PERF", "count == maxDiv!");
-            engine.onPhysicsFrame((float) NANO_IN_SECOND / physDt);
-            physDt = 0;
-        }
+        pfpsMeter.before();
+        engine.onPhysicsFrame((float) NANO_IN_SECOND / physStepTime);
 
+        pfpsMeter.after();
+
+        if (dt < physStepTime) {
+            try {
+                Thread.sleep((long) (1000*((float)(physStepTime - dt)/NANO_IN_SECOND)));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
 
         gfpsMeter.before();
-        engine.onGraphicsGrame((float)NANO_IN_SECOND / dt);
+        engine.onGraphicsGrame((float) NANO_IN_SECOND / physStepTime);
         gfpsMeter.after();
 
-
-        if (GameLoop1.FpsMeter.ready()) {
+        if (FpsMeter.ready()) {
             float gr = gfpsMeter.result();
 
             Log.d("PERF", "Pfps : " + String.valueOf(pfpsMeter.result()) + " Gfps : " + String.valueOf(gr));
@@ -114,5 +109,43 @@ public final class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void pause() {
         isRunning = false;
+    }
+
+    static class FpsMeter {
+        private static long spamRate = 2000;
+        private static long lastSpam = 0;
+
+        private long _before;
+        private float sum;
+        private int count = 0;
+        private float _max = 0;
+
+        public void before() {
+            _before = System.nanoTime();
+        }
+
+        public void after() {
+            float dt = ( (float)(System.nanoTime() - _before) / NANO_IN_SECOND);
+            sum += dt;
+            if(dt > _max) _max = dt;
+            count++;
+        }
+
+        public static boolean ready() {
+            return System.currentTimeMillis() - lastSpam > spamRate;
+        }
+
+        public float result() {
+            float res = sum / (spamRate / 1000f);
+            sum = 0;
+            count = 0;
+            lastSpam = System.currentTimeMillis();
+            return res;
+        }
+        public float max() {
+            float res = _max;
+            _max = 0;
+            return res;
+        }
     }
 }
